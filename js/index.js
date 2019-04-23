@@ -221,8 +221,7 @@ function entrerDansParcelle(sonCode) {
 		function (data) {
 			data_parcelle = data;
 			data_parcelle.mutations[0].infos[0]['Date mutation'] = (new Date(data_parcelle.mutations[0].infos[0]['Date mutation'])).toLocaleDateString('fr-FR');
-			//console.log(data_parcelle.mutations[0].infos[0]['Date mutation']);
-
+			data_parcelle.mutations[0].infos[0]['Valeur fonciere'] = data_parcelle.mutations[0].infos[0]['Valeur fonciere'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
 			vue.parcelle = {
 				code: codeParcelle,
 				n_mutations: data_parcelle.nbMutations,
