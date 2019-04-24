@@ -38,7 +38,7 @@ Vue.component('boite-accordeon', {
 					<div v-if="vue.mutationIndex == index" style="background-color: #eee" class="mt-3">
 						<boite 
 							v-for="batiment in mutation.batiments" 
-							:valeur="(batiment['Code type local'] < 3) ? (batiment['Surface reelle bati'] + ' m²') : ''" 
+							:valeur="(batiment['Code type local'] != 3) ? (batiment['Surface reelle bati'] + ' m²') : ''" 
 							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['Code type local']]" 
 							:texte="batiment['Type local'] + ((batiment['Code type local'] < 3) ? (' / ' + batiment['Nombre pieces principales'] + ' p') : '')">
 						</boite>
@@ -519,7 +519,7 @@ function onDepartementClick(event) {
 		dateMin = start.format('DD-MM-YYYY');
 		dateMax = end.format('DD-MM-YYYY');
 		if (codeSection != null) {
-			chargerSection(codeSection);
+			entrerDansSection(codeSection);
 		}
 	});
 
