@@ -20,8 +20,8 @@ host = config[0][2]
 engine = create_engine('postgresql://%s:%s@%s/dvf'%(id, pwd, host))
 
 # Chargement des natures de culture
-cultures = pd.read_csv('TableNatureCulture.csv', sep = ";")
-culturesSpeciales = pd.read_csv('TableNatureSpeciale.csv', sep = ";")
+cultures = pd.read_csv('TableNatureCulture.csv')
+culturesSpeciales = pd.read_csv('TableNatureSpeciale.csv')
 
 @app.route('/api/dates')
 def dates():
