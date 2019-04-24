@@ -65,7 +65,7 @@ def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
 	mutations = mutations.merge(mutations[group_vars].drop_duplicates(group_vars).reset_index(), on=group_vars)
 	mutations = mutations.rename(index=str, columns={"index": "groupe"})
 	nbMutations = len(mutations.groupe.unique())
-	
+	print(mutations.to_json(orient = 'records', date_format='iso', date_unit='s'))
 	json_mutations = '{"donnees": ' + mutations.to_json(orient = 'records') + ', "nbMutations": ' + str(nbMutations) + '}'
 	
 	return json_mutations
