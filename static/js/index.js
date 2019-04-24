@@ -126,12 +126,14 @@ function exportCSV(el) {
 	var replacer = function(key, value) { return value === null ? '' : value } 
 	var csv = json.map(function(row){
 	  return fields.map(function(fieldName){
+		  if (fieldName == "Date mutation") {
+			 console.log(row[fieldName]) ;
+		  }
 		return JSON.stringify(row[fieldName], replacer)
 	  }).join(';')
 	})
 	csv.unshift(fields.join(';')); // add header column
 	csv = csv.join('\r\n');
-	console.log(csv)
 	
 	el.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(csv));
 	el.setAttribute("download", nom_fichier_section);
