@@ -2,10 +2,10 @@
 # Puis acceder au site sur localhost:5000
 
 from flask import Flask, request, send_from_directory, jsonify
-
 import json
 import pandas as pd
 from sqlalchemy import create_engine
+
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
@@ -16,7 +16,8 @@ app = Flask(__name__, static_url_path='')
 config = pd.read_csv('config.csv', header=None)
 id = config[0][0]
 pwd = config[0][1]
-engine = create_engine('postgresql://%s:%s@165.22.70.25/dvf'%(id, pwd))
+host = config[0][2]
+engine = create_engine('postgresql://%s:%s@%s/dvf'%(id, pwd, host))
 
 # Chargement des natures de culture
 cultures = pd.read_csv('TableNatureCulture.csv', sep = ";")
@@ -53,22 +54,17 @@ def send_donneesgeo(path):
 def send_cadastre(path):
 	return send_from_directory('static/cadastre', path)
 
-
-@app.route('/api/mutations/<commune>/<section>/from=<dateminimum>&to=<datemaximum>')
-def get_mutations(commune, section, dateminimum, datemaximum):
-	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE "Code INSEE" = %(code)s AND "Section" = %(section)s AND "Date mutation" >= %(datemin)s AND "Date mutation" <= %(datemax)s """, 
-															engine, 
-															params = {"code": commune, "section" : section, "datemin": dateminimum, "datemax": datemaximum}
-															)
-	
-	data_dvf = mutations.to_json(orient = 'records') # Pour le bouton télécharger les données
+@app.route('/api/mutations/<commune>/<sectionPrefixee>/from=<dateminimum>&to=<datemaximum>')
+def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
+	print("On récupère les mutations")
+	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE "Code INSEE" = %(code)s AND "Section prefixe" = %(sectionPrefixee)s AND "Date mutation" >= %(datemin)s AND "Date mutation" <= %(datemax)s """, engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee, "datemin": dateminimum, "datemax": datemaximum})
 	
 	group_vars = ['No disposition','Date mutation', 'Valeur fonciere']
 	mutations = mutations.merge(mutations[group_vars].drop_duplicates(group_vars).reset_index(), on=group_vars)
 	mutations = mutations.rename(index=str, columns={"index": "groupe"})
 	nbMutations = len(mutations.groupe.unique())
 	
-	json_mutations = '{"donnees": ' + mutations.to_json(orient = 'records') + ', "nbMutations": ' + str(nbMutations) + ', "data_dvf": ' + data_dvf +'}'
+	json_mutations = '{"donnees": ' + mutations.to_json(orient = 'records') + ', "nbMutations": ' + str(nbMutations) + '}'
 	
 	return json_mutations
 
