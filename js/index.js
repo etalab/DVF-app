@@ -228,8 +228,8 @@ function entrerDansParcelle(sonCode) {
 			
 			// Formattage des champs pour l'affichage
 			for (m = 0; m < data_parcelle.mutations.length; m++){
-				data_parcelle.mutations[m].infos[0]['Date mutation'] = (new Date(data_parcelle.mutations[0].infos[0]['Date mutation'])).toLocaleDateString('fr-FR');
-				data_parcelle.mutations[m].infos[0]['Valeur fonciere'] = data_parcelle.mutations[0].infos[0]['Valeur fonciere'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
+				data_parcelle.mutations[m].infos[0]['Date mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['Date mutation'])).toLocaleDateString('fr-FR');
+				data_parcelle.mutations[m].infos[0]['Valeur fonciere'] = data_parcelle.mutations[m].infos[0]['Valeur fonciere'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
 				
 				for (b = 0 ; b < data_parcelle.mutations[m].batiments.length; b++){
 					data_parcelle.mutations[m].batiments[b]['Surface reelle bati'] = data_parcelle.mutations[m].batiments[b]['Surface reelle bati'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');					
