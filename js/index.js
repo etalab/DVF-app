@@ -68,13 +68,12 @@ var vue = new Vue({
 		data: {
 			fold_left: false,
 			section: null,
-			parcelle: {
-				code: null
-			},
+			parcelle: null,
 			mutationIndex: null,
 		},
 		methods: {},
 	});
+
 
 // Partie JavaScript standard (sans framework) --------------------------------
 
@@ -90,9 +89,13 @@ var sectionsLayer = null;
 var parcellesLayer = null;
 var labelsSections = [];
 var data_dvf = null;
-var nom_fichier_section = null;
 
+var nom_fichier_section = null;
 var data_section = null;
+
+var dateMin = '01-01-2015';
+var dateMax = '01-01-2019';
+
 
 var dateMin = '01-01-2015';
 var dateMax = '01-01-2019';
@@ -115,18 +118,26 @@ $('.input-daterange input').each(function() {
     $(this).datepicker('clearDates');
 });
 
+
+function exportCSV(el) {
+	var json = data_dvf
+	var fields = Object.keys(json[0])
+	var replacer = function(key, value) { return value === null ? '' : value } 
+	var csv = json.map(function(row){
+	  return fields.map(function(fieldName){
+		return JSON.stringify(row[fieldName], replacer)
+	  }).join(';')
+	})
+	csv.unshift(fields.join(';')); // add header column
+	csv = csv.join('\r\n');
+	
+	el.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(csv));
+	el.setAttribute("download", nom_fichier_section);
+}
+	
+// Non utilisé	
 function exportJson(el) {
 	var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data_dvf));
-	
-	// const items = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data_dvf));
-	// const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here ;
-	// const header = Object.keys(items[0])
-	// let csv = items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
-	// csv.unshift(header.join(';'))
-	// csv = csv.join('\r\n')
-	// console.log(csv)
-
-
 	el.setAttribute("href", "data:"+data);
 	el.setAttribute("download", nom_fichier_section);    
 }
@@ -136,7 +147,6 @@ function selectionnerDepartement() {
 	var e = document.getElementById("departements");
 	var sonCode = e.options[e.selectedIndex].value;
 	entrerDansDepartement(sonCode);
-
 };
 
 function selectionnerCommune() {
@@ -161,7 +171,6 @@ function selectionnerParcelle() {
 }
 
 function onEachFeatureCommune(feature, layer) {
-	
 	layer.on({
 		click: onCityClicked
 	});
@@ -172,14 +181,14 @@ function onEachFeatureSection(feature, layer) {
 	var label = L.marker(layer.getBounds().getCenter(), {
 			icon: L.divIcon({
 				className: 'labelSection',
-				html: feature.properties.code,
+				html: (feature.properties.prefixe + feature.properties.code).replace(/^0+/, ''),
 			})
 		});
 	label.addTo(map);
 	labelsSections.push(label);
 	$('#sections').append($('<option />', {
-		value: feature.properties.code,
-		text: feature.properties.code
+		value: (feature.properties.prefixe + ('0' + feature.properties.code).slice(-2)),
+		text: (feature.properties.prefixe + ('0' + feature.properties.code).slice(-2)).replace(/^0+/, '')
 	}));
 	layer.on({
 		click: onSectionClicked
@@ -187,7 +196,6 @@ function onEachFeatureSection(feature, layer) {
 }
 
 function viderLabelsSections() {
-
 	for (label of labelsSections) {
 		map.removeLayer(label);
 	}
@@ -195,7 +203,6 @@ function viderLabelsSections() {
 }
 
 function onEachFeatureParcelle(feature, layer) {
-	
 	$('#parcelles').append($('<option />', {
 		value: feature.id,
 		text: feature.id
@@ -206,22 +213,32 @@ function onEachFeatureParcelle(feature, layer) {
 }
 
 function onParcelleClicked(event) {
-
 	sonCode = event.target.feature.id;
 	document.getElementById("parcelles").value = sonCode;
 	entrerDansParcelle(sonCode);
 }
 
 function entrerDansParcelle(sonCode) {
-	
 	codeParcelle = sonCode;
 	console.log("Parcelle sélectionnée : " + codeParcelle);
 	data_parcelle = null;
 	$.getJSON("api/parcelles/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-")  + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
 		function (data) {
 			data_parcelle = data;
-			data_parcelle.mutations[0].infos[0]['Date mutation'] = (new Date(data_parcelle.mutations[0].infos[0]['Date mutation'])).toLocaleDateString('fr-FR');
-			data_parcelle.mutations[0].infos[0]['Valeur fonciere'] = data_parcelle.mutations[0].infos[0]['Valeur fonciere'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
+			
+			// Formattage des champs pour l'affichage
+			for (m = 0; m < data_parcelle.mutations.length; m++){
+				data_parcelle.mutations[m].infos[0]['Date mutation'] = (new Date(data_parcelle.mutations[0].infos[0]['Date mutation'])).toLocaleDateString('fr-FR');
+				data_parcelle.mutations[m].infos[0]['Valeur fonciere'] = data_parcelle.mutations[0].infos[0]['Valeur fonciere'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
+				
+				for (b = 0 ; b < data_parcelle.mutations[m].batiments.length; b++){
+					data_parcelle.mutations[m].batiments[b]['Surface reelle bati'] = data_parcelle.mutations[m].batiments[b]['Surface reelle bati'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');					
+				}
+				for (ter = 0 ; ter < data_parcelle.mutations[m].terrains.length; ter++){
+					data_parcelle.mutations[m].terrains[ter]['Surface terrain'] = data_parcelle.mutations[m].terrains[ter]['Surface terrain'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');					
+				}
+			}
+
 			vue.parcelle = {
 				code: codeParcelle,
 				n_mutations: data_parcelle.nbMutations,
@@ -238,14 +255,12 @@ function entrerDansParcelle(sonCode) {
 }
 
 function onSectionClicked(event) {
-
-	sonCode = event.target.feature.properties.code;
+	sonCode = event.target.feature.properties.prefixe + ('0' + event.target.feature.properties.code).slice(-2);
 	document.getElementById("sections").value = sonCode;
 	entrerDansSection(sonCode);
 }
 
 function entrerDansMutation(sonIndex) {
-
 	vue.mutationIndex = sonIndex;
 	leCode = vue.parcelle.mutations.length > 0 ? vue.parcelle.mutations[0].infos[0]['Code parcelle'] : '';
 	codesParcelles = [];
@@ -291,6 +306,7 @@ function entrerDansSection(sonCode) {
 	console.log("Section sélectionnée : " + sonCode);
 	viderLabelsSections();
 	vue.parcelle = null;
+	console.log("api/mutations/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ) ;
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.when(
 		// Charge la couche géographique
@@ -303,13 +319,13 @@ function entrerDansSection(sonCode) {
 		$.getJSON("api/mutations/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
 			function (data) {
 				data_section = data;
-				data_dvf = data.data_dvf;
+				data_dvf = data.donnees;
 			}
 		)
 	).then(
 		// Une fois qu'on a la géographie et les mutations, on fait tout l'affichage
 		function () {
-			data_geo.features = data_geo.features.filter(e => (sonCode == e.properties.section));
+			data_geo.features = data_geo.features.filter(e => (sonCode == (e.properties.prefixe + ('0'+ e.properties.section).slice(-2))));
 			if (parcellesLayer != null) {
 				map.removeLayer(parcellesLayer);
 			}
@@ -341,12 +357,11 @@ function entrerDansSection(sonCode) {
 			}
 			parcellesLayer.addTo(map);
 			map.fitBounds(parcellesLayer.getBounds());
-			nom_fichier_section = codeCommune + '_' + sonCode + '.json';
+			nom_fichier_section = codeCommune + '_' + sonCode + '.csv';
 			vue.section = {
 				code: sonCode,
 				n_mutations: data_section.nbMutations,
 			};
-			
 		}
 	);
 }
@@ -376,6 +391,11 @@ function entrerDansCommune(sonCode) {
 			}
 			sectionsLayer.addTo(map);
 			map.fitBounds(sectionsLayer.getBounds());
+			
+			nom_fichier_commune = codeCommune + '.csv';
+			vue.commune = {
+				code: sonCode
+			};
 		}
 	);
 }
@@ -386,6 +406,7 @@ function entrerDansDepartement(sonCode) {
 	console.log('Nous entrons dans le département ' + codeDepartement);
 	viderLabelsSections();
 	vue.section = null;
+	vue.commune = null;
 	document.getElementById('communes').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
