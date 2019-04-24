@@ -59,6 +59,8 @@ def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
 	print("On récupère les mutations")
 	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE "Code INSEE" = %(code)s AND "Section prefixe" = %(sectionPrefixee)s AND "Date mutation" >= %(datemin)s AND "Date mutation" <= %(datemax)s """, engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee, "datemin": dateminimum, "datemax": datemaximum})
 	
+	mutations = mutations.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
+
 	group_vars = ['No disposition','Date mutation', 'Valeur fonciere']
 	mutations = mutations.merge(mutations[group_vars].drop_duplicates(group_vars).reset_index(), on=group_vars)
 	mutations = mutations.rename(index=str, columns={"index": "groupe"})
@@ -93,7 +95,6 @@ def get_parcelle(parcelle, dateminimum, datemaximum):
 		parcelle = mutations['Code parcelle'][0]
 		
 		infos = infos.to_json(orient = 'records')
-
 		
 		# Mutations liées
 		mutations_liees = pd.read_sql("""SELECT * FROM public.dvf WHERE "Date mutation" = %(date)s AND  "Code INSEE" = %(codeInsee)s AND  "Section" = %(section)s AND  "Valeur fonciere" = %(prix)s AND  "Code parcelle"<> %(parcelle)s;""", 
