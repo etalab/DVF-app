@@ -528,7 +528,7 @@ function onDepartementClick(event) {
 	});
 
 	// Chargement de la liste des départements
-	$.getJSON("donneesgeo/departements.json", 
+	$.getJSON("https://geo.api.gouv.fr/departements?fields=nom,code",
 		function (data) {
 			var $select = $('#departements');
 			$.each(data, function (i, val) {
@@ -541,7 +541,7 @@ function onDepartementClick(event) {
 	);
 
 	// Chargement des contours des départements
-	$.getJSON("donneesgeo/departements-100m.geojson",
+	$.getJSON("donneesgeo/departements-1000m.geojson",
 		function (data) {
 			departements = data;
 			departements.features.forEach(function (state) {
