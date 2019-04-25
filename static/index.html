@@ -21,10 +21,13 @@
 			<a class="active" href="#home">Demande de Valeur Foncière</a>
 			<a onclick="vue.fold_left = !vue.fold_left"><i class="fas fa-bars fa-1x"></i></a>
 			<div class="topnav-right">
-				<a href="https://github.com/marion-paclot/DVF">Code source</a>
+				<a href="https://github.com/marion-paclot/DVF">
+					Code<span class="long-text"> source</span>
+				</a>
 				<a href="#about">A propos</a>
-				<a href="https://framaforms.org/demande-de-valeur-fonciere-dvf-votre-avis-nous-interesse-1556111586">Votre avis nous intéresse</a>
-
+				<a href="https://framaforms.org/demande-de-valeur-fonciere-dvf-votre-avis-nous-interesse-1556111586">
+					Votre avis<span class="long-text"> nous intéresse<span>
+				</a>
 			</div>
 		</div>
 		<div id="app" class="wrapper">
@@ -72,6 +75,8 @@
 			</div>
 			
 			<div id="sidebar_right" class="container" v-if="parcelle != null && parcelle.mutations.length > 0">
+				<span onclick="sortirDeParcelle()" class="mt-2 mb-2 close-link">Fermer</span>
+				<br/>
 				<boite-accordeon  v-for="(mutation, index) in parcelle.mutations" :mutation="mutation" :key="mutation.infos[0]['Code parcelle'] + index" :index="index"></boite-accordeon>
 			</div>
 		</div>

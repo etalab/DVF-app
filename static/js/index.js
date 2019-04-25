@@ -254,6 +254,11 @@ function entrerDansParcelle(sonCode) {
 	);
 }
 
+function sortirDeParcelle() {
+	
+	entrerDansSection(codeSection);
+}
+
 function onSectionClicked(event) {
 	sonCode = event.target.feature.properties.prefixe + ('0' + event.target.feature.properties.code).slice(-2);
 	document.getElementById("sections").value = sonCode;
@@ -558,4 +563,9 @@ function onDepartementClick(event) {
 			$('#daterange').data('daterangepicker').setEndDate(dateMax);
 		}
 	);
+	
+	// Sur mobile, cacher la barre latérale
+	if (window.innerWidth < 768) {
+		vue.fold_left = true;
+	}
 })();

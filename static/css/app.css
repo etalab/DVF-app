@@ -9,6 +9,10 @@ th {
 	color: black;
 }
 
+@media (max-width: 768px) {
+    .long-text { display: none; }
+}
+
 .wrapper {
     width: 100%;
     min-height: calc(100vh - 49px);
@@ -57,6 +61,14 @@ th {
 	background-color: #005DA3;
 	border-color: #005DA3;
 	cursor: pointer;
+}
+
+.close-link {
+	float: right;
+	cursor: pointer;
+}
+.close-link:hover {
+	text-decoration: underline;
 }
 
 /* Barre de menu en haut */
