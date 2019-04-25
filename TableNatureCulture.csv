@@ -1,28 +1,28 @@
-Code Nature de Culture;Libellé Nature de Culture
-AB;Terrains à bâtir
-AG;Terrains d'agrément
-B;Bois
-BF;Futaies feuillues
-BM;Futaies mixtes
-BO;Oseraies
-BP;Peupleraies
-BR;Futaies résineuses
-BS;Taillis sous futaie
-BT;Taillis simples
-CA;Carrières
-CH;Chemin de fer
-E;Eaux
-J;Jardins
-L;Landes
-LB;Landes boisées
-P;Prés
-PA;Pâtures
-PC;Pacages
-PE;Prés d'embouche
-PH;Herbages
-PP;Prés plantes
-S;Sols
-T;Terres
-TP;Terres plantées
-VE;Vergers
-VI;Vignes
+Code Nature de Culture,Libellé Nature de Culture
+AB,Terrains à bâtir
+AG,Terrains d'agrément
+B,Bois
+BF,Futaies feuillues
+BM,Futaies mixtes
+BO,Oseraies
+BP,Peupleraies
+BR,Futaies résineuses
+BS,Taillis sous futaie
+BT,Taillis simples
+CA,Carrières
+CH,Chemin de fer
+E,Eaux
+J,Jardins
+L,Landes
+LB,Landes boisées
+P,Prés
+PA,Pâtures
+PC,Pacages
+PE,Prés d'embouche
+PH,Herbages
+PP,Prés plantes
+S,Sols
+T,Terres
+TP,Terres plantées
+VE,Vergers
+VI,Vignes
