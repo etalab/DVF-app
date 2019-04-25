@@ -314,7 +314,7 @@ function entrerDansSection(sonCode) {
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.when(
 		// Charge la couche géographique
-		$.getJSON("cadastre/" + codeDepartement + "/" + codeCommune + "/cadastre-" + codeCommune + "-parcelles.json",
+		$.getJSON("https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/" + codeCommune + "/geojson/parcelles",
 			function (data) {
 				data_geo = data;
 			}
@@ -379,7 +379,7 @@ function entrerDansCommune(sonCode) {
 	codeCommune = sonCode;
 	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
-	$.getJSON("cadastre/" + codeDepartement + "/" + codeCommune + "/cadastre-" + codeCommune + "-sections.json",
+	$.getJSON("https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/" + codeCommune + "/geojson/sections",
 		function (data) {
 			if (sectionsLayer != null) {
 				map.removeLayer(sectionsLayer);
