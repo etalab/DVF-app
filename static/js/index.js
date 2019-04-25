@@ -120,15 +120,11 @@ $('.input-daterange input').each(function() {
 
 
 function exportCSV(el) {
-	var json = data_dvf
-	console.log(data_dvf)
+	var json = data_dvf;
 	var fields = Object.keys(json[0])
 	var replacer = function(key, value) { return value === null ? '' : value } 
 	var csv = json.map(function(row){
 	  return fields.map(function(fieldName){
-		  if (fieldName == "Date mutation") {
-			 console.log(row[fieldName]) ;
-		  }
 		return JSON.stringify(row[fieldName], replacer)
 	  }).join(';')
 	})
@@ -310,7 +306,6 @@ function entrerDansSection(sonCode) {
 	console.log("Section sélectionnée : " + sonCode);
 	viderLabelsSections();
 	vue.parcelle = null;
-	console.log("api/mutations/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ) ;
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.when(
 		// Charge la couche géographique
