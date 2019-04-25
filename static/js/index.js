@@ -329,7 +329,9 @@ function entrerDansSection(sonCode) {
 	).then(
 		// Une fois qu'on a la géographie et les mutations, on fait tout l'affichage
 		function () {
-			data_geo.features = data_geo.features.filter(e => (sonCode == (e.properties.prefixe + ('0'+ e.properties.section).slice(-2))));
+			data_geo.features = data_geo.features.filter(function(e) {
+				return (sonCode == (e.properties.prefixe + ('0'+ e.properties.section).slice(-2)))
+			});
 			if (parcellesLayer != null) {
 				map.removeLayer(parcellesLayer);
 			}
