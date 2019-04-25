@@ -179,6 +179,7 @@ function onEachFeatureCommune(feature, layer) {
 function onEachFeatureSection(feature, layer) {
 
 	var label = L.marker(layer.getBounds().getCenter(), {
+			interactive: false,
 			icon: L.divIcon({
 				className: 'labelSection',
 				html: (feature.properties.prefixe + feature.properties.code).replace(/^0+/, ''),
