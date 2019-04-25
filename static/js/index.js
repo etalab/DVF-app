@@ -534,7 +534,7 @@ function onDepartementClick(event) {
 			$.each(data, function (i, val) {
 				$select.append($('<option />', {
 						value: data[i].code,
-						text: data[i].nom
+						text: data[i].code + ' - ' + data[i].nom
 					}));
 			});
 		}
