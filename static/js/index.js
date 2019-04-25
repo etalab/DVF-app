@@ -306,19 +306,19 @@ function entrerDansMutation(sonIndex) {
 }
 
 function entrerDansSection(sonCode) {
-	
+	if (!data_geo) {
+		// Attente disponibilité data_geo
+		setTimeout(function() {
+			entrerDansSection(sonCode)
+		}, 250);
+		return;
+	}
 	codeSection = sonCode;
 	console.log("Section sélectionnée : " + sonCode);
 	viderLabelsSections();
 	vue.parcelle = null;
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.when(
-		// Charge la couche géographique
-		$.getJSON("https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/" + codeCommune + "/geojson/parcelles",
-			function (data) {
-				data_geo = data;
-			}
-		),
 		// Charge les mutations
 		$.getJSON("api/mutations/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
 			function (data) {
@@ -329,13 +329,13 @@ function entrerDansSection(sonCode) {
 	).then(
 		// Une fois qu'on a la géographie et les mutations, on fait tout l'affichage
 		function () {
-			data_geo.features = data_geo.features.filter(function(e) {
+			var features = data_geo.features.filter(function(e) {
 				return (sonCode == (e.properties.prefixe + ('0'+ e.properties.section).slice(-2)))
 			});
 			if (parcellesLayer != null) {
 				map.removeLayer(parcellesLayer);
 			}
-			parcellesLayer = L.geoJson(data_geo, {
+			parcellesLayer = L.geoJson(features, {
 				style: function (feature) {
 					var aColorier = false;
 					for (mutation of data_section.donnees) {
@@ -402,6 +402,13 @@ function entrerDansCommune(sonCode) {
 			vue.commune = {
 				code: sonCode
 			};
+		}
+	);
+	// Charge la couche géographique
+	data_geo = null;
+	$.getJSON("https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/" + codeCommune + "/geojson/parcelles",
+		function (data) {
+			data_geo = data;
 		}
 	);
 }
