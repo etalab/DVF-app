@@ -541,7 +541,7 @@ function onDepartementClick(event) {
 	);
 
 	// Chargement des contours des départements
-	$.getJSON("donneesgeo/departements-100m.geojson",
+	$.getJSON("donneesgeo/departements-1000m.geojson",
 		function (data) {
 			departements = data;
 			departements.features.forEach(function (state) {
