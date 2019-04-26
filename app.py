@@ -1,5 +1,9 @@
+# coding: utf-8
+
 # Pour lancer le serveur : python app.py
 # Puis acceder au site sur localhost:5000
+
+
 
 from flask import Flask, request, send_from_directory, jsonify
 import json
