@@ -341,7 +341,9 @@ function entrerDansSection(sonCode) {
 		function () {
 			data_geo.features = data_geo.features.filter(function(e) {
 				return (sonCode == (e.properties.prefixe + ('0'+ e.properties.section).slice(-2)))
-			});
+			}).sort(function(e,a){
+				return(e.id).localeCompare(a.id) ;
+			}) ;
 			if (parcellesLayer != null) {
 				map.removeLayer(parcellesLayer);
 			}
