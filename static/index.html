@@ -49,18 +49,9 @@
 					<label for="daterange" class="control-label">Date de la mutation</label>
 					<input type="text" id="daterange" name="daterange" value="01-01-2010 - 15-01-2018" class="form-control"/>
 				</div>
-				<div v-if="section != null">
-					<a id="exportCSV" onclick="exportCSV(this, data_dvf, codeCommune + '_' + codeSection + '.csv');" class="btn btn-primary" style="width: 100%">Télécharger les mutations de la section</a>
-				</div>
 			</div>
 			<div id="content">
 				<div id="mapid"></div>	
-			</div>
-			
-			<div id="sidebar_right" class="container" v-if="parcelle != null && parcelle.mutations.length > 0">
-				<span onclick="sortirDeParcelle()" class="mt-2 mb-2 close-link">Fermer</span>
-				<br/>
-				<boite-accordeon  v-for="(mutation, index) in parcelle.mutations" :mutation="mutation" :key="mutation.infos[0]['Code parcelle'] + index" :index="index"></boite-accordeon>
 			</div>
 		</div>
 

@@ -1,10 +1,5 @@
 # coding: utf-8
 
-# Pour lancer le serveur : python app.py
-# Puis acceder au site sur localhost:5000
-
-
-
 from flask import Flask, request, send_from_directory, jsonify
 import json
 import pandas as pd
@@ -52,16 +47,12 @@ def send_donneesgeo(path):
 	return send_from_directory('static/donneesgeo', path)
 
 
-@app.route('/api/mutations/<commune>/<sectionPrefixee>/from=<dateminimum>&to=<datemaximum>')
-def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
-	print("On récupère les mutations")
+@app.route('/api/mutations/<commune>/from=<dateminimum>&to=<datemaximum>')
+def get_mutations(commune, dateminimum, datemaximum):
+	print("On récupère les mutations de " + commune + " de " + dateminimum + " à " + datemaximum)
+	#TODO
 	json_mutations = '{}'
 	return json_mutations
-
-@app.route('/api/parcelles/<parcelle>/from=<dateminimum>&to=<datemaximum>')
-def get_parcelle(parcelle, dateminimum, datemaximum):
-	retour = '{}'
-	return retour
 
 
 @app.after_request
