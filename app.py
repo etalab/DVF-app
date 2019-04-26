@@ -8,7 +8,6 @@
 from flask import Flask, request, send_from_directory, jsonify
 import json
 import pandas as pd
-from sqlalchemy import create_engine
 
 
 pd.set_option('display.max_rows', 500)
@@ -17,21 +16,15 @@ pd.set_option('display.width', 1000)
 
 app = Flask(__name__, static_url_path='')
 
-config = pd.read_csv('config.csv', header=None)
-id = config[0][0]
-pwd = config[0][1]
-host = config[0][2]
-engine = create_engine('postgresql://%s:%s@%s/dvf'%(id, pwd, host))
-
 # Chargement des natures de culture
 cultures = pd.read_csv('TableNatureCulture.csv')
 culturesSpeciales = pd.read_csv('TableNatureSpeciale.csv')
 
 @app.route('/api/dates')
 def dates():
-	dateMin = pd.read_sql("""SELECT min("Date mutation") FROM public.dvf """, engine)
-	dateMax = pd.read_sql("""SELECT max("Date mutation") FROM public.dvf """, engine)
-	return '{"min": "' + str(dateMin['min'][0]) + '", "max": "' + str(dateMax['max'][0]) + '"}'
+	dateMin = "2014-01-01"
+	dateMax = "2018-12-31"
+	return '{"min": "' + dateMin + '", "max": "' + dateMax + '"}'
 
 
 @app.route('/')
@@ -62,6 +55,7 @@ def send_donneesgeo(path):
 @app.route('/api/mutations/<commune>/<sectionPrefixee>/from=<dateminimum>&to=<datemaximum>')
 def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
 	print("On récupère les mutations")
+	'''
 	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE "Code INSEE" = %(code)s AND "Section prefixe" = %(sectionPrefixee)s AND "Date mutation" >= %(datemin)s AND "Date mutation" <= %(datemax)s """, engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee, "datemin": dateminimum, "datemax": datemaximum})
 	
 	mutations = mutations.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
@@ -72,11 +66,13 @@ def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
 	nbMutations = len(mutations.groupe.unique())
 	print(mutations.to_json(orient = 'records', date_format='iso', date_unit='s'))
 	json_mutations = '{"donnees": ' + mutations.to_json(orient = 'records') + ', "nbMutations": ' + str(nbMutations) + '}'
-	
+	'''
+	json_mutations = '{}'
 	return json_mutations
 
 @app.route('/api/parcelles/<parcelle>/from=<dateminimum>&to=<datemaximum>')
 def get_parcelle(parcelle, dateminimum, datemaximum):
+	'''
 	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE "Code parcelle" = %(code)s AND "Date mutation" >= %(datemin)s AND "Date mutation" <= %(datemax)s ;""", 
 								engine, 
 								params = {"code": parcelle, "datemin": dateminimum, "datemax": datemaximum})
@@ -143,6 +139,8 @@ def get_parcelle(parcelle, dateminimum, datemaximum):
 		json_mutations.append(json_mutation)
 
 	retour = '{"mutations": [' + ', '.join(json_mutations) + '], "nbMutations": [' + str(len(mutations.groupe.unique())) +  ']}'
+	'''
+	retour = '{}'
 	return retour
 
 
