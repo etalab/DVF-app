@@ -164,14 +164,7 @@ function selectionnerSection() {
 	// L'utilisateur a cliqué sur la liste déroulante des sections
 	var e = document.getElementById("sections");
 	var sonCode = e.options[e.selectedIndex].value;
-	entrerDansSection(sonCode);
-}
-
-function selectionnerParcelle() {
-	// L'utilisateur a cliqué sur la liste déroulante des sections
-	var e = document.getElementById("parcelles");
-	var sonCode = e.options[e.selectedIndex].value;
-	entrerDansParcelle(sonCode);
+	console.log(sonCode);
 }
 
 function onEachFeatureCommune(feature, layer) {
@@ -212,173 +205,10 @@ function viderLabelsSections() {
 	labelsSections = [];
 }
 
-function onEachFeatureParcelle(feature, layer) {
-	$('#parcelles').append($('<option />', {
-		value: feature.id,
-		text: feature.id
-	}));
-	layer.on({
-		click: onParcelleClicked
-	});
-}
-
-function onParcelleClicked(event) {
-	sonCode = event.target.feature.id;
-	document.getElementById("parcelles").value = sonCode;
-	entrerDansParcelle(sonCode);
-}
-
-function entrerDansParcelle(sonCode) {
-	codeParcelle = sonCode;
-	console.log("Parcelle sélectionnée : " + codeParcelle);
-	data_parcelle = null;
-	$.getJSON("api/parcelles/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-")  + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
-		function (data) {
-			data_parcelle = data;
-			
-			// Formattage des champs pour l'affichage
-			for (m = 0; m < data_parcelle.mutations.length; m++){
-				data_parcelle.mutations[m].infos[0]['Date mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['Date mutation'])).toLocaleDateString('fr-FR');
-				data_parcelle.mutations[m].infos[0]['Valeur fonciere'] = data_parcelle.mutations[m].infos[0]['Valeur fonciere'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
-				
-				for (b = 0 ; b < data_parcelle.mutations[m].batiments.length; b++){
-					data_parcelle.mutations[m].batiments[b]['Surface reelle bati'] = data_parcelle.mutations[m].batiments[b]['Surface reelle bati'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');					
-				}
-				for (ter = 0 ; ter < data_parcelle.mutations[m].terrains.length; ter++){
-					data_parcelle.mutations[m].terrains[ter]['Surface terrain'] = data_parcelle.mutations[m].terrains[ter]['Surface terrain'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');					
-				}
-			}
-
-			vue.parcelle = {
-				code: codeParcelle,
-				n_mutations: data_parcelle.nbMutations,
-				mutations: data_parcelle.mutations,
-			};
-			
-			if (vue.parcelle.mutations.length == 1) {
-				entrerDansMutation(0);
-			} else {
-				entrerDansMutation(null);
-			}
-		}
-	);
-}
-
-function sortirDeParcelle() {
-	
-	entrerDansSection(codeSection);
-}
-
 function onSectionClicked(event) {
 	sonCode = event.target.feature.properties.prefixe + ('0' + event.target.feature.properties.code).slice(-2);
 	document.getElementById("sections").value = sonCode;
-	entrerDansSection(sonCode);
-}
-
-function entrerDansMutation(sonIndex) {
-	vue.mutationIndex = sonIndex;
-	leCode = vue.parcelle.mutations.length > 0 ? vue.parcelle.mutations[0].infos[0]['Code parcelle'] : '';
-	codesParcelles = [];
-	if (sonIndex != null) {
-		for (autre of vue.parcelle.mutations[sonIndex].mutations_liees) {
-			codesParcelles.push(autre['Code parcelle']);
-		}
-	}
-	parcellesLayer.eachLayer(function (layer) {
-		var aColorier = false;
-		for (mutation of data_section.donnees) {
-			if (mutation["Code parcelle"] == layer.feature.id) {
-				aColorier = true;
-			}
-		}
-		if (aColorier) {
-			style = {
-				color: '#238FD8',
-				fillOpacity: 0.5
-			};
-			for (autreCode of codesParcelles) {
-				if (autreCode == layer.feature.id) {
-					style = {
-						color: '#ff8FD8',
-						fillOpacity: 0.5
-					};
-				}
-			}
-			if (leCode == layer.feature.id) {
-				style = {
-					color: '#ff5FA8',
-					fillOpacity: 0.8
-				};
-			}
-			layer.setStyle(style);
-		};
-	});
-}
-
-function entrerDansSection(sonCode) {
-	
-	codeSection = sonCode;
-	console.log("Section sélectionnée : " + sonCode);
-	viderLabelsSections();
-	vue.parcelle = null;
-	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
-	$.when(
-		// Charge la couche géographique
-		$.getJSON("https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/" + codeCommune + "/geojson/parcelles",
-			function (data) {
-				data_geo = data;
-			}
-		),
-		// Charge les mutations
-		$.getJSON("api/mutations/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
-			function (data) {
-				data_section = data;
-				data_dvf = data.donnees;
-			}
-		)
-	).then(
-		// Une fois qu'on a la géographie et les mutations, on fait tout l'affichage
-		function () {
-			data_geo.features = data_geo.features.filter(function(e) {
-				return (sonCode == (e.properties.prefixe + ('0'+ e.properties.section).slice(-2)))
-			});
-			if (parcellesLayer != null) {
-				map.removeLayer(parcellesLayer);
-			}
-			parcellesLayer = L.geoJson(data_geo, {
-				style: function (feature) {
-					var aColorier = false;
-					for (mutation of data_section.donnees) {
-						if (mutation["Code parcelle"] == feature.id) {
-							aColorier = true;
-						}
-					}
-					if (aColorier) {
-						return {
-							color: '#238FD8',
-							fillOpacity: 0.5
-						};
-					} else {
-						return {
-							color: '#212f39',
-							fillOpacity: 0.2
-						};
-					}
-				},
-				weight: 1,
-				onEachFeature: onEachFeatureParcelle
-			});
-			if (parcellesLayer != null) {
-				map.removeLayer(parcellesLayer);
-			}
-			parcellesLayer.addTo(map);
-			map.fitBounds(parcellesLayer.getBounds());
-			vue.section = {
-				code: sonCode,
-				n_mutations: data_section.nbMutations,
-			};
-		}
-	);
+	console.log(sonCode);
 }
 
 
@@ -388,8 +218,6 @@ function entrerDansCommune(sonCode) {
 	viderLabelsSections();
 	vue.section = null;
 	codeCommune = sonCode;
-	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
-	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.getJSON("https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/" + codeCommune + "/geojson/sections",
 		function (data) {
 			if (sectionsLayer != null) {
@@ -423,11 +251,9 @@ function entrerDansDepartement(sonCode) {
 	vue.section = null;
 	vue.commune = null;
 	document.getElementById('communes').innerHTML = '<option style="display:none"></option>';
-	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
-	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	if (sonCode == "75" || sonCode == "13" || sonCode == "69") {
 		// Pour Paris, Marseille et Lyon, on utilise un fichier local qui contient les arrondissements
-		url = "donneesgeo/communesParDepartement/communes_" + codeDepartement + ".geojson";
+		url = "https://app.dvf.etalab.gouv.fr/donneesgeo/communesParDepartement/communes_" + codeDepartement + ".geojson";
 	} else {
 		// Pour tous les autres, on profite de l'API Geo
 		url = "https://geo.api.gouv.fr/departements/" + codeDepartement + "/communes?geometry=contour&format=geojson&type=commune-actuelle,arrondissement-municipal"
@@ -527,9 +353,6 @@ function onDepartementClick(event) {
 		console.log("L'utilisateur a modifié la plage de dates. Rechargement des données.");
 		dateMin = start.format('DD-MM-YYYY');
 		dateMax = end.format('DD-MM-YYYY');
-		if (codeSection != null) {
-			entrerDansSection(codeSection);
-		}
 	});
 
 	// Chargement de la liste des départements
