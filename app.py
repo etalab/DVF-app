@@ -35,6 +35,11 @@ def root():
 	return app.send_static_file('index.html')
 
 
+@app.route('/faq.html')
+def rootFAQ():
+	return app.send_static_file('faq.html')
+
+	
 @app.route('/css/<path:path>')
 def send_css(path):
 	return send_from_directory('static/css', path)
@@ -49,10 +54,6 @@ def send_js(path):
 def send_donneesgeo(path):
 	return send_from_directory('static/donneesgeo', path)
 
-
-@app.route('/cadastre/<path:path>')
-def send_cadastre(path):
-	return send_from_directory('static/cadastre', path)
 
 @app.route('/api/mutations/<commune>/<sectionPrefixee>/from=<dateminimum>&to=<datemaximum>')
 def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):

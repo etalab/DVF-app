@@ -175,6 +175,11 @@ function selectionnerParcelle() {
 }
 
 function onEachFeatureCommune(feature, layer) {
+
+	$('#communes').append($('<option />', {
+		value: feature.properties.code,
+		text: feature.properties.nom
+	}));
 	layer.on({
 		click: onCityClicked
 	});
@@ -420,8 +425,14 @@ function entrerDansDepartement(sonCode) {
 	document.getElementById('communes').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
-	$.getJSON(// "https://geo.api.gouv.fr/departements/"+ codeDepartement +"/communes?fields=contour&type=commune-actuelle,arrondissement-municipal",
-		"donneesgeo/communesParDepartement/communes_" + codeDepartement + ".geojson",
+	if (sonCode == "75" || sonCode == "13" || sonCode == "69") {
+		// Pour Paris, Marseille et Lyon, on utilise un fichier local qui contient les arrondissements
+		url = "donneesgeo/communesParDepartement/communes_" + codeDepartement + ".geojson";
+	} else {
+		// Pour tous les autres, on profite de l'API Geo
+		url = "https://geo.api.gouv.fr/departements/" + codeDepartement + "/communes?geometry=contour&format=geojson&type=commune-actuelle,arrondissement-municipal"
+	}
+	$.getJSON(url,
 		function (data) {
 			if (communesLayer != null) {
 				map.removeLayer(communesLayer);
@@ -440,18 +451,6 @@ function entrerDansDepartement(sonCode) {
 			}
 			communesLayer.addTo(map);
 			map.fitBounds(communesLayer.getBounds());
-		}
-	);
-	// Liste des communes du département
-	$.getJSON("https://geo.api.gouv.fr/communes?codeDepartement=" + sonCode + "&fields=nom,code&type=commune-actuelle,arrondissement-municipal", 
-		function (data) {
-			var $select = $('#communes');
-			$.each(data, function (i, val) {
-				$select.append($('<option />', {
-					value: data[i].code,
-					text: data[i].nom
-				}));
-			});
 		}
 	);
 }
