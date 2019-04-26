@@ -1,3 +1,4 @@
 
 config.csv
 static/donneesgeo/*
+!static/donneesgeo/departements-100m.geojson
