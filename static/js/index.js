@@ -119,8 +119,9 @@ $('.input-daterange input').each(function() {
 });
 
 
-function exportCSV(el) {
-	var json = data_dvf;
+function exportCSV(el, data, fileName) {
+	
+	var json = data;
 	var fields = Object.keys(json[0])
 	var replacer = function(key, value) { return value === null ? '' : value } 
 	var csv = json.map(function(row){
@@ -132,15 +133,18 @@ function exportCSV(el) {
 	csv = csv.join('\r\n');
 	
 	el.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(csv));
-	el.setAttribute("download", nom_fichier_section);
+	el.setAttribute("download", fileName);
 }
 	
+/*
 // Non utilisé	
 function exportJson(el) {
+	
 	var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data_dvf));
 	el.setAttribute("href", "data:"+data);
-	el.setAttribute("download", nom_fichier_section);    
+	el.setAttribute("download", 'nomfichier.json');    
 }
+*/
 
 function selectionnerDepartement() {
 	// L'utilisateur a cliqué sur la liste déroulante des départements
@@ -363,7 +367,6 @@ function entrerDansSection(sonCode) {
 			}
 			parcellesLayer.addTo(map);
 			map.fitBounds(parcellesLayer.getBounds());
-			nom_fichier_section = codeCommune + '_' + sonCode + '.csv';
 			vue.section = {
 				code: sonCode,
 				n_mutations: data_section.nbMutations,
