@@ -397,6 +397,11 @@ function entrerDansCommune(sonCode) {
 			if (sectionsLayer != null) {
 				map.removeLayer(sectionsLayer);
 			}
+
+			data.features.sort(function (a, b) {
+				if (!a.properties.nom) return -Infinity;
+				return a.properties.nom.localeCompare(b.properties.nom);
+			});
 			sectionsLayer = L.geoJson(data, {
 					weight: 1,
 					fillOpacity: 0.2,
