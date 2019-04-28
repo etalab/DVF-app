@@ -20,7 +20,7 @@
 	<body>
 		<div class="topnav">
 			<a class="active" href="/">Demande de Valeur Foncière</a>
-			<a onclick="vue.fold_left = !vue.fold_left"><i class="fas fa-bars fa-1x"></i></a>
+			<a onclick="toggleLeftBar()"><i class="fas fa-bars fa-1x"></i></a>
 			<div class="topnav-right">
 				<a href="https://github.com/marion-paclot/DVF">
 					Code<span class="long-text"> source</span>
@@ -69,7 +69,6 @@
 			<div id="content">
 				<div id="mapid"></div>
 			</div>
-
 			<div id="sidebar_right" class="container" v-if="parcelle != null && parcelle.mutations.length > 0">
 				<span onclick="sortirDeParcelle()" class="mt-2 mb-2 close-link">Fermer</span>
 				<br/>
@@ -92,7 +91,7 @@
 		  })();
 		</script>
 
-		<script src="js/index.js"></script>
+		<script src="js/index.js?version=1"></script>
 
 	</body>
 </html>

@@ -254,6 +254,7 @@ function entrerDansParcelle(sonCode) {
 				n_mutations: data_parcelle.nbMutations,
 				mutations: data_parcelle.mutations,
 			};
+			invalidateMap();
 			
 			if (vue.parcelle.mutations.length == 1) {
 				entrerDansMutation(0);
@@ -321,6 +322,7 @@ function entrerDansSection(sonCode) {
 	console.log("Section sélectionnée : " + sonCode);
 	viderLabelsSections();
 	vue.parcelle = null;
+	invalidateMap();
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.when(
 		// Charge la couche géographique
@@ -388,7 +390,9 @@ function entrerDansCommune(sonCode) {
 
 	console.log("Nous entrons dans la commune " + sonCode);
 	viderLabelsSections();
+	vue.parcelle = null;
 	vue.section = null;
+	invalidateMap();
 	codeCommune = sonCode;
 	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
@@ -477,6 +481,16 @@ function onDepartementClick(event) {
 	document.getElementById("departements").value = sonCode;
 };
 
+function toggleLeftBar() {
+	vue.fold_left = !vue.fold_left; 
+	invalidateMap();
+}
+
+function invalidateMap() {
+	// Il faut absolument invalider la carte après chaque changement d'affichage des menus pour qu'elle s'adapte bien à la largeur.
+	// C'est de plus important de laisser du temps pour que l'invalidation passe après le changement de taille effectif.
+	setTimeout(function(){ map.invalidateSize(); }, 200);
+}
 
 // C'est le code qui est appelé au début (sans que personne ne clique)
 (function () {
@@ -579,5 +593,7 @@ function onDepartementClick(event) {
 	// Sur mobile, cacher la barre latérale
 	if (window.innerWidth < 768) {
 		vue.fold_left = true;
+		invalidateMap();
 	}
+
 })();
