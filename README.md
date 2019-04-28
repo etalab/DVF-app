@@ -6,7 +6,7 @@ L'application https://app.dvf.etalab.gouv.fr prend appui sur ces données et pro
 
 Nous lirons volontiers vos suggestions d'amélioration. 
 
-Les données de Mayotte ainsi que de l'Alsace sont manquantes.
+Les données de Mayotte ainsi que de l'Alsace et de la Moselle sont manquantes.
 
 Une API développée par Christian Quest est disponible [ici](http://api.cquest.org/dvf), avec sa [documentation](http://data.cquest.org/dgfip_dvf/LISEZ_MOI.txt)
 
