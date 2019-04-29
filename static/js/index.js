@@ -31,7 +31,7 @@ Vue.component('boite-accordeon', {
 							<i class="fas fa-file-signature fa-fw fa-2x"></i>
 						</div>
 						<div class="media-body text-left ml-1">
-							<b>{{ mutation.infos[0]['Valeur fonciere'] }} €</b><br>
+							<b>{{ mutation.infos[0]['Valeur fonciere'] }} € / {{ mutation.infos[0]['Nature mutation'] }}</b><br>
 							<span>{{ mutation.infos[0]['Date mutation'] }}</span>
 			 			</div>
 					</div>
