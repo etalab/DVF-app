@@ -230,7 +230,6 @@ function onParcelleClicked(event) {
 
 function entrerDansParcelle(sonCode) {
 	codeParcelle = sonCode;
-	console.log("Parcelle sélectionnée : " + codeParcelle);
 	data_parcelle = null;
 	$.getJSON("api/parcelles/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-")  + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
 		function (data) {
@@ -319,7 +318,6 @@ function entrerDansMutation(sonIndex) {
 function entrerDansSection(sonCode) {
 	
 	codeSection = sonCode;
-	console.log("Section sélectionnée : " + sonCode);
 	viderLabelsSections();
 	vue.parcelle = null;
 	invalidateMap();
@@ -388,7 +386,6 @@ function entrerDansSection(sonCode) {
 
 function entrerDansCommune(sonCode) {
 
-	console.log("Nous entrons dans la commune " + sonCode);
 	viderLabelsSections();
 	vue.parcelle = null;
 	vue.section = null;
@@ -429,7 +426,6 @@ function entrerDansCommune(sonCode) {
 function entrerDansDepartement(sonCode) {
 
 	codeDepartement = sonCode;
-	console.log('Nous entrons dans le département ' + codeDepartement);
 	viderLabelsSections();
 	vue.section = null;
 	vue.commune = null;
@@ -545,7 +541,6 @@ function invalidateMap() {
 		}
 	}, function (start, end) {
 		// Fonction executée quand la personne change les dates
-		console.log("L'utilisateur a modifié la plage de dates. Rechargement des données.");
 		dateMin = start.format('DD-MM-YYYY');
 		dateMax = end.format('DD-MM-YYYY');
 		if (codeSection != null) {

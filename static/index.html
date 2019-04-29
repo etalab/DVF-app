@@ -63,7 +63,14 @@
 					<input type="text" id="daterange" name="daterange" value="01-01-2010 - 15-01-2018" class="form-control"/>
 				</div>
 				<div v-if="section != null">
-					<a id="exportCSV" onclick="exportCSV(this, data_dvf, codeCommune + '_' + codeSection + '.csv');" class="btn btn-primary" style="width: 100%">Télécharger les mutations de la section</a>
+					<a v-if="data_dvf.length > 0" id="exportCSV" onclick="exportCSV(this, data_dvf, codeCommune + '_' + codeSection + '.csv');" class="btn btn-primary" style="width: 100%">Télécharger les mutations de la section</a>
+					<div v-else class="text-muted">
+						La base de données DVF ne contient pas de mutation dans la section sélectionnée sur la plage temporelle choisie.
+						<div v-if="['67', '68', '57', '976'].indexOf(codeDepartement) != -1">
+							En particulier, la base DVF ne contient pas de mutation en Haut-Rhin, Bas-Rhin, Moselle et à Mayotte.
+						</div>
+						<a href="faq.html">En savoir plus</a>
+					</div>
 				</div>
 			</div>
 			<div id="content">
@@ -91,7 +98,7 @@
 		  })();
 		</script>
 
-		<script src="js/index.js?version=1"></script>
+		<script src="js/index.js?version=2"></script>
 
 	</body>
 </html>
