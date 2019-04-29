@@ -425,6 +425,7 @@ function entrerDansCommune(sonCode) {
 
 function entrerDansDepartement(sonCode) {
 
+	// Vide l'interface
 	codeDepartement = sonCode;
 	viderLabelsSections();
 	vue.section = null;
@@ -432,34 +433,45 @@ function entrerDansDepartement(sonCode) {
 	document.getElementById('communes').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
-	if (sonCode == "75" || sonCode == "13" || sonCode == "69") {
-		// Pour Paris, Marseille et Lyon, on utilise un fichier local qui contient les arrondissements
-		url = "donneesgeo/communesParDepartement/communes_" + codeDepartement + ".geojson";
-	} else {
-		// Pour tous les autres, on profite de l'API Geo
-		url = "https://geo.api.gouv.fr/departements/" + codeDepartement + "/communes?geometry=contour&format=geojson&type=commune-actuelle,arrondissement-municipal"
-	}
-	$.getJSON(url,
+	// Charge les communes
+	$.getJSON("https://geo.api.gouv.fr/departements/" + codeDepartement + "/communes?geometry=contour&format=geojson&type=commune-actuelle",
 		function (data) {
-			if (communesLayer != null) {
-				map.removeLayer(communesLayer);
+			// Pour Paris, Lyon, Marseille, il faut compléter avec les arrondissements
+			if (['75', '69', '13'].includes(codeDepartement)) {
+				$.getJSON("donneesgeo/arrondissements_municipaux-20180711.json",
+					function (dataPLM) {
+						data.features = data.features.filter(function (e) { return !(['13055', '69123', '75056'].includes(e.properties.code)); });
+						dataPLM.features = dataPLM.features.filter(function (e) { return e.properties.code.substring(0, 2) == codeDepartement; });
+						data.features = data.features.concat(dataPLM.features);
+						afficherCommunesDepartement(data);
+					}
+				);
+			} else {
+				afficherCommunesDepartement(data);
 			}
-			communesLayer = L.geoJson(data, {
-					weight: 1,
-					fillOpacity: 0,
-					color: '#212f39',
-					onEachFeature: onEachFeatureCommune
-				});
-			if (sectionsLayer != null) {
-				map.removeLayer(sectionsLayer);
-			}
-			if (parcellesLayer != null) {
-				map.removeLayer(parcellesLayer);
-			}
-			communesLayer.addTo(map);
-			map.fitBounds(communesLayer.getBounds());
 		}
 	);
+}
+
+function afficherCommunesDepartement(geojson) {
+	
+	if (communesLayer != null) {
+		map.removeLayer(communesLayer);
+	}
+	communesLayer = L.geoJson(geojson, {
+		weight: 1,
+		fillOpacity: 0,
+		color: '#212f39',
+		onEachFeature: onEachFeatureCommune
+	});
+	if (sectionsLayer != null) {
+		map.removeLayer(sectionsLayer);
+	}
+	if (parcellesLayer != null) {
+		map.removeLayer(parcellesLayer);
+	}
+	communesLayer.addTo(map);
+	map.fitBounds(communesLayer.getBounds());
 }
 
 function onCityClicked(event) {
