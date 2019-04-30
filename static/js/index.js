@@ -7,7 +7,7 @@ Vue.component('boite', {
 	// Les paramètres sont là
 	props: ['couleur', 'valeur', 'icone', 'texte'],
 	// La on donne le code source HTML du composant qui peut utiliser des données
-	template: 
+	template:
 		`<div class="media d-flex mt-3">
 			<div class="align-self-center ml-1 mr-1">
 				<i :class="'fa-2x fa-fw ' + icone"></i>
@@ -23,7 +23,7 @@ Vue.component('boite-accordeon', {
 	// Les paramètres sont là
 	props: ['couleur', 'mutation', 'icone', 'index'],
 	// La on donne le code source HTML du composant qui peut utiliser des données
-	
+
 	template: `<div class="card mt-3">
 				<div class="card-body" v-on:click="selectionnerMutation()">
 					<div class="media d-flex">
@@ -36,16 +36,16 @@ Vue.component('boite-accordeon', {
 			 			</div>
 					</div>
 					<div v-if="vue.mutationIndex == index" style="background-color: #eee" class="mt-3">
-						<boite 
-							v-for="batiment in mutation.batiments" 
-							:valeur="(batiment['Code type local'] != 3) ? (batiment['Surface reelle bati'] + ' m²') : ''" 
-							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['Code type local']]" 
+						<boite
+							v-for="batiment in mutation.batiments"
+							:valeur="(batiment['Code type local'] != 3) ? (batiment['Surface reelle bati'] + ' m²') : ''"
+							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['Code type local']]"
 							:texte="batiment['Type local'] + ((batiment['Code type local'] < 3) ? (' / ' + batiment['Nombre pieces principales'] + ' p') : '')">
 						</boite>
-						<boite 
-							v-for="terrain in mutation.terrains"  
-							:valeur="terrain['Surface terrain'] + ' m²'" 
-							icone="fa fa-tree" 
+						<boite
+							v-for="terrain in mutation.terrains"
+							:valeur="terrain['Surface terrain'] + ' m²'"
+							icone="fa fa-tree"
 							:texte="terrain['Libellé Nature de Culture'] + (terrain['Libellé Nature Culture Spéciale'] != '' ? ' / ' + terrain['Libellé Nature Culture Spéciale'] : '')">
 						</boite>
 							<div v-if="mutation.mutations_liees.length > 0" style = "padding:0.5rem">
@@ -79,15 +79,15 @@ var vue = new Vue({
 
 // Définition des variables globales
 
+var map = null;
+var mapLoaded = false;
+var hoveredStateId = null;
+var selectedStateId = null;
 var codeDepartement = null;
 var codeCommune = null;
 var codeSection = null;
 var codeParcelle = null;
 
-var communesLayer = null;
-var sectionsLayer = null;
-var parcellesLayer = null;
-var labelsSections = [];
 var data_dvf = null;
 
 var nom_fichier_section = null;
@@ -96,9 +96,96 @@ var data_section = null;
 var dateMin = '01-01-2015';
 var dateMax = '01-01-2019';
 
-
 var dateMin = '01-01-2015';
 var dateMax = '01-01-2019';
+
+var hoverableSources = ['departements', 'communes', 'sections', 'parcelles']
+var fillLayerPaint = {
+	"fill-color": ["case",
+		["boolean", ["feature-state", "selected"], false],
+		"#ff5FA8",
+		"#2a4ba9"
+	],
+	"fill-outline-color": ["case",
+		["boolean", ["feature-state", "selected"], false],
+		"#ff8FD8",
+		"#627BC1"
+	],
+	"fill-opacity": ["case",
+		["boolean", ["feature-state", "hover"], false],
+		0.8,
+		["boolean", ["feature-state", "selected"], false],
+		0.8,
+		0.4
+	]
+}
+
+var departements = null;
+var departementsLayer = {
+	id: 'departements-layer',
+	source: 'departements',
+	type: 'fill',
+	paint: fillLayerPaint
+}
+
+var communes = null;
+var communesLayer = {
+	id: 'communes-layer',
+	source: 'communes',
+	type: 'fill',
+	paint: fillLayerPaint
+}
+
+var sections = null;
+var sectionsLayer = {
+	id: 'sections-layer',
+	source: 'sections',
+	type: 'symbol',
+	layout: {
+		'text-field': ['format',
+			['get', 'prefix'], {},
+			' ', {},
+			['get', 'code'], {},
+		]
+	}
+}
+var sectionsLineLayer = {
+	id: 'sections-line-layer',
+	source: 'sections',
+	type: 'line',
+	paint: {
+		"line-color": "#1b388a",
+		"line-width": [
+			'case',
+			["boolean", ["feature-state", "hover"], false],
+			4,
+			1
+		]
+	}
+}
+
+var parcelles = null;
+var parcellesLayer = {
+	id: 'parcelles-layer',
+	source: 'parcelles',
+	type: 'fill',
+	paint: fillLayerPaint
+}
+var unmutatedParcellesLayer = {
+	id: 'unmutated-parcelles-layer',
+	source: 'parcelles',
+	type: 'fill',
+	paint: {
+		'fill-color': "#212f39",
+		"fill-outline-color": "#222",
+		'fill-opacity': 0.2
+	}
+}
+
+const EMPTY_FEATURE_COLLECTION = {
+	type: 'FeatureCollection',
+	features: []
+}
 
 // Fonctions
 
@@ -120,10 +207,10 @@ $('.input-daterange input').each(function() {
 
 
 function exportCSV(el, data, fileName) {
-	
+
 	var json = data;
 	var fields = Object.keys(json[0])
-	var replacer = function(key, value) { return value === null ? '' : value } 
+	var replacer = function(key, value) { return value === null ? '' : value }
 	var csv = json.map(function(row){
 	  return fields.map(function(fieldName){
 		return JSON.stringify(row[fieldName], replacer)
@@ -131,20 +218,59 @@ function exportCSV(el, data, fileName) {
 	})
 	csv.unshift(fields.join(';')); // add header column
 	csv = csv.join('\r\n');
-	
+
 	el.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(csv));
 	el.setAttribute("download", fileName);
 }
-	
+
 /*
-// Non utilisé	
+// Non utilisé
 function exportJson(el) {
-	
+
 	var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data_dvf));
 	el.setAttribute("href", "data:"+data);
-	el.setAttribute("download", 'nomfichier.json');    
+	el.setAttribute("download", 'nomfichier.json');
 }
 */
+
+function resetSourcesData(sources) {
+	sources.map(source => {
+		var source = map.getSource(source)
+		if (source) {
+			source.setData(EMPTY_FEATURE_COLLECTION)
+		}
+	})
+}
+
+function fit(geosjon) {
+	var bbox = turf.extent(geosjon)
+	map.fitBounds(bbox, { padding: 20 })
+}
+
+function onMouseMove(event, source) {
+	var canvas = map.getCanvas()
+	canvas.style.cursor = 'pointer'
+
+	if (event.features.length > 0) {
+		if (hoveredStateId !== null) {
+			hoverableSources.map(function(source) {
+				map.setFeatureState({ source, id: hoveredStateId }, { hover: false }); // clean all sources to prevent error
+			})
+		}
+		hoveredStateId = event.features[0].id;
+		map.setFeatureState({ source, id: hoveredStateId }, { hover: true });
+	}
+}
+
+function onMouseLeave(event, source) {
+	var canvas = map.getCanvas()
+	canvas.style.cursor = ''
+
+	if (hoveredStateId !== null) {
+		map.setFeatureState({ source, id: hoveredStateId }, { hover: false });
+	}
+	hoveredStateId = null;
+}
 
 function selectionnerDepartement() {
 	// L'utilisateur a cliqué sur la liste déroulante des départements
@@ -174,56 +300,30 @@ function selectionnerParcelle() {
 	entrerDansParcelle(sonCode);
 }
 
-function onEachFeatureCommune(feature, layer) {
-
+function filledCommunesOptions(feature) {
 	$('#communes').append($('<option />', {
 		value: feature.properties.code,
 		text: feature.properties.nom
-	}));
-	layer.on({
-		click: onCityClicked
-	});
+	}))
 }
 
-function onEachFeatureSection(feature, layer) {
-
-	var label = L.marker(layer.getBounds().getCenter(), {
-			interactive: false,
-			icon: L.divIcon({
-				className: 'labelSection',
-				html: (feature.properties.prefixe + feature.properties.code).replace(/^0+/, ''),
-			})
-		});
-	label.addTo(map);
-	labelsSections.push(label);
+function filledSectionsOptions(feature) {
 	$('#sections').append($('<option />', {
 		value: (feature.properties.prefixe + ('0' + feature.properties.code).slice(-2)),
 		text: (feature.properties.prefixe + ('0' + feature.properties.code).slice(-2)).replace(/^0+/, '')
-	}));
-	layer.on({
-		click: onSectionClicked
-	});
+	}))
 }
 
-function viderLabelsSections() {
-	for (label of labelsSections) {
-		map.removeLayer(label);
-	}
-	labelsSections = [];
-}
-
-function onEachFeatureParcelle(feature, layer) {
+function onEachFeatureParcelle(feature) {
 	$('#parcelles').append($('<option />', {
 		value: feature.id,
 		text: feature.id
-	}));
-	layer.on({
-		click: onParcelleClicked
-	});
+	}))
 }
 
 function onParcelleClicked(event) {
-	sonCode = event.target.feature.id;
+	sonCode = event.features[0].properties.id;
+	selectedStateId = event.features[0].id
 	document.getElementById("parcelles").value = sonCode;
 	entrerDansParcelle(sonCode);
 }
@@ -231,20 +331,20 @@ function onParcelleClicked(event) {
 function entrerDansParcelle(sonCode) {
 	codeParcelle = sonCode;
 	data_parcelle = null;
-	$.getJSON("api/parcelles/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-")  + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
+	$.getJSON("https://app.dvf.etalab.gouv.fr/api/parcelles/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-"),
 		function (data) {
 			data_parcelle = data;
-			
+
 			// Formattage des champs pour l'affichage
 			for (m = 0; m < data_parcelle.mutations.length; m++){
 				data_parcelle.mutations[m].infos[0]['Date mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['Date mutation'])).toLocaleDateString('fr-FR');
 				data_parcelle.mutations[m].infos[0]['Valeur fonciere'] = data_parcelle.mutations[m].infos[0]['Valeur fonciere'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
-				
+
 				for (b = 0 ; b < data_parcelle.mutations[m].batiments.length; b++){
-					data_parcelle.mutations[m].batiments[b]['Surface reelle bati'] = data_parcelle.mutations[m].batiments[b]['Surface reelle bati'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');					
+					data_parcelle.mutations[m].batiments[b]['Surface reelle bati'] = data_parcelle.mutations[m].batiments[b]['Surface reelle bati'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
 				}
 				for (ter = 0 ; ter < data_parcelle.mutations[m].terrains.length; ter++){
-					data_parcelle.mutations[m].terrains[ter]['Surface terrain'] = data_parcelle.mutations[m].terrains[ter]['Surface terrain'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');					
+					data_parcelle.mutations[m].terrains[ter]['Surface terrain'] = data_parcelle.mutations[m].terrains[ter]['Surface terrain'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
 				}
 			}
 
@@ -253,8 +353,6 @@ function entrerDansParcelle(sonCode) {
 				n_mutations: data_parcelle.nbMutations,
 				mutations: data_parcelle.mutations,
 			};
-			invalidateMap();
-			
 			if (vue.parcelle.mutations.length == 1) {
 				entrerDansMutation(0);
 			} else {
@@ -265,12 +363,12 @@ function entrerDansParcelle(sonCode) {
 }
 
 function sortirDeParcelle() {
-	
 	entrerDansSection(codeSection);
 }
 
 function onSectionClicked(event) {
-	sonCode = event.target.feature.properties.prefixe + ('0' + event.target.feature.properties.code).slice(-2);
+	var { prefixe, code } = event.features[0].properties
+	sonCode = `${prefixe}0${code.slice(-2)}`
 	document.getElementById("sections").value = sonCode;
 	entrerDansSection(sonCode);
 }
@@ -278,49 +376,28 @@ function onSectionClicked(event) {
 function entrerDansMutation(sonIndex) {
 	vue.mutationIndex = sonIndex;
 	leCode = vue.parcelle.mutations.length > 0 ? vue.parcelle.mutations[0].infos[0]['Code parcelle'] : '';
-	codesParcelles = [];
+
 	if (sonIndex != null) {
+		codesParcelles = [leCode];
+
 		for (autre of vue.parcelle.mutations[sonIndex].mutations_liees) {
 			codesParcelles.push(autre['Code parcelle']);
 		}
+
+		map.setPaintProperty('parcelles-layer', 'fill-color', [
+			'case',
+			['match',['get', 'id'], codesParcelles, true, false],
+			"#ff8FD8",
+			"#627BC1"
+		])
 	}
-	parcellesLayer.eachLayer(function (layer) {
-		var aColorier = false;
-		for (mutation of data_section.donnees) {
-			if (mutation["Code parcelle"] == layer.feature.id) {
-				aColorier = true;
-			}
-		}
-		if (aColorier) {
-			style = {
-				color: '#238FD8',
-				fillOpacity: 0.5
-			};
-			for (autreCode of codesParcelles) {
-				if (autreCode == layer.feature.id) {
-					style = {
-						color: '#ff8FD8',
-						fillOpacity: 0.5
-					};
-				}
-			}
-			if (leCode == layer.feature.id) {
-				style = {
-					color: '#ff5FA8',
-					fillOpacity: 0.8
-				};
-			}
-			layer.setStyle(style);
-		};
-	});
 }
 
 function entrerDansSection(sonCode) {
-	
+
 	codeSection = sonCode;
-	viderLabelsSections();
+	console.log("Section sélectionnée : " + sonCode);
 	vue.parcelle = null;
-	invalidateMap();
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.when(
 		// Charge la couche géographique
@@ -330,7 +407,7 @@ function entrerDansSection(sonCode) {
 			}
 		),
 		// Charge les mutations
-		$.getJSON("api/mutations/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
+		$.getJSON("https://app.dvf.etalab.gouv.fr/api/mutations/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
 			function (data) {
 				data_section = data;
 				data_dvf = data.donnees;
@@ -338,43 +415,35 @@ function entrerDansSection(sonCode) {
 		)
 	).then(
 		// Une fois qu'on a la géographie et les mutations, on fait tout l'affichage
-		function () {
+		function (data) {
 			data_geo.features = data_geo.features.filter(function(e) {
 				return (sonCode == (e.properties.prefixe + ('0'+ e.properties.section).slice(-2)))
 			}).sort(function(e,a){
 				return(e.id).localeCompare(a.id) ;
-			}) ;
-			if (parcellesLayer != null) {
-				map.removeLayer(parcellesLayer);
-			}
-			parcellesLayer = L.geoJson(data_geo, {
-				style: function (feature) {
-					var aColorier = false;
-					for (mutation of data_section.donnees) {
-						if (mutation["Code parcelle"] == feature.id) {
-							aColorier = true;
-						}
-					}
-					if (aColorier) {
-						return {
-							color: '#238FD8',
-							fillOpacity: 0.5
-						};
-					} else {
-						return {
-							color: '#212f39',
-							fillOpacity: 0.2
-						};
-					}
-				},
-				weight: 1,
-				onEachFeature: onEachFeatureParcelle
 			});
-			if (parcellesLayer != null) {
-				map.removeLayer(parcellesLayer);
-			}
-			parcellesLayer.addTo(map);
-			map.fitBounds(parcellesLayer.getBounds());
+
+			parcelles = data[0]
+
+			map.getSource('parcelles').setData(parcelles)
+
+			fit(parcelles)
+
+			parcelles.features.map(onEachFeatureParcelle)
+
+			var parcellesCodes = data_section.donnees.map(parcelle => parcelle['Code parcelle'])
+			parcellesCodes.unshift('id')
+
+			var includesMutated = parcellesCodes.slice()
+			includesMutated.unshift('in')
+
+			var exludesMutated = parcellesCodes.slice()
+			exludesMutated.unshift('!in')
+
+			map.setFilter('parcelles-layer', includesMutated) // include
+			map.setFilter('unmutated-parcelles-layer', exludesMutated) // exclude
+			map.setFilter('sections-layer', ['!=', ['get', 'code'], codeSection.slice(-1)]) // TODO le code n'est pas le bon (prefixe+code)
+
+			fit(parcelles)
 			vue.section = {
 				code: sonCode,
 				n_mutations: data_section.nbMutations,
@@ -383,38 +452,25 @@ function entrerDansSection(sonCode) {
 	);
 }
 
-
 function entrerDansCommune(sonCode) {
-
-	viderLabelsSections();
 	vue.parcelle = null;
 	vue.section = null;
-	invalidateMap();
+	console.log("Nous entrons dans la commune " + sonCode);
 	codeCommune = sonCode;
 	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.getJSON("https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/" + codeCommune + "/geojson/sections",
 		function (data) {
-			if (sectionsLayer != null) {
-				map.removeLayer(sectionsLayer);
-			}
+			sections = data
+			map.getSource('sections').setData(sections)
 
-			data.features.sort(function (a, b) {
-				if (!a.properties.nom) return -Infinity;
-				return a.properties.nom.localeCompare(b.properties.nom);
-			});
-			sectionsLayer = L.geoJson(data, {
-					weight: 1,
-					fillOpacity: 0.2,
-					color: '#212f39',
-					onEachFeature: onEachFeatureSection
-				});
-			if (parcellesLayer != null) {
-				map.removeLayer(parcellesLayer);
-			}
-			sectionsLayer.addTo(map);
-			map.fitBounds(sectionsLayer.getBounds());
-			
+			data.features.map(filledSectionsOptions)
+			map.setFilter('communes-layer', ['!=', ['get', 'code'], codeCommune])
+
+			resetSourcesData(['parcelles'])
+
+			fit(sections)
+
 			nom_fichier_commune = codeCommune + '.csv';
 			vue.commune = {
 				code: sonCode
@@ -427,7 +483,7 @@ function entrerDansDepartement(sonCode) {
 
 	// Vide l'interface
 	codeDepartement = sonCode;
-	viderLabelsSections();
+	console.log('Nous entrons dans le département ' + codeDepartement);
 	vue.section = null;
 	vue.commune = null;
 	document.getElementById('communes').innerHTML = '<option style="display:none"></option>';
@@ -453,67 +509,104 @@ function entrerDansDepartement(sonCode) {
 	);
 }
 
-function afficherCommunesDepartement(geojson) {
-	
-	if (communesLayer != null) {
-		map.removeLayer(communesLayer);
-	}
-	communesLayer = L.geoJson(geojson, {
-		weight: 1,
-		fillOpacity: 0,
-		color: '#212f39',
-		onEachFeature: onEachFeatureCommune
-	});
-	if (sectionsLayer != null) {
-		map.removeLayer(sectionsLayer);
-	}
-	if (parcellesLayer != null) {
-		map.removeLayer(parcellesLayer);
-	}
-	communesLayer.addTo(map);
-	map.fitBounds(communesLayer.getBounds());
+function afficherCommunesDepartement(data) {
+	communes = data
+
+	map.getSource('communes').setData(communes)
+	data.features.map(filledCommunesOptions)
+	map.setFilter('departements-layer', ['!=', ['get', 'code'], codeDepartement])
+
+	resetSourcesData(['sections', 'parcelles'])
+
+	fit(communes)
 }
 
 function onCityClicked(event) {
 	// L'utilisateur a cliqué sur la géométrie d'une commune
-	var sonCode = event.sourceTarget.feature.properties.code;
+	var sonCode = event.features[0].properties.code;
 	entrerDansCommune(sonCode);
 	document.getElementById("communes").value = sonCode;
 }
 
 function onDepartementClick(event) {
 	// L'utilisateur a cliqué sur la géométrie d'un département
-	var id = event.target._leaflet_id;
-	var sonCode = event.target._layers[id - 1]['feature'].properties.code;
+	var sonCode = event.features[0].properties.code
 	entrerDansDepartement(sonCode);
 	document.getElementById("departements").value = sonCode;
 };
 
 function toggleLeftBar() {
-	vue.fold_left = !vue.fold_left; 
-	invalidateMap();
-}
-
-function invalidateMap() {
-	// Il faut absolument invalider la carte après chaque changement d'affichage des menus pour qu'elle s'adapte bien à la largeur.
-	// C'est de plus important de laisser du temps pour que l'invalidation passe après le changement de taille effectif.
-	setTimeout(function(){ map.invalidateSize(); }, 200);
+	vue.fold_left = !vue.fold_left;
 }
 
 // C'est le code qui est appelé au début (sans que personne ne clique)
 (function () {
 
 	// Mise en place de la carte
-	map = new L.Map('mapid', min = 0, max = 30);
-	var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-	var osmAttrib = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
-	var osm = new L.TileLayer(osmUrl, {
-			minZoom: 0,
-			maxZoom: 30,
-			attribution: osmAttrib
-		});
-	map.setView(new L.LatLng(47, 3), 5);
-	map.addLayer(osm);
+	map = new mapboxgl.Map({
+		container: 'mapid',
+		style: 'https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json',
+		center: [3, 47],
+		zoom: 5,
+		minZoom: 0,
+		maxZoom: 30
+	})
+
+	if (!mapLoaded) {
+		map.on('load', function () {
+			map.addSource("departements", {
+				type: 'geojson',
+				generateId: true,
+				data: departements
+			})
+			map.addLayer(departementsLayer)
+
+			map.addSource("communes", {
+				type: 'geojson',
+				generateId: true,
+				data: communes
+			})
+			map.addLayer(communesLayer)
+
+			map.addSource("sections", {
+				type: 'geojson',
+				generateId: true,
+				data: sections
+			})
+			map.addLayer(sectionsLineLayer)
+			map.addLayer(sectionsLayer)
+
+			map.addSource("parcelles", {
+				type: 'geojson',
+				generateId: true,
+				data: parcelles
+			})
+			map.addLayer(parcellesLayer)
+			map.addLayer(unmutatedParcellesLayer)
+		})
+
+		mapLoaded = true
+	}
+
+	hoverableSources.map(function (source) {
+		var layer = `${source}-layer`
+
+		map.on("mousemove", layer, function(e) {onMouseMove(e, source)});
+		map.on("mouseleave", layer, function(e) {onMouseLeave(e, source)});
+	})
+
+	map.on('click', 'departements-layer', onDepartementClick)
+	map.on('click', 'communes-layer', onCityClicked)
+	map.on('click', 'sections-layer', onSectionClicked)
+	map.on('click', 'parcelles-layer', function(event) {
+		if (selectedStateId) {
+			map.setFeatureState({ source: 'parcelles', id: selectedStateId }, { selected: false });
+		}
+
+		selectedStateId = event.features[0].id
+		map.setFeatureState({ source: 'parcelles', id: selectedStateId }, { selected: true })
+		onParcelleClicked(event)
+	})
 
 	// Paramètres français du range picker
 	$('input[name="daterange"]').daterangepicker({
@@ -561,7 +654,7 @@ function invalidateMap() {
 	});
 
 	// Chargement de la liste des départements
-	$.getJSON("https://geo.api.gouv.fr/departements?fields=nom,code", 
+	$.getJSON("https://geo.api.gouv.fr/departements?fields=nom,code",
 		function (data) {
 			var $select = $('#departements');
 			$.each(data, function (i, val) {
@@ -574,21 +667,15 @@ function invalidateMap() {
 	);
 
 	// Chargement des contours des départements
-	$.getJSON("donneesgeo/departements-100m.geojson",
+	$.getJSON("https://app.dvf.etalab.gouv.fr/donneesgeo/departements-100m.geojson",
 		function (data) {
-			departements = data;
-			departements.features.forEach(function (state) {
-				var polygon = L.geoJson(state, {
-						weight: 1,
-						fillOpacity: 0,
-						color: '#212f39',
-					}).addTo(map).on('click', onDepartementClick);
-			});
+			departements = data
+			map.getSource('departements').setData(departements)
 		}
-	);
+	)
 
 	// On récupère la plage des mutations de la base
-	$.getJSON("api/dates",
+	$.getJSON("https://app.dvf.etalab.gouv.fr/api/dates",
 		function (data) {
 			dateMin = (new Date(data.min)).toLocaleDateString('fr-FR');
 			dateMax = (new Date(data.max)).toLocaleDateString('fr-FR');
@@ -596,11 +683,10 @@ function invalidateMap() {
 			$('#daterange').data('daterangepicker').setEndDate(dateMax);
 		}
 	);
-	
+
 	// Sur mobile, cacher la barre latérale
 	if (window.innerWidth < 768) {
 		vue.fold_left = true;
-		invalidateMap();
 	}
 
 })();
