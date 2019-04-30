@@ -26,3 +26,28 @@ sh DVF/db/build_db.sh
 ```
 
 Le script commence par créer une base de données PostgreSQL et une table, puis télécharge les données brutes depuis data.gouv.fr, retire les décimales (dans les montants et surfaces), injecte les données dans la table, puis effectue une série de post-traitements (création d'index, de colonnes, normalisation de codes). Certaines étapes sont très longues (plusieurs minutes).
+
+## Développer l'interface utilisateur
+
+Pour participer au développement de l'interface utilisateur il n'est pas nécessaire d'installer Python et PostgreSQL.
+
+Un script [Node.js](https://nodejs.org) permet de servir l'interface et de faire proxy vers l'API de production.
+
+### Pré-requis
+
+- [Node.js](https://nodejs.org) 8 ou supérieur
+- [yarn](https://yarnpkg.com)
+
+### Utilisation
+
+```bash
+# On installe les dépendances Node.js
+yarn
+
+# Démarrage du serveur Web (port 3000 par défaut)
+yarn start
+```
+
+### Configuration
+
+Certains paramètres peuvent être écrasés au moyen d'un fichier `.env`. Le fichier `.env.sample` est fourni en exemple.
