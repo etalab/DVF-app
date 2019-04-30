@@ -31,7 +31,7 @@ Vue.component('boite-accordeon', {
 							<i class="fas fa-file-signature fa-fw fa-2x"></i>
 						</div>
 						<div class="media-body text-left ml-1">
-							<b>{{ mutation.infos[0]['Valeur fonciere'] }} €</b><br>
+							<b>{{ mutation.infos[0]['Valeur fonciere'] }} € / {{ mutation.infos[0]['Nature mutation'] }}</b><br>
 							<span>{{ mutation.infos[0]['Date mutation'] }}</span>
 			 			</div>
 					</div>
@@ -323,14 +323,12 @@ function onEachFeatureParcelle(feature) {
 
 function onParcelleClicked(event) {
 	sonCode = event.features[0].properties.id;
-	selectedStateId = event.features[0].id
 	document.getElementById("parcelles").value = sonCode;
 	entrerDansParcelle(sonCode);
 }
 
 function entrerDansParcelle(sonCode) {
 	codeParcelle = sonCode;
-	console.log("Parcelle sélectionnée : " + codeParcelle);
 	data_parcelle = null;
 	$.getJSON("https://app.dvf.etalab.gouv.fr/api/parcelles/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-"),
 		function (data) {
@@ -420,6 +418,8 @@ function entrerDansSection(sonCode) {
 		function (data) {
 			data_geo.features = data_geo.features.filter(function(e) {
 				return (sonCode == (e.properties.prefixe + ('0'+ e.properties.section).slice(-2)))
+			}).sort(function (e, a) {
+				return (e.id).localeCompare(a.id);
 			});
 
 			parcelles = data[0]
@@ -444,6 +444,7 @@ function entrerDansSection(sonCode) {
 			map.setFilter('sections-layer', ['!=', ['get', 'code'], codeSection.slice(-1)]) // TODO le code n'est pas le bon (prefixe+code)
 
 			fit(parcelles)
+
 			vue.section = {
 				code: sonCode,
 				n_mutations: data_section.nbMutations,
@@ -455,12 +456,18 @@ function entrerDansSection(sonCode) {
 function entrerDansCommune(sonCode) {
 
 	console.log("Nous entrons dans la commune " + sonCode);
+	vue.parcelle = null;
 	vue.section = null;
 	codeCommune = sonCode;
 	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.getJSON("https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/" + codeCommune + "/geojson/sections",
 		function (data) {
+			data.features.sort(function (a, b) {
+				if (!a.properties.nom) return -Infinity;
+				return a.properties.nom.localeCompare(b.properties.nom);
+			})
+
 			sections = data
 			map.getSource('sections').setData(sections)
 
@@ -481,6 +488,7 @@ function entrerDansCommune(sonCode) {
 
 function entrerDansDepartement(sonCode) {
 
+	// Vide l'interface
 	codeDepartement = sonCode;
 	console.log('Nous entrons dans le département ' + codeDepartement);
 	vue.section = null;
@@ -488,27 +496,41 @@ function entrerDansDepartement(sonCode) {
 	document.getElementById('communes').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
-	if (sonCode == "75" || sonCode == "13" || sonCode == "69") {
-		// Pour Paris, Marseille et Lyon, on utilise un fichier local qui contient les arrondissements
-		url = "donneesgeo/communesParDepartement/communes_" + codeDepartement + ".geojson";
-	} else {
-		// Pour tous les autres, on profite de l'API Geo
-		url = "https://geo.api.gouv.fr/departements/" + codeDepartement + "/communes?geometry=contour&format=geojson&type=commune-actuelle,arrondissement-municipal"
-	}
-	$.getJSON(url,
+
+	// Pour Paris, Lyon, Marseille, il faut compléter avec les arrondissements
+	// Charge les communes
+	$.getJSON("https://geo.api.gouv.fr/departements/" + codeDepartement + "/communes?geometry=contour&format=geojson&type=commune-actuelle",
 		function (data) {
-			communes = data
-			map.getSource('communes').setData(communes)
+			if (['75', '69', '13'].includes(codeDepartement)) {
+				$.getJSON("donneesgeo/arrondissements_municipaux-20180711.json",
+					function (dataPLM) {
+						data.features = data.features.filter(function (e) { return !(['13055', '69123', '75056'].includes(e.properties.code)); });
+						dataPLM.features = dataPLM.features.filter(function (e) { return e.properties.code.substring(0, 2) == codeDepartement; });
+						data.features = data.features.concat(dataPLM.features);
 
-			data.features.map(filledCommunesOptions)
-
-			map.setFilter('departements-layer', ['!=', ['get', 'code'], codeDepartement])
-
-			resetSourcesData(['sections', 'parcelles'])
-
-			fit(communes)
+						afficherCommunesDepartement(dataPLM)
+					}
+				)
+			} else {
+				afficherCommunesDepartement(data)
+			}
 		}
 	);
+
+
+
+}
+
+function afficherCommunesDepartement(geosjon) {
+	communes = geosjon
+
+	map.getSource('communes').setData(communes)
+	communes.features.map(filledCommunesOptions)
+	map.setFilter('departements-layer', ['!=', ['get', 'code'], codeDepartement])
+
+	resetSourcesData(['sections', 'parcelles'])
+
+	fit(communes)
 }
 
 function onCityClicked(event) {
@@ -525,6 +547,9 @@ function onDepartementClick(event) {
 	document.getElementById("departements").value = sonCode;
 };
 
+function toggleLeftBar() {
+	vue.fold_left = !vue.fold_left;
+}
 
 // C'est le code qui est appelé au début (sans que personne ne clique)
 (function () {
@@ -633,7 +658,6 @@ function onDepartementClick(event) {
 		}
 	}, function (start, end) {
 		// Fonction executée quand la personne change les dates
-		console.log("L'utilisateur a modifié la plage de dates. Rechargement des données.");
 		dateMin = start.format('DD-MM-YYYY');
 		dateMax = end.format('DD-MM-YYYY');
 		if (codeSection != null) {
@@ -676,4 +700,5 @@ function onDepartementClick(event) {
 	if (window.innerWidth < 768) {
 		vue.fold_left = true;
 	}
+
 })();

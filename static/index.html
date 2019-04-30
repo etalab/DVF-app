@@ -16,16 +16,17 @@
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+		<link rel="shortcut icon" type="image/x-icon" href="/favicon.png">
 	</head>
 	<body>
 		<div class="topnav">
 			<a class="active" href="/">Demande de Valeur Foncière</a>
-			<a onclick="vue.fold_left = !vue.fold_left"><i class="fas fa-bars fa-1x"></i></a>
+			<a onclick="toggleLeftBar()"><i class="fas fa-bars fa-1x"></i></a>
 			<div class="topnav-right">
 				<a href="https://github.com/marion-paclot/DVF">
 					Code<span class="long-text"> source</span>
 				</a>
-				<a href="faq.html">A propos</a>
+				<a href="faq.html">À propos</a>
 				<a href="https://framaforms.org/demande-de-valeur-fonciere-dvf-votre-avis-nous-interesse-1556111586">
 					Votre avis<span class="long-text"> nous intéresse<span>
 				</a>
@@ -63,7 +64,14 @@
 					<input type="text" id="daterange" name="daterange" value="01-01-2010 - 15-01-2018" class="form-control"/>
 				</div>
 				<div v-if="section != null">
-					<a id="exportCSV" onclick="exportCSV(this, data_dvf, codeCommune + '_' + codeSection + '.csv');" class="btn btn-primary" style="width: 100%">Télécharger les mutations de la section</a>
+					<a v-if="data_dvf.length > 0" id="exportCSV" onclick="exportCSV(this, data_dvf, codeCommune + '_' + codeSection + '.csv');" class="btn btn-primary" style="width: 100%">Télécharger les mutations de la section</a>
+					<div v-else class="text-muted">
+						La base de données DVF ne contient pas de mutation dans la section sélectionnée sur la plage temporelle choisie.
+						<div v-if="['67', '68', '57', '976'].indexOf(codeDepartement) != -1">
+							En particulier, la base DVF ne contient pas de mutation en Haut-Rhin, Bas-Rhin, Moselle et à Mayotte.
+						</div>
+						<a href="faq.html">En savoir plus</a>
+					</div>
 				</div>
 			</div>
 			<div id="content">
@@ -92,7 +100,7 @@
 		  })();
 		</script>
 
-		<script src="js/index.js"></script>
+		<script src="js/index.js?version=3"></script>
 
 	</body>
 </html>

@@ -66,7 +66,6 @@ def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
 	mutations = mutations.merge(mutations[group_vars].drop_duplicates(group_vars).reset_index(), on=group_vars)
 	mutations = mutations.rename(index=str, columns={"index": "groupe"})
 	nbMutations = len(mutations.groupe.unique())
-	print(mutations.to_json(orient = 'records', date_format='iso', date_unit='s'))
 	json_mutations = '{"donnees": ' + mutations.to_json(orient = 'records') + ', "nbMutations": ' + str(nbMutations) + '}'
 	
 	return json_mutations
@@ -91,14 +90,14 @@ def get_parcelle(parcelle, dateminimum, datemaximum):
 		
 		date = infos['Date mutation'][0]
 		codeInsee = infos['Code INSEE'][0]
-		section = infos['Section'][0]
+		section = infos['Section prefixe'][0]
 		prix = infos['Valeur fonciere'][0]
 		parcelle = mutations['Code parcelle'][0]
 		
 		infos = infos.to_json(orient = 'records')
 		
 		# Mutations liées
-		mutations_liees = pd.read_sql("""SELECT * FROM public.dvf WHERE "Date mutation" = %(date)s AND  "Code INSEE" = %(codeInsee)s AND  "Section" = %(section)s AND  "Valeur fonciere" = %(prix)s AND  "Code parcelle"<> %(parcelle)s;""", 
+		mutations_liees = pd.read_sql("""SELECT * FROM public.dvf WHERE "Date mutation" = %(date)s AND  "Code INSEE" = %(codeInsee)s AND  "Section prefixe" = %(section)s AND  "Valeur fonciere" = %(prix)s AND  "Code parcelle"<> %(parcelle)s;""", 
                                   engine, 
 								  params = {"date": date, "codeInsee" : codeInsee, "section" : section, "prix" : prix, "parcelle" : parcelle})
 		mutations_liees['Type local'].replace('Local industriel. commercial ou assimilé', 'Local industriel commercial ou assimilé', inplace = True)
