@@ -231,7 +231,7 @@ function onParcelleClicked(event) {
 function entrerDansParcelle(sonCode) {
 	codeParcelle = sonCode;
 	data_parcelle = null;
-	$.getJSON("api/parcelles/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-")  + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
+	$.getJSON("/api/parcelles/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-")  + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
 		function (data) {
 			data_parcelle = data;
 			
@@ -330,7 +330,7 @@ function entrerDansSection(sonCode) {
 			}
 		),
 		// Charge les mutations
-		$.getJSON("api/mutations/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
+		$.getJSON("/api/mutations/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
 			function (data) {
 				data_section = data;
 				data_dvf = data.donnees;
@@ -438,7 +438,7 @@ function entrerDansDepartement(sonCode) {
 		function (data) {
 			// Pour Paris, Lyon, Marseille, il faut compléter avec les arrondissements
 			if (['75', '69', '13'].includes(codeDepartement)) {
-				$.getJSON("donneesgeo/arrondissements_municipaux-20180711.json",
+				$.getJSON("/donneesgeo/arrondissements_municipaux-20180711.json",
 					function (dataPLM) {
 						data.features = data.features.filter(function (e) { return !(['13055', '69123', '75056'].includes(e.properties.code)); });
 						dataPLM.features = dataPLM.features.filter(function (e) { return e.properties.code.substring(0, 2) == codeDepartement; });
@@ -574,7 +574,7 @@ function invalidateMap() {
 	);
 
 	// Chargement des contours des départements
-	$.getJSON("donneesgeo/departements-100m.geojson",
+	$.getJSON("/donneesgeo/departements-100m.geojson",
 		function (data) {
 			departements = data;
 			departements.features.forEach(function (state) {
@@ -588,7 +588,7 @@ function invalidateMap() {
 	);
 
 	// On récupère la plage des mutations de la base
-	$.getJSON("api/dates",
+	$.getJSON("/api/dates",
 		function (data) {
 			dateMin = (new Date(data.min)).toLocaleDateString('fr-FR');
 			dateMax = (new Date(data.max)).toLocaleDateString('fr-FR');
