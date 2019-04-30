@@ -243,7 +243,7 @@ function resetSourcesData(sources) {
 }
 
 function fit(geosjon) {
-	var bbox = turf.extent(geosjon)
+	var bbox = turf.bbox(geosjon)
 	map.fitBounds(bbox, { padding: 20 })
 }
 
