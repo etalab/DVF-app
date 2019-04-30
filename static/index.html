@@ -9,8 +9,9 @@
 		<link rel="stylesheet" href="css/app.css"/>
 		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.min.js"></script>
-		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
-		<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+		<script src='https://unpkg.com/mapbox-gl@0.54.0/dist/mapbox-gl.js'></script>
+		<link href='https://unpkg.com/mapbox-gl@0.54.0/dist/mapbox-gl.css' rel='stylesheet' />
+		<script src='https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js'></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -76,6 +77,7 @@
 			<div id="content">
 				<div id="mapid"></div>
 			</div>
+
 			<div id="sidebar_right" class="container" v-if="parcelle != null && parcelle.mutations.length > 0">
 				<span onclick="sortirDeParcelle()" class="mt-2 mb-2 close-link">Fermer</span>
 				<br/>
