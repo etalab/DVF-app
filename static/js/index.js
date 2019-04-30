@@ -381,22 +381,21 @@ function onSectionClicked(event) {
 
 function entrerDansMutation(sonIndex) {
 	vue.mutationIndex = sonIndex;
-	leCode = vue.parcelle.mutations.length > 0 ? vue.parcelle.mutations[0].infos[0]['Code parcelle'] : '';
 
+	codesParcelles = [codeParcelle];
 	if (sonIndex != null) {
-		codesParcelles = [leCode];
 
 		for (autre of vue.parcelle.mutations[sonIndex].mutations_liees) {
 			codesParcelles.push(autre['Code parcelle']);
 		}
-
-		map.setPaintProperty('parcelles-layer', 'fill-color', [
-			'case',
-			['match',['get', 'id'], codesParcelles, true, false],
-			"#ff8FD8",
-			"#627BC1"
-		])
 	}
+
+	map.setPaintProperty('parcelles-layer', 'fill-color', [
+		'case',
+		['match',['get', 'id'], codesParcelles, true, false],
+		"#ff8FD8",
+		"#627BC1"
+	])
 }
 
 function entrerDansSection(sonCode) {
