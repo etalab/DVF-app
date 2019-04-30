@@ -521,9 +521,6 @@ function entrerDansDepartement(sonCode) {
 			}
 		}
 	);
-
-
-
 }
 
 function afficherCommunesDepartement(geosjon) {
