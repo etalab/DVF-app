@@ -308,9 +308,11 @@ function filledCommunesOptions(feature) {
 }
 
 function filledSectionsOptions(feature) {
+	var code = getSectionCode(feature.properties)
+
 	$('#sections').append($('<option />', {
-		value: (feature.properties.prefixe + ('0' + feature.properties.code).slice(-2)),
-		text: (feature.properties.prefixe + ('0' + feature.properties.code).slice(-2)).replace(/^0+/, '')
+		value: code,
+		text: code.replace(/^0+/, '')
 	}))
 }
 
@@ -366,9 +368,13 @@ function sortirDeParcelle() {
 	entrerDansSection(codeSection);
 }
 
+function getSectionCode(section) {
+	const {prefixe, code} = section
+	return (prefixe + ('0' + code).slice(-2))
+}
+
 function onSectionClicked(event) {
-	var { prefixe, code } = event.features[0].properties
-	sonCode = `${prefixe}0${code.slice(-2)}`
+	sonCode = getSectionCode(event.features[0].properties)
 	document.getElementById("sections").value = sonCode;
 	entrerDansSection(sonCode);
 }
@@ -417,9 +423,9 @@ function entrerDansSection(sonCode) {
 		// Une fois qu'on a la géographie et les mutations, on fait tout l'affichage
 		function (data) {
 			data_geo.features = data_geo.features.filter(function(e) {
-				return (sonCode == (e.properties.prefixe + ('0'+ e.properties.section).slice(-2)))
-			}).sort(function(e,a){
-				return(e.id).localeCompare(a.id) ;
+				return (sonCode == getSectionCode({ prefixe: e.properties.prefixe, code: e.properties.section}))
+			}).sort(function (e, a) {
+				return (e.id).localeCompare(a.id);
 			});
 
 			parcelles = data[0]
