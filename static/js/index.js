@@ -96,10 +96,6 @@ var data_section = null;
 var dateMin = '01-01-2015';
 var dateMax = '01-01-2019';
 
-
-var dateMin = '01-01-2015';
-var dateMax = '01-01-2019';
-
 // Fonctions
 
 /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
