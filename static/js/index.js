@@ -143,6 +143,12 @@ var sections = null;
 var sectionsLayer = {
 	id: 'sections-layer',
 	source: 'sections',
+	type: 'fill',
+	paint: fillLayerPaint
+}
+var sectionsSymbolLayer = {
+	id: 'sections-symbol-layer',
+	source: 'sections',
 	type: 'symbol',
 	layout: {
 		'text-field': ['format',
@@ -604,8 +610,9 @@ function toggleLeftBar() {
 				generateId: true,
 				data: sections
 			})
-			map.addLayer(sectionsLineLayer)
 			map.addLayer(sectionsLayer)
+			map.addLayer(sectionsLineLayer)
+			map.addLayer(sectionsSymbolLayer)
 
 			map.addSource("parcelles", {
 				type: 'geojson',
