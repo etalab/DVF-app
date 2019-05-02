@@ -150,6 +150,10 @@ var sectionsSymbolLayer = {
 	id: 'sections-symbol-layer',
 	source: 'sections',
 	type: 'symbol',
+	paint: {
+		'text-halo-color': '#fff',
+		'text-halo-width': 2
+	},
 	layout: {
 		'text-field': ['format',
 			['get', 'prefix'], {},
