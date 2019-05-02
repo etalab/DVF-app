@@ -587,6 +587,8 @@ function toggleLeftBar() {
 		maxZoom: 30
 	})
 
+	map.addControl(new mapboxgl.NavigationControl({showCompass: false}));
+
 	if (!mapLoaded) {
 		map.on('load', function () {
 			map.addSource("departements", {
