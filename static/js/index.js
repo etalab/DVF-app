@@ -202,10 +202,16 @@ var parcellesLayer = {
 var unmutatedParcellesLayer = {
 	id: 'unmutated-parcelles-layer',
 	source: 'parcelles',
-	type: 'line',
+	type: 'fill',
 	paint: {
-		'line-color': "#212f39",
+		'fill-color': "#212f39",
+		'fill-opacity': 0.2
 	}
+}
+var unmutatedParcellesContoursLayer = {
+	id: 'unmutated-parcelles-countours-layer',
+	source: 'parcelles',
+	type: 'line'
 }
 
 const EMPTY_FEATURE_COLLECTION = {
@@ -304,7 +310,6 @@ function onMouseLeave(event, source) {
 	if (hoveredStateId !== null) {
 		map.setFeatureState({ source, id: hoveredStateId }, { hover: false });
 	}
-	hoveredStateId = null;
 }
 
 function selectionnerDepartement() {
@@ -332,6 +337,7 @@ function selectionnerParcelle() {
 	// L'utilisateur a cliqué sur la liste déroulante des sections
 	var e = document.getElementById("parcelles");
 	var sonCode = e.options[e.selectedIndex].value;
+	console.log("TCL: selectionnerParcelle -> value", value)
 	entrerDansParcelle(sonCode);
 }
 
@@ -351,10 +357,10 @@ function filledSectionsOptions(feature) {
 	}))
 }
 
-function onEachFeatureParcelle(feature) {
+function filledParcelleOptions(feature) {
 	$('#parcelles').append($('<option />', {
-		value: feature.id,
-		text: feature.id
+		value: feature.properties.id,
+		text: feature.properties.id
 	}))
 }
 
@@ -472,7 +478,7 @@ function entrerDansSection(sonCode) {
 
 			fit(parcelles)
 
-			parcelles.features.map(onEachFeatureParcelle)
+			parcelles.features.map(filledParcelleOptions)
 
 			var parcellesCodes = data_section.donnees.map(parcelle => parcelle['Code parcelle'])
 			parcellesCodes.unshift('id')
@@ -485,7 +491,7 @@ function entrerDansSection(sonCode) {
 
 			map.setFilter('parcelles-layer', includesMutated) // include
 			map.setFilter('unmutated-parcelles-layer', exludesMutated) // exclude
-			map.setFilter('sections-layer', ['!=', ['get', 'code'], codeSection.slice(-1)]) // TODO le code n'est pas le bon (prefixe+code)
+			map.setFilter('sections-layer', ['!=', ['get', 'code'], sonCode.replace(/^0+/, '')])
 
 			fit(parcelles)
 			vue.section = {
@@ -659,6 +665,7 @@ function toggleLeftBar() {
 			})
 			map.addLayer(parcellesLayer)
 			map.addLayer(unmutatedParcellesLayer)
+			map.addLayer(unmutatedParcellesContoursLayer)
 		})
 
 		mapLoaded = true
