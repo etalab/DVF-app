@@ -56,7 +56,6 @@ def send_donneesgeo(path):
 
 @app.route('/api/mutations2/<commune>/<sectionPrefixee>/from=<dateminimum>&to=<datemaximum>')
 def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
-	print("On récupère les mutations")
 	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE code_commune = %(code)s AND section_prefixe = %(sectionPrefixee)s AND date_mutation >= %(datemin)s AND date_mutation <= %(datemax)s """, engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee, "datemin": dateminimum, "datemax": datemaximum})
 
 	mutations = mutations.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
@@ -72,7 +71,6 @@ def get_parcelle(parcelle, dateminimum, datemaximum):
 								params = {"code": parcelle, "datemin": dateminimum, "datemax": datemaximum})
 	mutations = mutations.sort_values(by=['date_mutation'], ascending = False)
 	mutations['valeur_fonciere'] = mutations['valeur_fonciere'].round()
-	print(mutations['valeur_fonciere'])
 	
 	json_mutations = []
 	for mutationIndex in mutations.id_mutation.unique():
@@ -82,7 +80,8 @@ def get_parcelle(parcelle, dateminimum, datemaximum):
 
 		# Informations générales
 		infos = df_s.iloc[[0]]
-		
+		infos = infos.reset_index()
+
 		date = infos['date_mutation'][0]
 		codeInsee = infos['code_commune'][0]
 		section = infos['section_prefixe'][0]
