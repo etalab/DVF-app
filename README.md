@@ -17,6 +17,8 @@ Une API développée par Christian Quest est disponible [ici](http://api.cquest.
 Il faut un serveur Linux, avec au minium PostgreSQL et Python (Flask). Pour héberger l'application, ajouter Nginx, Supervisor et GUnicorn.
 
 ### Base de données
+**Le modèle de données a changé le 02/05, cette section sera mise à jour très vite**
+
 
 Pour préparer la base de données, il faut lancer le script dédié. On peut procéder ainsi :
 
