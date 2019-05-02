@@ -108,7 +108,8 @@ def get_parcelle(parcelle, dateminimum, datemaximum):
 		# Terrains 
 		terrains = df_s[['nature_culture', 'nature_culture_speciale', 'surface_terrain']].drop_duplicates()
 		terrains['nature_culture'] = terrains['nature_culture'].str.capitalize() 
-		terrains = terrains[terrains['surface_terrain'] != "None"]
+		terrains = terrains[terrains['nature_culture'] != "None"]
+		
 		terrains = terrains.fillna("")
 		terrains = terrains.to_json(orient = 'records')
 		
