@@ -593,13 +593,20 @@ function toggleLeftBar() {
 
 	if (!mapLoaded) {
 		map.on('load', function () {
-			map.addSource("departements", {
-				type: 'geojson',
-				generateId: true,
-				data: departements
-			})
-			map.addLayer(departementsLayer)
-			map.addLayer(departementsContoursLayer)
+			// Chargement des contours des départements
+			$.getJSON("/donneesgeo/departements-100m.geojson",
+				function (data) {
+					departements = data
+
+					map.addSource("departements", {
+						type: 'geojson',
+						generateId: true,
+						data
+					})
+					map.addLayer(departementsLayer)
+					map.addLayer(departementsContoursLayer)
+				}
+			)
 
 			map.addSource("communes", {
 				type: 'geojson',
@@ -707,14 +714,6 @@ function toggleLeftBar() {
 			});
 		}
 	);
-
-	// Chargement des contours des départements
-	$.getJSON("/donneesgeo/departements-100m.geojson",
-		function (data) {
-			departements = data
-			map.getSource('departements').setData(departements)
-		}
-	)
 
 	// On récupère la plage des mutations de la base
 	$.getJSON("/api/dates",
