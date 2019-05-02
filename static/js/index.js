@@ -96,9 +96,6 @@ var data_section = null;
 var dateMin = '01-01-2015';
 var dateMax = '01-01-2019';
 
-var dateMin = '01-01-2015';
-var dateMax = '01-01-2019';
-
 var hoverableSources = ['departements', 'communes', 'sections', 'parcelles']
 var fillLayerPaint = {
 	"fill-color": ["case",
