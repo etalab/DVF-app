@@ -270,7 +270,7 @@ function resetSourcesData(sources) {
 
 function fit(geosjon) {
 	var bbox = turf.bbox(geosjon)
-	map.fitBounds(bbox, { padding: 20 })
+	map.fitBounds(bbox, { padding: 20, animate: false })
 }
 
 function onMouseMove(event, source) {
@@ -580,7 +580,27 @@ function toggleLeftBar() {
 	// Mise en place de la carte
 	map = new mapboxgl.Map({
 		container: 'mapid',
-		style: 'https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json',
+		style: {
+			"version": 8,
+			"glyphs": "https://openmaptiles.geo.data.gouv.fr/fonts/{fontstack}/{range}.pbf",
+			"sources": {
+				"raster-tiles": {
+					"type": "raster",
+					"tiles": [
+						"https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+					],
+					"tileSize": 256,
+					"attribution": '© Contributeurs <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+				}
+			},
+			"layers": [
+				{
+					"id": "simple-tiles",
+					"type": "raster",
+					"source": "raster-tiles"
+				}
+			]
+		},
 		center: [3, 47],
 		zoom: 5,
 		minZoom: 0,
