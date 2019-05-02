@@ -98,22 +98,14 @@ var dateMax = '01-01-2019';
 
 var hoverableSources = ['departements', 'communes', 'sections', 'parcelles']
 var fillLayerPaint = {
-	"fill-color": ["case",
-		["boolean", ["feature-state", "selected"], false],
-		"#ff5FA8",
-		"#2a4ba9"
-	],
-	"fill-outline-color": ["case",
-		["boolean", ["feature-state", "selected"], false],
-		"#ff8FD8",
-		"#627BC1"
-	],
+	"fill-color": "#2a4ba9",
+	"fill-outline-color": "#627BC1",
 	"fill-opacity": ["case",
 		["boolean", ["feature-state", "hover"], false],
-		0.8,
+		0.4,
 		["boolean", ["feature-state", "selected"], false],
-		0.8,
-		0.4
+		0.4,
+		0
 	]
 }
 
@@ -124,6 +116,11 @@ var departementsLayer = {
 	type: 'fill',
 	paint: fillLayerPaint
 }
+var departementsContoursLayer = {
+	id: 'departements-contours-layer',
+	source: 'departements',
+	type: 'line'
+}
 
 var communes = null;
 var communesLayer = {
@@ -131,6 +128,11 @@ var communesLayer = {
 	source: 'communes',
 	type: 'fill',
 	paint: fillLayerPaint
+}
+var communesContoursLayer = {
+	id: 'communes-contours-layer',
+	source: 'communes',
+	type: 'line'
 }
 
 var sections = null;
@@ -151,7 +153,6 @@ var sectionsLineLayer = {
 	source: 'sections',
 	type: 'line',
 	paint: {
-		"line-color": "#1b388a",
 		"line-width": [
 			'case',
 			["boolean", ["feature-state", "hover"], false],
@@ -166,7 +167,25 @@ var parcellesLayer = {
 	id: 'parcelles-layer',
 	source: 'parcelles',
 	type: 'fill',
-	paint: fillLayerPaint
+	paint: {
+		"fill-color": ["case",
+			["boolean", ["feature-state", "selected"], false],
+			"#ff5FA8",
+			"#2a4ba9"
+		],
+		"fill-outline-color": ["case",
+			["boolean", ["feature-state", "selected"], false],
+			"#ff8FD8",
+			"#627BC1"
+		],
+		"fill-opacity": ["case",
+			["boolean", ["feature-state", "hover"], false],
+			0.8,
+			["boolean", ["feature-state", "selected"], false],
+			0.8,
+			0.4
+		]
+	}
 }
 var unmutatedParcellesLayer = {
 	id: 'unmutated-parcelles-layer',
@@ -362,6 +381,10 @@ function entrerDansParcelle(sonCode) {
 }
 
 function sortirDeParcelle() {
+	map.setPaintProperty('parcelles-layer', 'fill-color', "#627BC1")
+	if (selectedStateId) {
+		map.setFeatureState({ source: 'parcelles', id: selectedStateId }, { selected: false });
+	}
 	entrerDansSection(codeSection);
 }
 
@@ -562,6 +585,7 @@ function toggleLeftBar() {
 				data: departements
 			})
 			map.addLayer(departementsLayer)
+			map.addLayer(departementsContoursLayer)
 
 			map.addSource("communes", {
 				type: 'geojson',
@@ -569,6 +593,7 @@ function toggleLeftBar() {
 				data: communes
 			})
 			map.addLayer(communesLayer)
+			map.addLayer(communesContoursLayer)
 
 			map.addSource("sections", {
 				type: 'geojson',
