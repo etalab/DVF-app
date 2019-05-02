@@ -259,6 +259,15 @@ function exportJson(el) {
 }
 */
 
+function uniq(array) {
+	return Object.keys(
+		array.reduce(function (acc, item) {
+			acc[item] = true
+			return acc
+		}, {})
+	)
+}
+
 function resetSourcesData(sources) {
 	sources.map(source => {
 		var source = map.getSource(source)
@@ -422,7 +431,7 @@ function entrerDansMutation(sonIndex) {
 
 	map.setPaintProperty('parcelles-layer', 'fill-color', [
 		'case',
-		['match',['get', 'id'], codesParcelles, true, false],
+		['match', ['get', 'id'], uniq(codesParcelles), true, false],
 		"#ff8FD8",
 		"#627BC1"
 	])
