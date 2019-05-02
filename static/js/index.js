@@ -200,11 +200,9 @@ var parcellesLayer = {
 var unmutatedParcellesLayer = {
 	id: 'unmutated-parcelles-layer',
 	source: 'parcelles',
-	type: 'fill',
+	type: 'line',
 	paint: {
-		'fill-color': "#212f39",
-		"fill-outline-color": "#222",
-		'fill-opacity': 0.2
+		'line-color': "#212f39",
 	}
 }
 
