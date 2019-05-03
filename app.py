@@ -64,6 +64,16 @@ def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
 	
 	return json_mutations
 
+@app.route('/api/mutations3/<commune>/<sectionPrefixee>')
+def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
+	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE code_commune = %(code)s AND section_prefixe = %(sectionPrefixee)s""", engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee})
+
+	mutations = mutations.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
+	nbMutations = len(mutations.id_mutation.unique())
+	json_mutations = '{"donnees": ' + mutations.to_json(orient = 'records') + ', "nbMutations": ' + str(nbMutations) + '}'
+
+	return json_mutations
+
 @app.route('/api/parcelles2/<parcelle>/from=<dateminimum>&to=<datemaximum>')
 def get_parcelle(parcelle, dateminimum, datemaximum):
 	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE id_parcelle = %(code)s AND date_mutation >= %(datemin)s AND date_mutation <= %(datemax)s ;""", 
