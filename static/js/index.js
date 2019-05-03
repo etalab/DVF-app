@@ -634,9 +634,14 @@ function computeParcelle(mutationsSection, idParcelle) {
 				})
 				.value()
 
-			return {infos, parcellesLiees, batiments, terrains}
+			return {
+				infos: infos,
+				parcellesLiees: parcellesLiees,
+				batiments: batiments,
+				terrains: terrains
+			}
   	})
 		.value()
 
-	return {mutations}
+	return {mutations: mutations}
 }
