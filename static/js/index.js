@@ -34,6 +34,9 @@ Vue.component('boite-accordeon', {
 							<b>{{ formatterNombre(mutation.infos[0]['valeur_fonciere']) }} € / {{ mutation.infos[0]['nature_mutation'] }}</b><br>
 							<span>{{ mutation.infos[0]['date_mutation'] }}</span>
 			 			</div>
+						<div v-if="vue.mutationIndex != index" class="ml-1 mr-1">
+							<i class="fas fa-sort-down fa-1x"></i>
+						</div>						
 					</div>
 					<div v-if="vue.mutationIndex == index" style="background-color: #eee" class="mt-3">
 						<boite 
