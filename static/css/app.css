@@ -8,10 +8,6 @@ th {
 	color: black;
 }
 
-@media (max-width: 768px) {
-    .long-text { display: none; }
-}
-
 .wrapper {
   width: 100%;
   height: calc(100vh - 48px);
@@ -106,4 +102,12 @@ th {
 
 .topnav-right {
   float: right;
+}
+
+@media (max-width: 768px) {
+  .long-text { display: none; }
+
+  .wrapper {
+    height: calc(100vh - 98px);
+  }
 }
