@@ -14,7 +14,7 @@ th {
 
 .wrapper {
   width: 100%;
-  height: calc(100vh - 49px);
+  height: calc(100vh - 48px);
 	display: flex;
 }
 
@@ -38,7 +38,6 @@ th {
 }
 
 .scrollable {
-  height: 95vh;
   overflow-y: scroll;
 }
 
