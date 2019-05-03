@@ -80,7 +80,7 @@
 			<div id="sidebar_right" class="container scrollable" v-if="parcelle != null && parcelle.mutations.length > 0">
 				<span onclick="sortirDeParcelle()" class="mt-2 mb-2 close-link">Fermer</span>
 				<br/>
-				<boite-accordeon  v-for="(mutation, index) in parcelle.mutations" :mutation="mutation" :key="mutation.infos[0]['Code parcelle'] + index" :index="index"></boite-accordeon>
+				<boite-accordeon  v-for="(mutation, index) in parcelle.mutations" :mutation="mutation" :key="mutation.infos[0].id_parcelle + index" :index="index"></boite-accordeon>
 			</div>
 		</div>
 
