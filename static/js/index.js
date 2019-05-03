@@ -93,8 +93,8 @@ var data_dvf = null;
 var nom_fichier_section = null;
 var data_section = null;
 
-var dateMin = '01-01-2015';
-var dateMax = '01-01-2019';
+var dateMin = '01-01-2014';
+var dateMax = '31-12-2018';
 
 // Fonctions
 

@@ -70,7 +70,6 @@ def get_parcelle(parcelle, dateminimum, datemaximum):
 								engine, 
 								params = {"code": parcelle, "datemin": dateminimum, "datemax": datemaximum})
 	mutations = mutations.sort_values(by=['date_mutation'], ascending = False)
-	mutations['valeur_fonciere'] = mutations['valeur_fonciere'].round()
 	
 	json_mutations = []
 	for mutationIndex in mutations.id_mutation.unique():
