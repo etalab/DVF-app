@@ -89,7 +89,6 @@ th {
 .topnav a:hover {
   background-color: #ddd;
   color: black;
-  font-weight: bold;
 }
 
 .topnav a.active {
