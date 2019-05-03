@@ -31,22 +31,22 @@ Vue.component('boite-accordeon', {
 							<i class="fas fa-file-signature fa-fw fa-2x"></i>
 						</div>
 						<div class="media-body text-left ml-1">
-							<b>{{ mutation.infos[0]['Valeur fonciere'] }} € / {{ mutation.infos[0]['Nature mutation'] }}</b><br>
-							<span>{{ mutation.infos[0]['Date mutation'] }}</span>
+							<b>{{ formatterNombre(mutation.infos[0]['valeur_fonciere']) }} € / {{ mutation.infos[0]['nature_mutation'] }}</b><br>
+							<span>{{ mutation.infos[0]['date_mutation'] }}</span>
 			 			</div>
 					</div>
 					<div v-if="vue.mutationIndex == index" style="background-color: #eee" class="mt-3">
 						<boite
 							v-for="batiment in mutation.batiments"
-							:valeur="(batiment['Code type local'] != 3) ? (batiment['Surface reelle bati'] + ' m²') : ''"
-							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['Code type local']]"
-							:texte="batiment['Type local'] + ((batiment['Code type local'] < 3) ? (' / ' + batiment['Nombre pieces principales'] + ' p') : '')">
+							:valeur="(batiment['code_type_local'] != 3) ? (formatterNombre(batiment['surface_reelle_bati']) + ' m²') : ''"
+							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['code_type_local']]"
+							:texte="batiment['type_local'] + ((batiment['code_type_local'] < 3) ? (' / ' + batiment['nombre_pieces_principales'] + ' p') : '')">
 						</boite>
 						<boite
 							v-for="terrain in mutation.terrains"
-							:valeur="terrain['Surface terrain'] + ' m²'"
+							:valeur="formatterNombre(terrain['surface_terrain']) + ' m²'"
 							icone="fa fa-tree"
-							:texte="terrain['Libellé Nature de Culture'] + (terrain['Libellé Nature Culture Spéciale'] != '' ? ' / ' + terrain['Libellé Nature Culture Spéciale'] : '')">
+							:texte="terrain['nature_culture'] + (terrain['nature_culture_speciale'] != 'None' ? ' / ' + terrain['nature_culture_speciale'] : '')">
 						</boite>
 							<div v-if="mutation.mutations_liees.length > 0" style = "padding:0.5rem">
 								Cette mutation contient des dispositions dans des parcelles adjacentes. La valeur foncière correspond au total.
@@ -371,24 +371,21 @@ function onParcelleClicked(event) {
 	entrerDansParcelle(sonCode);
 }
 
+function formatterNombre(nombreDecimal) {
+
+	return nombreDecimal.replace(/\..*/g, '').replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
+}
+
 function entrerDansParcelle(sonCode) {
 	codeParcelle = sonCode;
 	data_parcelle = null;
-	$.getJSON("/api/parcelles/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-")  + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
+	$.getJSON("/api/parcelles2/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-")  + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
 		function (data) {
 			data_parcelle = data;
 
 			// Formattage des champs pour l'affichage
 			for (m = 0; m < data_parcelle.mutations.length; m++){
-				data_parcelle.mutations[m].infos[0]['Date mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['Date mutation'])).toLocaleDateString('fr-FR');
-				data_parcelle.mutations[m].infos[0]['Valeur fonciere'] = data_parcelle.mutations[m].infos[0]['Valeur fonciere'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
-
-				for (b = 0 ; b < data_parcelle.mutations[m].batiments.length; b++){
-					data_parcelle.mutations[m].batiments[b]['Surface reelle bati'] = data_parcelle.mutations[m].batiments[b]['Surface reelle bati'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
-				}
-				for (ter = 0 ; ter < data_parcelle.mutations[m].terrains.length; ter++){
-					data_parcelle.mutations[m].terrains[ter]['Surface terrain'] = data_parcelle.mutations[m].terrains[ter]['Surface terrain'].replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
-				}
+				data_parcelle.mutations[m].infos[0]['date_mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['date_mutation'])).toLocaleDateString('fr-FR');
 			}
 
 			vue.parcelle = {
@@ -431,7 +428,7 @@ function entrerDansMutation(sonIndex) {
 	if (sonIndex != null) {
 
 		for (autre of vue.parcelle.mutations[sonIndex].mutations_liees) {
-			codesParcelles.push(autre['Code parcelle']);
+			codesParcelles.push(autre['id_parcelle']);
 		}
 	}
 
@@ -457,7 +454,7 @@ function entrerDansSection(sonCode) {
 			}
 		),
 		// Charge les mutations
-		$.getJSON("/api/mutations/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
+		$.getJSON("/api/mutations2/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
 			function (data) {
 				data_section = data;
 				data_dvf = data.donnees;
@@ -480,7 +477,7 @@ function entrerDansSection(sonCode) {
 
 			parcelles.features.map(filledParcelleOptions)
 
-			var parcellesCodes = data_section.donnees.map(parcelle => parcelle['Code parcelle'])
+			var parcellesCodes = data_section.donnees.map(parcelle => parcelle.id_parcelle)
 			parcellesCodes.unshift('id')
 
 			var includesMutated = parcellesCodes.slice()
@@ -750,7 +747,7 @@ function toggleLeftBar() {
 	);
 
 	// On récupère la plage des mutations de la base
-	$.getJSON("/api/dates",
+	$.getJSON("/api/dates2",
 		function (data) {
 			dateMin = (new Date(data.min)).toLocaleDateString('fr-FR');
 			dateMax = (new Date(data.max)).toLocaleDateString('fr-FR');

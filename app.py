@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
+pd.set_option('precision', 0)
 
 app = Flask(__name__, static_url_path='')
 
@@ -17,16 +18,14 @@ config = pd.read_csv('config.csv', header=None)
 id = config[0][0]
 pwd = config[0][1]
 host = config[0][2]
-engine = create_engine('postgresql://%s:%s@%s/dvf'%(id, pwd, host))
+engine = create_engine('postgresql://%s:%s@%s/dvf2'%(id, pwd, host))
 
-# Chargement des natures de culture
-cultures = pd.read_csv('TableNatureCulture.csv')
-culturesSpeciales = pd.read_csv('TableNatureSpeciale.csv')
+# Chargement des natures de culture plus besoin
 
-@app.route('/api/dates')
+@app.route('/api/dates2')
 def dates():
-	dateMin = pd.read_sql("""SELECT min("Date mutation") FROM public.dvf """, engine)
-	dateMax = pd.read_sql("""SELECT max("Date mutation") FROM public.dvf """, engine)
+	dateMin = pd.read_sql("""SELECT min(date_mutation) FROM public.dvf """, engine)
+	dateMax = pd.read_sql("""SELECT max(date_mutation) FROM public.dvf """, engine)
 	return '{"min": "' + str(dateMin['min'][0]) + '", "max": "' + str(dateMax['max'][0]) + '"}'
 
 
@@ -55,77 +54,72 @@ def send_donneesgeo(path):
 	return send_from_directory('static/donneesgeo', path)
 
 
-@app.route('/api/mutations/<commune>/<sectionPrefixee>/from=<dateminimum>&to=<datemaximum>')
+@app.route('/api/mutations2/<commune>/<sectionPrefixee>/from=<dateminimum>&to=<datemaximum>')
 def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
-	print("On récupère les mutations")
-	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE "Code INSEE" = %(code)s AND "Section prefixe" = %(sectionPrefixee)s AND "Date mutation" >= %(datemin)s AND "Date mutation" <= %(datemax)s """, engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee, "datemin": dateminimum, "datemax": datemaximum})
-	
-	mutations = mutations.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
+	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE code_commune = %(code)s AND section_prefixe = %(sectionPrefixee)s AND date_mutation >= %(datemin)s AND date_mutation <= %(datemax)s """, engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee, "datemin": dateminimum, "datemax": datemaximum})
 
-	group_vars = ['No disposition','Date mutation', 'Valeur fonciere']
-	mutations = mutations.merge(mutations[group_vars].drop_duplicates(group_vars).reset_index(), on=group_vars)
-	mutations = mutations.rename(index=str, columns={"index": "groupe"})
-	nbMutations = len(mutations.groupe.unique())
+	mutations = mutations.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
+	nbMutations = len(mutations.id_mutation.unique())
 	json_mutations = '{"donnees": ' + mutations.to_json(orient = 'records') + ', "nbMutations": ' + str(nbMutations) + '}'
 	
 	return json_mutations
 
-@app.route('/api/parcelles/<parcelle>/from=<dateminimum>&to=<datemaximum>')
+@app.route('/api/parcelles2/<parcelle>/from=<dateminimum>&to=<datemaximum>')
 def get_parcelle(parcelle, dateminimum, datemaximum):
-	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE "Code parcelle" = %(code)s AND "Date mutation" >= %(datemin)s AND "Date mutation" <= %(datemax)s ;""", 
+	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE id_parcelle = %(code)s AND date_mutation >= %(datemin)s AND date_mutation <= %(datemax)s ;""", 
 								engine, 
 								params = {"code": parcelle, "datemin": dateminimum, "datemax": datemaximum})
-	group_vars = ['No disposition','Date mutation', 'Valeur fonciere']
-	mutations = mutations.merge(mutations[group_vars].drop_duplicates(group_vars).reset_index(), on=group_vars)
-	mutations = mutations.rename(index=str, columns={"index": "groupe"})
-	mutations = mutations.sort_values(by=['Date mutation'], ascending = False)
-
+	mutations = mutations.sort_values(by=['date_mutation'], ascending = False)
+	mutations['valeur_fonciere'] = mutations['valeur_fonciere'].round()
+	
 	json_mutations = []
-	for mutationIndex in mutations.groupe.unique():
-		df_s = mutations.loc[mutations.groupe == mutationIndex]
+	for mutationIndex in mutations.id_mutation.unique():
+		df_s = mutations.loc[mutations.id_mutation == mutationIndex]
+		
 		df_s = df_s.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
 
 		# Informations générales
 		infos = df_s.iloc[[0]]
-		
-		date = infos['Date mutation'][0]
-		codeInsee = infos['Code INSEE'][0]
-		section = infos['Section prefixe'][0]
-		prix = infos['Valeur fonciere'][0]
-		parcelle = mutations['Code parcelle'][0]
+		infos = infos.reset_index()
+
+		date = infos['date_mutation'][0]
+		codeInsee = infos['code_commune'][0]
+		section = infos['section_prefixe'][0]
+		prix = infos['valeur_fonciere'][0]
+		parcelle = mutations['id_parcelle'][0]
 		
 		infos = infos.to_json(orient = 'records')
 		
 		# Mutations liées
-		mutations_liees = pd.read_sql("""SELECT * FROM public.dvf WHERE "Date mutation" = %(date)s AND  "Code INSEE" = %(codeInsee)s AND  "Section prefixe" = %(section)s AND  "Valeur fonciere" = %(prix)s AND  "Code parcelle"<> %(parcelle)s;""", 
+		mutations_liees = pd.read_sql("""SELECT * FROM public.dvf WHERE date_mutation = %(date)s AND  code_commune = %(codeInsee)s AND  section_prefixe = %(section)s AND  valeur_fonciere = %(prix)s AND  id_parcelle<> %(parcelle)s;""", 
                                   engine, 
 								  params = {"date": date, "codeInsee" : codeInsee, "section" : section, "prix" : prix, "parcelle" : parcelle})
-		mutations_liees['Type local'].replace('Local industriel. commercial ou assimilé', 'Local industriel commercial ou assimilé', inplace = True)
+		mutations_liees['type_local'].replace('Local industriel. commercial ou assimilé', 'Local industriel commercial ou assimilé', inplace = True)
 		mutations_liees = mutations_liees.to_json(orient = 'records')
 		
 
 		# Maison, dépendances et locaux commerciaux
-		batiments = df_s[['Code type local', 'Type local', 'Surface reelle bati', 'Nombre pieces principales']].drop_duplicates()
-		batiments = batiments[batiments['Type local'] != "None"]
-		batiments = batiments.sort_values(by=['Code type local'])
-		batiments['Type local'].replace('Local industriel. commercial ou assimilé', 'Local industriel commercial ou assimilé', inplace = True)		
+		batiments = df_s[['code_type_local', 'type_local', 'surface_reelle_bati', 'nombre_pieces_principales']].drop_duplicates()
+		batiments = batiments[batiments['type_local'] != "None"]
+		batiments = batiments.sort_values(by=['code_type_local'])
+		batiments['type_local'].replace('Local industriel. commercial ou assimilé', 'Local industriel commercial ou assimilé', inplace = True)	
 		batiments = batiments.to_json(orient = 'records')
 
 		# Terrains 
-		terrains = df_s[['Nature culture', 'Nature culture speciale', 'Surface terrain']].drop_duplicates()
-		terrains = terrains[terrains['Surface terrain'] != "None"]
-		terrains = terrains.merge(cultures, left_on='Nature culture', right_on='Code Nature de Culture', how = 'left')
-		terrains = terrains.merge(culturesSpeciales, left_on='Nature culture speciale', right_on='Code Nature Culture Spéciale', how = 'left')
+		terrains = df_s[['nature_culture', 'nature_culture_speciale', 'surface_terrain']].drop_duplicates()
+		terrains['nature_culture'] = terrains['nature_culture'].str.capitalize() 
+		terrains = terrains[terrains['nature_culture'] != "None"]
+		
 		terrains = terrains.fillna("")
 		terrains = terrains.to_json(orient = 'records')
+		
 
 		# Appartements avec lots
-		
-		lots = df_s[['1er lot', 'Surface Carrez du 1er lot',
-				 '2eme lot', 'Surface Carrez du 2eme lot', 
-				 '3eme lot', 'Surface Carrez du 3eme lot',
-				 '4eme lot', 'Surface Carrez du 4eme lot',
-				 '5eme lot', 'Surface Carrez du 5eme lot']].drop_duplicates()
+		lots = df_s[['lot1_numero', 'lot1_surface_carrez', 
+					'lot2_numero', 'lot2_surface_carrez',
+					'lot3_numero', 'lot3_surface_carrez',
+					'lot4_numero', 'lot4_surface_carrez',
+					'lot5_numero', 'lot5_surface_carrez']].drop_duplicates()
 		lots.columns = ['Lot1', 'Carrez1', 'Lot2', 'Carrez2', 'Lot3', 'Carrez3', 'Lot4', 'Carrez4', 'Lot5', 'Carrez5']
 		
 		lots['id'] = range(1, len(lots) + 1)
@@ -137,7 +131,7 @@ def get_parcelle(parcelle, dateminimum, datemaximum):
 		json_mutation = '{"infos": ' + infos + ', "batiments": ' + batiments + ', "terrains": ' + terrains + ', "lots": ' + lots + ', "mutations_liees": ' + mutations_liees + '}'
 		json_mutations.append(json_mutation)
 
-	retour = '{"mutations": [' + ', '.join(json_mutations) + '], "nbMutations": [' + str(len(mutations.groupe.unique())) +  ']}'
+	retour = '{"mutations": [' + ', '.join(json_mutations) + '], "nbMutations": [' + str(len(mutations.id_mutation.unique())) +  ']}'
 	return retour
 
 

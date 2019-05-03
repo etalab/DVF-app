@@ -25,7 +25,7 @@ git clone https://github.com/marion-paclot/DVF
 sh DVF/db/build_db.sh
 ```
 
-Le script commence par créer une base de données PostgreSQL et une table, puis télécharge les données brutes depuis data.gouv.fr, retire les décimales (dans les montants et surfaces), injecte les données dans la table, puis effectue une série de post-traitements (création d'index, de colonnes, normalisation de codes). Certaines étapes sont très longues (plusieurs minutes).
+Le script commence par créer une base de données PostgreSQL et une table, puis télécharge les données DVF retraitées par Etalab, disponibles [ici](https://github.com/etalab/dvf/). Enfin quelques post-traitements sont effectués (traitement de quelques minutes).
 
 ## Développer l'interface utilisateur
 
