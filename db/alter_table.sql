@@ -11,3 +11,4 @@ CREATE INDEX idx_commune ON dvf(code_commune) ;
 CREATE INDEX idx_date ON dvf(date_mutation) ;
 CREATE INDEX idx_parcelle ON dvf(id_parcelle) ;
 CREATE INDEX idx_section_commune ON dvf(code_commune, section_prefixe) ;
+CREATE INDEX id_mutation ON dvf(id_mutation) ;
