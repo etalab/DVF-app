@@ -80,6 +80,8 @@ var vue = new Vue({
 
 // Partie JavaScript standard (sans framework) --------------------------------
 
+var DISABLED_DEPARTEMENTS = ['57', '67', '68', '976'];
+
 // Définition des variables globales
 
 var codeDepartement = null;
@@ -556,6 +558,10 @@ function invalidateMap() {
 		function (data) {
 			var $select = $('#departements');
 			$.each(data, function (i, val) {
+				if (DISABLED_DEPARTEMENTS.includes(data[i].code)) {
+					return;
+				}
+
 				$select.append($('<option />', {
 					value: data[i].code,
 					text: data[i].code + ' - ' + data[i].nom
@@ -567,9 +573,12 @@ function invalidateMap() {
 	// Chargement des contours des départements
 	$.getJSON("/donneesgeo/departements-100m.geojson",
 		function (data) {
-			departements = data;
-			departements.features.forEach(function (state) {
-				var polygon = L.geoJson(state, {
+			data.features.forEach(function (feature) {
+				if (DISABLED_DEPARTEMENTS.includes(feature.properties.code)) {
+					return;
+				}
+
+				L.geoJson(feature, {
 						weight: 1,
 						fillOpacity: 0,
 						color: '#212f39',
