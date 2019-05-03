@@ -39,11 +39,11 @@ Vue.component('boite-accordeon', {
 						</div>						
 					</div>
 					<div v-if="vue.mutationIndex == index" style="background-color: #eee" class="mt-3">
-						<boite 
-							v-for="batiment in mutation.batiments" 
-							:valeur="(batiment['code_type_local'] != 3) ? (formatterNombre(batiment['surface_reelle_bati']) + ' m²') : ''" 
-							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['code_type_local']]" 
-							:texte="batiment['type_local'] + ((batiment['code_type_local'] < 3) ? (' / ' + batiment['nombre_pieces_principales'] + ' p') : '')">
+						<boite
+							v-for="batiment in mutation.batiments"
+							:valeur="(batiment['code_type_local'] != 3) ? (formatterNombre(batiment['surface_reelle_bati']) + ' m²') : ''"
+							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['code_type_local']]"
+							:texte="batiment['type_local'] + ((batiment['code_type_local'] < 3) ? (' / ' + formatterNombre(batiment['nombre_pieces_principales']) + ' p') : '')">
 						</boite>
 						<boite 
 							v-for="terrain in mutation.terrains"  
