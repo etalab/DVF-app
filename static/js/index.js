@@ -7,7 +7,7 @@ Vue.component('boite', {
 	// Les paramètres sont là
 	props: ['couleur', 'valeur', 'icone', 'texte'],
 	// La on donne le code source HTML du composant qui peut utiliser des données
-	template: 
+	template:
 		`<div class="media d-flex mt-3">
 			<div class="align-self-center ml-1 mr-1">
 				<i :class="'fa-2x fa-fw ' + icone"></i>
@@ -23,7 +23,7 @@ Vue.component('boite-accordeon', {
 	// Les paramètres sont là
 	props: ['couleur', 'mutation', 'icone', 'index'],
 	// La on donne le code source HTML du composant qui peut utiliser des données
-	
+
 	template: `<div class="card mt-3">
 				<div class="card-body" v-on:click="selectionnerMutation()">
 					<div class="media d-flex">
@@ -36,7 +36,7 @@ Vue.component('boite-accordeon', {
 			 			</div>
 						<div v-if="vue.mutationIndex != index" class="ml-1 mr-1">
 							<i class="fas fa-sort-down fa-1x"></i>
-						</div>						
+						</div>
 					</div>
 					<div v-if="vue.mutationIndex == index" style="background-color: #eee" class="mt-3">
 						<boite
@@ -45,10 +45,10 @@ Vue.component('boite-accordeon', {
 							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['code_type_local']]"
 							:texte="batiment['type_local'] + ((batiment['code_type_local'] < 3) ? (' / ' + formatterNombre(batiment['nombre_pieces_principales']) + ' p') : '')">
 						</boite>
-						<boite 
-							v-for="terrain in mutation.terrains"  
-							:valeur="formatterNombre(terrain['surface_terrain']) + ' m²'" 
-							icone="fa fa-tree" 
+						<boite
+							v-for="terrain in mutation.terrains"
+							:valeur="formatterNombre(terrain['surface_terrain']) + ' m²'"
+							icone="fa fa-tree"
 							:texte="terrain['nature_culture'] + (terrain['nature_culture_speciale'] != 'None' ? ' / ' + terrain['nature_culture_speciale'] : '')">
 						</boite>
 							<div v-if="mutation.parcellesLiees.length > 0" style = "padding:0.5rem">
@@ -119,10 +119,10 @@ $('.input-daterange input').each(function() {
 
 
 function exportCSV(el, data, fileName) {
-	
+
 	var json = data;
 	var fields = Object.keys(json[0])
-	var replacer = function(key, value) { return value === null ? '' : value } 
+	var replacer = function(key, value) { return value === null ? '' : value }
 	var csv = json.map(function(row){
 	  return fields.map(function(fieldName){
 		return JSON.stringify(row[fieldName], replacer)
@@ -130,18 +130,18 @@ function exportCSV(el, data, fileName) {
 	})
 	csv.unshift(fields.join(';')); // add header column
 	csv = csv.join('\r\n');
-	
+
 	el.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(csv));
 	el.setAttribute("download", fileName);
 }
-	
+
 /*
-// Non utilisé	
+// Non utilisé
 function exportJson(el) {
-	
+
 	var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data_dvf));
 	el.setAttribute("href", "data:"+data);
-	el.setAttribute("download", 'nomfichier.json');    
+	el.setAttribute("download", 'nomfichier.json');
 }
 */
 
@@ -228,7 +228,7 @@ function onParcelleClicked(event) {
 }
 
 function formatterNombre(nombreDecimal) {
-	
+
 	return nombreDecimal.replace(/\..*/g, '').replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
 }
 
@@ -256,7 +256,7 @@ function entrerDansParcelle(sonCode) {
 }
 
 function sortirDeParcelle() {
-	
+
 	entrerDansSection(codeSection);
 }
 
@@ -307,7 +307,7 @@ function entrerDansMutation(sonIndex) {
 }
 
 function entrerDansSection(sonCode) {
-	
+
 	codeSection = sonCode;
 	viderLabelsSections();
 	vue.parcelle = null;
@@ -405,7 +405,7 @@ function entrerDansCommune(sonCode) {
 			}
 			sectionsLayer.addTo(map);
 			map.fitBounds(sectionsLayer.getBounds());
-			
+
 			nom_fichier_commune = codeCommune + '.csv';
 			vue.commune = {
 				code: sonCode
@@ -445,7 +445,7 @@ function entrerDansDepartement(sonCode) {
 }
 
 function afficherCommunesDepartement(geojson) {
-	
+
 	if (communesLayer != null) {
 		map.removeLayer(communesLayer);
 	}
@@ -481,7 +481,7 @@ function onDepartementClick(event) {
 };
 
 function toggleLeftBar() {
-	vue.fold_left = !vue.fold_left; 
+	vue.fold_left = !vue.fold_left;
 	invalidateMap();
 }
 
@@ -552,7 +552,7 @@ function invalidateMap() {
 	});
 
 	// Chargement de la liste des départements
-	$.getJSON("https://geo.api.gouv.fr/departements?fields=nom,code", 
+	$.getJSON("https://geo.api.gouv.fr/departements?fields=nom,code",
 		function (data) {
 			var $select = $('#departements');
 			$.each(data, function (i, val) {
@@ -587,7 +587,7 @@ function invalidateMap() {
 			$('#daterange').data('daterangepicker').setEndDate(dateMax);
 		}
 	);
-	
+
 	// Sur mobile, cacher la barre latérale
 	if (window.innerWidth < 768) {
 		vue.fold_left = true;
