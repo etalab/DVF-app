@@ -34,13 +34,16 @@ Vue.component('boite-accordeon', {
 							<b>{{ formatterNombre(mutation.infos[0]['valeur_fonciere']) }} € / {{ mutation.infos[0]['nature_mutation'] }}</b><br>
 							<span>{{ mutation.infos[0]['date_mutation'] }}</span>
 			 			</div>
+						<div v-if="vue.mutationIndex != index" class="ml-1 mr-1">
+							<i class="fas fa-sort-down fa-1x"></i>
+						</div>
 					</div>
 					<div v-if="vue.mutationIndex == index" style="background-color: #eee" class="mt-3">
 						<boite
 							v-for="batiment in mutation.batiments"
 							:valeur="(batiment['code_type_local'] != 3) ? (formatterNombre(batiment['surface_reelle_bati']) + ' m²') : ''"
 							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['code_type_local']]"
-							:texte="batiment['type_local'] + ((batiment['code_type_local'] < 3) ? (' / ' + batiment['nombre_pieces_principales'] + ' p') : '')">
+							:texte="batiment['type_local'] + ((batiment['code_type_local'] < 3) ? (' / ' + formatterNombre(batiment['nombre_pieces_principales']) + ' p') : '')">
 						</boite>
 						<boite
 							v-for="terrain in mutation.terrains"
@@ -48,7 +51,7 @@ Vue.component('boite-accordeon', {
 							icone="fa fa-tree"
 							:texte="terrain['nature_culture'] + (terrain['nature_culture_speciale'] != 'None' ? ' / ' + terrain['nature_culture_speciale'] : '')">
 						</boite>
-							<div v-if="mutation.mutations_liees.length > 0" style = "padding:0.5rem">
+							<div v-if="mutation.parcellesLiees.length > 0" style = "padding:0.5rem">
 								Cette mutation contient des dispositions dans des parcelles adjacentes. La valeur foncière correspond au total.
 							</div>
 					</div>
@@ -97,8 +100,8 @@ var data_dvf = null;
 var nom_fichier_section = null;
 var data_section = null;
 
-var dateMin = '01-01-2015';
-var dateMax = '01-01-2019';
+var dateMin = '01-01-2014';
+var dateMax = '31-12-2018';
 
 var hoverableSources = ['departements', 'communes', 'sections', 'parcelles']
 var fillLayerPaint = {
@@ -283,8 +286,8 @@ function resetSourcesData(sources) {
 	})
 }
 
-function fit(geosjon) {
-	var bbox = turf.bbox(geosjon)
+function fit(geojson) {
+	var bbox = turf.bbox(geojson)
 	map.fitBounds(bbox, { padding: 20, animate: false })
 }
 
@@ -377,28 +380,24 @@ function formatterNombre(nombreDecimal) {
 
 function entrerDansParcelle(sonCode) {
 	codeParcelle = sonCode;
-	data_parcelle = null;
-	$.getJSON("/api/parcelles2/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-")  + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
-		function (data) {
-			data_parcelle = data;
+	data_parcelle = computeParcelle(data_section.donnees, sonCode)
 
-			// Formattage des champs pour l'affichage
-			for (m = 0; m < data_parcelle.mutations.length; m++){
-				data_parcelle.mutations[m].infos[0]['date_mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['date_mutation'])).toLocaleDateString('fr-FR');
-			}
 
-			vue.parcelle = {
-				code: codeParcelle,
-				n_mutations: data_parcelle.nbMutations,
-				mutations: data_parcelle.mutations,
-			};
-			if (vue.parcelle.mutations.length == 1) {
-				entrerDansMutation(0);
-			} else {
-				entrerDansMutation(null);
-			}
-		}
-	);
+	// Formattage des champs pour l'affichage
+	for (m = 0; m < data_parcelle.mutations.length; m++){
+		data_parcelle.mutations[m].infos[0]['date_mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['date_mutation'])).toLocaleDateString('fr-FR');
+	}
+
+	vue.parcelle = {
+		code: codeParcelle,
+		mutations: data_parcelle.mutations,
+	};
+
+	if (vue.parcelle.mutations.length == 1) {
+		entrerDansMutation(0);
+	} else {
+		entrerDansMutation(null);
+	}
 }
 
 function sortirDeParcelle() {
@@ -425,9 +424,8 @@ function entrerDansMutation(sonIndex) {
 
 	codesParcelles = [codeParcelle];
 	if (sonIndex != null) {
-
-		for (autre of vue.parcelle.mutations[sonIndex].mutations_liees) {
-			codesParcelles.push(autre['id_parcelle']);
+		for (parcelleLiee of vue.parcelle.mutations[sonIndex].parcellesLiees) {
+			codesParcelles.push(parcelleLiee);
 		}
 	}
 
@@ -761,3 +759,53 @@ function toggleLeftBar() {
 	}
 
 })();
+
+function computeParcelle(mutationsSection, idParcelle) {
+	var mutationsParcelle = mutationsSection.filter(function (m) {
+		return m.id_parcelle === idParcelle
+	})
+
+  var mutations = _.chain(mutationsParcelle)
+  	.groupBy('id_mutation')
+  	.map(function (rows, idMutation) {
+			var infos = [_.pick(rows[0], 'date_mutation', 'id_parcelle', 'nature_mutation', 'valeur_fonciere')]
+
+			var parcellesLiees = _.uniq(
+				mutationsSection
+					.filter(function (m) {
+						return m.id_mutation === idMutation && m.id_parcelle !== idParcelle
+					})
+					.map(function (m) {
+						return m.id_parcelle
+					})
+			)
+
+			var batiments = _.chain(mutationsParcelle)
+				.filter(function (m) {
+					return m.type_local !== 'None'
+				})
+				.uniqBy(function (m) {
+					return `${m.code_type_local}@${m.surface_reelle_bati}`
+				})
+				.value()
+
+			var terrains = _.chain(mutationsParcelle)
+				.filter(function (m) {
+					return m.nature_culture !== 'None'
+				})
+				.uniqBy(function (m) {
+					return `${m.code_nature_culture}@${m.code_nature_culture_special}@${m.surface_terrain}`
+				})
+				.value()
+
+			return {
+				infos: infos,
+				parcellesLiees: parcellesLiees,
+				batiments: batiments,
+				terrains: terrains
+			}
+  	})
+		.value()
+
+	return {mutations: mutations}
+}

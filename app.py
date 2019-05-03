@@ -70,7 +70,6 @@ def get_parcelle(parcelle, dateminimum, datemaximum):
 								engine, 
 								params = {"code": parcelle, "datemin": dateminimum, "datemax": datemaximum})
 	mutations = mutations.sort_values(by=['date_mutation'], ascending = False)
-	mutations['valeur_fonciere'] = mutations['valeur_fonciere'].round()
 	
 	json_mutations = []
 	for mutationIndex in mutations.id_mutation.unique():
@@ -91,13 +90,12 @@ def get_parcelle(parcelle, dateminimum, datemaximum):
 		infos = infos.to_json(orient = 'records')
 		
 		# Mutations liées
-		mutations_liees = pd.read_sql("""SELECT * FROM public.dvf WHERE date_mutation = %(date)s AND  code_commune = %(codeInsee)s AND  section_prefixe = %(section)s AND  valeur_fonciere = %(prix)s AND  id_parcelle<> %(parcelle)s;""", 
-                                  engine, 
-								  params = {"date": date, "codeInsee" : codeInsee, "section" : section, "prix" : prix, "parcelle" : parcelle})
+		mutations_liees = pd.read_sql("""SELECT * FROM public.dvf WHERE id_mutation = %(id_mutation)s AND id_parcelle<> %(parcelle)s;""", 
+		engine, 
+		params = {"id_mutation" : mutationIndex, "parcelle" : parcelle})
 		mutations_liees['type_local'].replace('Local industriel. commercial ou assimilé', 'Local industriel commercial ou assimilé', inplace = True)
 		mutations_liees = mutations_liees.to_json(orient = 'records')
 		
-
 		# Maison, dépendances et locaux commerciaux
 		batiments = df_s[['code_type_local', 'type_local', 'surface_reelle_bati', 'nombre_pieces_principales']].drop_duplicates()
 		batiments = batiments[batiments['type_local'] != "None"]
