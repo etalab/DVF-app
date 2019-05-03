@@ -337,7 +337,6 @@ function selectionnerParcelle() {
 	// L'utilisateur a cliqué sur la liste déroulante des sections
 	var e = document.getElementById("parcelles");
 	var sonCode = e.options[e.selectedIndex].value;
-	console.log("TCL: selectionnerParcelle -> value", value)
 	entrerDansParcelle(sonCode);
 }
 
