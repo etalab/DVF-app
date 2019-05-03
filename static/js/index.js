@@ -82,6 +82,9 @@ var vue = new Vue({
 
 // Définition des variables globales
 
+var MIN_DATE = '2014-01-01'
+var MAX_DATE = '2018-12-31'
+
 var codeDepartement = null;
 var codeCommune = null;
 var codeSection = null;
@@ -91,13 +94,12 @@ var communesLayer = null;
 var sectionsLayer = null;
 var parcellesLayer = null;
 var labelsSections = [];
-var data_dvf = null;
 
 var nom_fichier_section = null;
 var data_section = null;
 
-var dateMin = '01-01-2014';
-var dateMax = '31-12-2018';
+var startDate = MIN_DATE
+var endDate = MAX_DATE
 
 // Fonctions
 
@@ -139,7 +141,7 @@ function exportCSV(el, data, fileName) {
 // Non utilisé
 function exportJson(el) {
 
-	var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data_dvf));
+	var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data_section));
 	el.setAttribute("href", "data:"+data);
 	el.setAttribute("download", 'nomfichier.json');
 }
@@ -234,7 +236,7 @@ function formatterNombre(nombreDecimal) {
 
 function entrerDansParcelle(sonCode) {
 	codeParcelle = sonCode;
-	data_parcelle = computeParcelle(data_section.donnees, sonCode)
+	data_parcelle = computeParcelle(data_section, sonCode)
 
 
 	// Formattage des champs pour l'affichage
@@ -277,7 +279,7 @@ function entrerDansMutation(sonIndex) {
 	}
 	parcellesLayer.eachLayer(function (layer) {
 		var aColorier = false;
-		for (mutation of data_section.donnees) {
+		for (mutation of data_section) {
 			if (mutation['id_parcelle'] == layer.feature.id) {
 				aColorier = true;
 			}
@@ -321,10 +323,11 @@ function entrerDansSection(sonCode) {
 			}
 		),
 		// Charge les mutations
-		$.getJSON("/api/mutations2/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
+		$.getJSON(`/api/mutations3/${codeCommune}/${sonCode}`,
 			function (data) {
-				data_section = data;
-				data_dvf = data.donnees;
+				data_section = data.donnees.filter(function (m) {
+					return m.date_mutation >= startDate && m.date_mutation <= endDate
+				});
 			}
 		)
 	).then(
@@ -341,7 +344,7 @@ function entrerDansSection(sonCode) {
 			parcellesLayer = L.geoJson(data_geo, {
 				style: function (feature) {
 					var aColorier = false;
-					for (mutation of data_section.donnees) {
+					for (mutation of data_section) {
 						if (mutation['id_parcelle'] == feature.id) {
 							aColorier = true;
 						}
@@ -368,7 +371,6 @@ function entrerDansSection(sonCode) {
 			map.fitBounds(parcellesLayer.getBounds());
 			vue.section = {
 				code: sonCode,
-				n_mutations: data_section.nbMutations,
 			};
 		}
 	);
@@ -508,6 +510,10 @@ function invalidateMap() {
 
 	// Paramètres français du range picker
 	$('input[name="daterange"]').daterangepicker({
+		minDate: new Date(MIN_DATE),
+		maxDate: new Date(MAX_DATE),
+		startDate: new Date(startDate),
+		endDate: new Date(endDate),
 		opens: 'left',
 		"locale": {
 			"format": "DD/MM/YYYY",
@@ -544,9 +550,9 @@ function invalidateMap() {
 		}
 	}, function (start, end) {
 		// Fonction executée quand la personne change les dates
-		dateMin = start.format('DD-MM-YYYY');
-		dateMax = end.format('DD-MM-YYYY');
-		if (codeSection != null) {
+		startDate = start.format('YYYY-MM-DD');
+		endDate = end.format('YYYY-MM-DD');
+		if (codeSection !== null) {
 			entrerDansSection(codeSection);
 		}
 	});
@@ -575,16 +581,6 @@ function invalidateMap() {
 						color: '#212f39',
 					}).addTo(map).on('click', onDepartementClick);
 			});
-		}
-	);
-
-	// On récupère la plage des mutations de la base
-	$.getJSON("/api/dates2",
-		function (data) {
-			dateMin = (new Date(data.min)).toLocaleDateString('fr-FR');
-			dateMax = (new Date(data.max)).toLocaleDateString('fr-FR');
-			$('#daterange').data('daterangepicker').setStartDate(dateMin);
-			$('#daterange').data('daterangepicker').setEndDate(dateMax);
 		}
 	);
 
