@@ -51,7 +51,7 @@ Vue.component('boite-accordeon', {
 							icone="fa fa-tree" 
 							:texte="terrain['nature_culture'] + (terrain['nature_culture_speciale'] != 'None' ? ' / ' + terrain['nature_culture_speciale'] : '')">
 						</boite>
-							<div v-if="mutation.mutations_liees.length > 0" style = "padding:0.5rem">
+							<div v-if="mutation.parcellesLiees.length > 0" style = "padding:0.5rem">
 								Cette mutation contient des dispositions dans des parcelles adjacentes. La valeur foncière correspond au total.
 							</div>
 					</div>
@@ -234,30 +234,25 @@ function formatterNombre(nombreDecimal) {
 
 function entrerDansParcelle(sonCode) {
 	codeParcelle = sonCode;
-	data_parcelle = null;
-	$.getJSON("/api/parcelles2/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-")  + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
-		function (data) {
-			data_parcelle = data;
-			
-			// Formattage des champs pour l'affichage
-			for (m = 0; m < data_parcelle.mutations.length; m++){
-				data_parcelle.mutations[m].infos[0]['date_mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['date_mutation'])).toLocaleDateString('fr-FR');
-			}
+	data_parcelle = computeParcelle(data_section.donnees, sonCode)
 
-			vue.parcelle = {
-				code: codeParcelle,
-				n_mutations: data_parcelle.nbMutations,
-				mutations: data_parcelle.mutations,
-			};
-			invalidateMap();
-			
-			if (vue.parcelle.mutations.length == 1) {
-				entrerDansMutation(0);
-			} else {
-				entrerDansMutation(null);
-			}
-		}
-	);
+
+	// Formattage des champs pour l'affichage
+	for (m = 0; m < data_parcelle.mutations.length; m++){
+		data_parcelle.mutations[m].infos[0]['date_mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['date_mutation'])).toLocaleDateString('fr-FR');
+	}
+
+	vue.parcelle = {
+		code: codeParcelle,
+		mutations: data_parcelle.mutations,
+	};
+	invalidateMap();
+
+	if (vue.parcelle.mutations.length == 1) {
+		entrerDansMutation(0);
+	} else {
+		entrerDansMutation(null);
+	}
 }
 
 function sortirDeParcelle() {
@@ -276,8 +271,8 @@ function entrerDansMutation(sonIndex) {
 	leCode = vue.parcelle.mutations.length > 0 ? vue.parcelle.mutations[0].infos[0]['id_parcelle'] : '';
 	codesParcelles = [];
 	if (sonIndex != null) {
-		for (autre of vue.parcelle.mutations[sonIndex].mutations_liees) {
-			codesParcelles.push(autre['id_parcelle']);
+		for (parcelleLiee of vue.parcelle.mutations[sonIndex].parcellesLiees) {
+			codesParcelles.push(parcelleLiee);
 		}
 	}
 	parcellesLayer.eachLayer(function (layer) {
@@ -600,3 +595,48 @@ function invalidateMap() {
 	}
 
 })();
+
+function computeParcelle(mutationsSection, idParcelle) {
+	var mutationsParcelle = mutationsSection.filter(function (m) {
+		return m.id_parcelle === idParcelle
+	})
+
+  var mutations = _.chain(mutationsParcelle)
+  	.groupBy('id_mutation')
+  	.map(function (rows, idMutation) {
+			var infos = [_.pick(rows[0], 'date_mutation', 'id_parcelle', 'nature_mutation', 'valeur_fonciere')]
+
+			var parcellesLiees = _.uniq(
+				mutationsSection
+					.filter(function (m) {
+						return m.id_mutation === idMutation && m.id_parcelle !== idParcelle
+					})
+					.map(function (m) {
+						return m.id_parcelle
+					})
+			)
+
+			var batiments = _.chain(mutationsParcelle)
+				.filter(function (m) {
+					return m.type_local !== 'None'
+				})
+				.uniqBy(function (m) {
+					return `${m.code_type_local}@${m.surface_reelle_bati}`
+				})
+				.value()
+
+			var terrains = _.chain(mutationsParcelle)
+				.filter(function (m) {
+					return m.nature_culture !== 'None'
+				})
+				.uniqBy(function (m) {
+					return `${m.code_nature_culture}@${m.code_nature_culture_special}@${m.surface_terrain}`
+				})
+				.value()
+
+			return {infos, parcellesLiees, batiments, terrains}
+  	})
+		.value()
+
+	return {mutations}
+}
