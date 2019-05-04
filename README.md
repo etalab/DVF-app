@@ -51,3 +51,9 @@ yarn start
 ### Configuration
 
 Certains paramètres peuvent être écrasés au moyen d'un fichier `.env`. Le fichier `.env.sample` est fourni en exemple.
+
+### Générer le fichier
+
+```
+yarn build-communes-mapping
+```
