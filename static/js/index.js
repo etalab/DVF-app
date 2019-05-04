@@ -325,7 +325,7 @@ function entrerDansSection(sonCode) {
 		// Charge les mutations
 		$.getJSON(`/api/mutations3/${codeCommune}/${sonCode}`,
 			function (data) {
-				data_section = data.donnees.filter(function (m) {
+				data_section = data.mutations.filter(function (m) {
 					return m.date_mutation >= startDate && m.date_mutation <= endDate
 				});
 			}
