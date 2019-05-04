@@ -55,7 +55,7 @@ def send_donneesgeo(path):
 
 
 @app.route('/api/mutations2/<commune>/<sectionPrefixee>/from=<dateminimum>&to=<datemaximum>')
-def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
+def get_mutations2(commune, sectionPrefixee, dateminimum, datemaximum):
 	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE code_commune = %(code)s AND section_prefixe = %(sectionPrefixee)s AND date_mutation >= %(datemin)s AND date_mutation <= %(datemax)s """, engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee, "datemin": dateminimum, "datemax": datemaximum})
 
 	mutations = mutations.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
@@ -63,6 +63,15 @@ def get_mutations(commune, sectionPrefixee, dateminimum, datemaximum):
 	json_mutations = '{"donnees": ' + mutations.to_json(orient = 'records') + ', "nbMutations": ' + str(nbMutations) + '}'
 	
 	return json_mutations
+
+
+@app.route('/api/mutations3/<commune>/<sectionPrefixee>')
+def get_mutations3(commune, sectionPrefixee):
+	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE code_commune = %(code)s AND section_prefixe = %(sectionPrefixee)s""", engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee})
+	mutations = mutations.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
+	json_mutations = '{"mutations": ' + mutations.to_json(orient = 'records') + '}'
+	return json_mutations
+
 
 @app.route('/api/parcelles2/<parcelle>/from=<dateminimum>&to=<datemaximum>')
 def get_parcelle(parcelle, dateminimum, datemaximum):
