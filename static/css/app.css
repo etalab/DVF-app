@@ -1,7 +1,8 @@
 html, body {
 	color: #fff;
 	font-size: 14px !important;
-	height: 100vh;
+  height: 100vh;
+  overflow-y: hidden;
 }
 
 th {
@@ -34,7 +35,7 @@ th {
 }
 
 .scrollable {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 #mapid {
