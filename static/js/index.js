@@ -616,7 +616,7 @@ function computeParcelle(mutationsSection, idParcelle) {
 					})
 			)
 
-			var batiments = _.chain(mutationsParcelle)
+			var batiments = _.chain(rows)
 				.filter(function (m) {
 					return m.type_local !== 'None'
 				})
@@ -625,7 +625,7 @@ function computeParcelle(mutationsSection, idParcelle) {
 				})
 				.value()
 
-			var terrains = _.chain(mutationsParcelle)
+			var terrains = _.chain(rows)
 				.filter(function (m) {
 					return m.nature_culture !== 'None'
 				})
