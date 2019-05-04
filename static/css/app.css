@@ -111,3 +111,8 @@ th {
     height: calc(100vh - 98px);
   }
 }
+
+#logo {
+	margin-top: 50px;
+}
+
