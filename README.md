@@ -52,7 +52,7 @@ yarn start
 
 Certains paramètres peuvent être écrasés au moyen d'un fichier `.env`. Le fichier `.env.sample` est fourni en exemple.
 
-### Générer le fichier
+### Re-générer le fichier `communes-mapping.json`
 
 ```
 yarn build-communes-mapping
