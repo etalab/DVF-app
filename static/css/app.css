@@ -1,7 +1,8 @@
 html, body {
 	color: #fff;
 	font-size: 14px !important;
-	height: 100vh;
+  height: 100vh;
+  overflow-y: hidden;
 }
 
 th {
@@ -34,7 +35,7 @@ th {
 }
 
 .scrollable {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 #mapid {
@@ -71,48 +72,91 @@ th {
   text-decoration: underline;
 }
 
-
 /* Barre de menu en haut */
-
 .topnav {
-  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
   background-color: #005DA3;
 }
 
-.topnav a {
-  float: left;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 14px;
-  cursor: pointer;
+.topnav-left {
+  display: flex;
+  align-items: center;
 }
 
-.topnav a:hover {
+.topnav .title {
+  display: flex;
+  background-color: #002C81;
+  font-weight: bold;
+  padding: 1em;
+  min-width: 250px;
+}
+
+.topnav .short-title {
+  display: none;
+}
+
+.topnav a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.topnav .hamburger {
+  display: flex;
+  height: 100%;
+  width: 3em;
+  align-items: center;
+  justify-content: center;
+  background-color: #005DA3;
+}
+
+.topnav .hamburger:hover {
+  cursor: pointer;
+  background-color: #ddd;
+}
+
+.topnav-right a:hover {
+  cursor: pointer;
   background-color: #ddd;
   color: black;
 }
 
-.topnav a.active {
-  text-align: left;
-  background-color: #002C81;
-  color: white;
-  min-width: 250px;
-  max-width: 250px;
-  font-weight: bold;
+.topnav-right {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.topnav-right {
-  float: right;
+.topnav-right a {
+  padding: 1em;
 }
 
 @media (max-width: 768px) {
+  .topnav .title {
+    min-width: 0;
+  }
+
+  .topnav .full-title {
+    display: none;
+  }
+
+  .topnav .short-title {
+    display: block;
+  }
+
   .long-text {
     display: none;
   }
+
   .wrapper {
-    height: calc(100vh - 98px);
+    height: calc(100% - 49px);
+  }
+}
+
+@media (max-width: 360px) {
+  .topnav-right a {
+    font-size: 12px;
   }
 }
 
