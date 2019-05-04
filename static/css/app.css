@@ -1,37 +1,37 @@
 html, body {
-	color: #fff;
-	font-size: 14px !important;
+  color: #fff;
+  font-size: 14px !important;
   height: 100vh;
   overflow-y: hidden;
 }
 
 th {
-	color: black;
+  color: black;
 }
 
 .wrapper {
   width: 100%;
   height: calc(100vh - 48px);
-	display: flex;
+  display: flex;
 }
 
 #content {
-	height: 100%;
-	width: 100%;
+  height: 100%;
+  width: 100%;
 }
 
 #sidebar_left {
-    min-width: 250px;
-    max-width: 250px;
-	background-color: #212D32;
-	height: 100%;
+  min-width: 250px;
+  max-width: 250px;
+  background-color: #212D32;
+  height: 100%;
 }
 
 #sidebar_right {
   min-width: 250px;
   max-width: 250px;
-	background-color: #212D32;
-	height: 100%;
+  background-color: #212D32;
+  height: 100%;
 }
 
 .scrollable {
@@ -39,37 +39,39 @@ th {
 }
 
 #mapid {
-	height: 100%;
+  height: 100%;
 }
 
 .labelFeuille {
-	font-weight: bold;
-	color: #fff;
+  font-weight: bold;
+  color: #fff;
 }
 
 .card-body {
-	color: black;
-	padding: 0.5rem;
+  color: black;
+  padding: 0.5rem;
 }
 
 .btn-primary {
-	background-color: #002C81;
-	border-color: #002C81;
+  background-color: #002C81;
+  border-color: #002C81;
 }
 
 .btn-primary:hover {
-	background-color: #005DA3;
-	border-color: #005DA3;
-	cursor: pointer;
+  background-color: #005DA3;
+  border-color: #005DA3;
+  cursor: pointer;
 }
 
 .close-link {
-	float: right;
-	cursor: pointer;
+  float: right;
+  cursor: pointer;
 }
+
 .close-link:hover {
-	text-decoration: underline;
+  text-decoration: underline;
 }
+
 
 /* Barre de menu en haut */
 
@@ -106,8 +108,9 @@ th {
 }
 
 @media (max-width: 768px) {
-  .long-text { display: none; }
-
+  .long-text {
+    display: none;
+  }
   .wrapper {
     height: calc(100vh - 98px);
   }
