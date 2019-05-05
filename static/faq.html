@@ -6,7 +6,7 @@
 		<title>DVF</title>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous"/>
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
-		<link rel="stylesheet" href="/css/app.css"/>
+		<link rel="stylesheet" href="/css/app.css?version=11"/>
 		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.min.js"></script>
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
@@ -14,20 +14,25 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+		<script type="text/javascript" src="https://unpkg.com/lodash@4.17.11/lodash.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.png">
 	</head>
 	<body>
 		<div class="topnav">
-			<a class="active" href="/">Demande de Valeur Foncière</a>
-			<a onclick="vue.fold_left = !vue.fold_left"><i class="fas fa-bars fa-1x"></i></a>
+			<div class="topnav-left">
+				<div class="title">
+					<a class="full-title" href="/">Demande de Valeur Foncière</a>
+					<a class="short-title" href="/">DVF</a>
+				</div>
+			</div>
 			<div class="topnav-right">
 				<a href="https://github.com/marion-paclot/DVF">
 					Code<span class="long-text"> source</span>
 				</a>
 				<a href="faq.html">À propos</a>
 				<a href="https://framaforms.org/demande-de-valeur-fonciere-dvf-votre-avis-nous-interesse-1556111586">
-					Votre avis<span class="long-text"> nous intéresse<span>
+					Votre avis<span class="long-text"> nous intéresse</span>
 				</a>
 			</div>
 		</div>

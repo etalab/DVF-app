@@ -22,7 +22,8 @@ Pour préparer la base de données, il faut lancer le script dédié. On peut pr
 
 ```bash
 git clone https://github.com/marion-paclot/DVF
-sh DVF/db/build_db.sh
+cd DVF
+sh db/build_db.sh
 ```
 
 Le script commence par créer une base de données PostgreSQL et une table, puis télécharge les données DVF retraitées par Etalab, disponibles [ici](https://github.com/etalab/dvf/). Enfin quelques post-traitements sont effectués (traitement de quelques minutes).

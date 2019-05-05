@@ -1,8 +1,6 @@
 html, body {
 	color: #fff;
 	font-size: 14px !important;
-  height: 100vh;
-  overflow-y: hidden;
 }
 
 th {
