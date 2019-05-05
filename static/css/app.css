@@ -70,6 +70,32 @@ th {
   text-decoration: underline;
 }
 
+p {
+	text-align: justify;
+}
+
+.faq {
+	color: #000; 
+	background-color: #eee; 
+	padding: 1em 50px 1em 50px;
+}
+
+.law {
+	background-color: #dfdfdf;
+	padding: 10px 20px 10px 20px;
+	border-radius: 3px;
+	margin-bottom: 1em;
+}
+
+h2 {
+	margin-top: 1em;
+	margin-bottom: 0.5em;
+}
+
+h3 {
+	color: #002D81;
+}
+
 /* Barre de menu en haut */
 .topnav {
   display: flex;
