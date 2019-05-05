@@ -101,6 +101,8 @@ var data_section = null;
 var startDate = MIN_DATE
 var endDate = MAX_DATE
 
+var communesMappingPromise = getRemoteJSON('/donneesgeo/communes-mapping.json', true)
+
 // Fonctions
 
 /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
@@ -146,6 +148,45 @@ function exportJson(el) {
 	el.setAttribute("download", 'nomfichier.json');
 }
 */
+
+function getRemoteJSON(url, throwIfNotFound) {
+	return fetch(url).then(function (response) {
+		if (response.ok) {
+			return response.json()
+		}
+
+		if (response.status === 404 && !throwIfNotFound) {
+			return
+		}
+
+		throw new Error('Impossible de récupérer les données demandées : ' + response.status)
+	})
+}
+
+function getCadastreLayer(layerName, codeCommune) {
+	return communesMappingPromise.then(function (communesMapping) {
+		const communesToGet = codeCommune in communesMapping ? communesMapping[codeCommune] : [codeCommune]
+		return Promise.all(communesToGet.map(function (communeToGet) {
+			return getRemoteJSON(`https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/${communeToGet}/geojson/${layerName}`)
+		})).then(function (featureCollections) {
+			return {
+				type: 'FeatureCollection',
+				features: featureCollections.reduce(function (acc, featureCollection) {
+					if (featureCollection && featureCollection.features)
+					return acc.concat(featureCollection.features)
+				}, [])
+			}
+		})
+	})
+}
+
+function getParcelles(codeCommune) {
+	return getCadastreLayer('parcelles', codeCommune)
+}
+
+function getSections(codeCommune) {
+	return getCadastreLayer('sections', codeCommune)
+}
 
 function selectionnerDepartement() {
 	// L'utilisateur a cliqué sur la liste déroulante des départements
@@ -317,11 +358,9 @@ function entrerDansSection(sonCode) {
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.when(
 		// Charge la couche géographique
-		$.getJSON("https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/" + codeCommune + "/geojson/parcelles",
-			function (data) {
-				data_geo = data;
-			}
-		),
+		getParcelles(codeCommune).then(function (data) {
+			data_geo = data
+		}),
 		// Charge les mutations
 		$.getJSON(`/api/mutations3/${codeCommune}/${sonCode}`,
 			function (data) {
@@ -386,7 +425,7 @@ function entrerDansCommune(sonCode) {
 	codeCommune = sonCode;
 	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
-	$.getJSON("https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/" + codeCommune + "/geojson/sections",
+	getSections(codeCommune).then(
 		function (data) {
 			if (sectionsLayer != null) {
 				map.removeLayer(sectionsLayer);
