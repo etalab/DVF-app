@@ -1,0 +1,18 @@
+{
+  "addons": [
+
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+  },
+  "formation": {
+  },
+  "name": "DVF-app",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
