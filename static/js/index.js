@@ -635,10 +635,12 @@ function toggleLeftBar() {
 				"raster-tiles": {
 					"type": "raster",
 					"tiles": [
-						"https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+						"https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
+						"https://b.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
+						"https://c.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
 					],
 					"tileSize": 256,
-					"attribution": '© Contributeurs <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+					"attribution": 'donn&eacute;es &copy; <a href="//osm.org/copyright">OpenStreetMap</a>/ODbL - rendu <a href="//openstreetmap.fr">OSM France</a>'
 				}
 			},
 			"layers": [
@@ -651,8 +653,8 @@ function toggleLeftBar() {
 		},
 		center: [3, 47],
 		zoom: 5,
-		minZoom: 0,
-		maxZoom: 30
+		minZoom: 1,
+		maxZoom: 20
 	})
 
 	map.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
