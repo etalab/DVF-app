@@ -820,6 +820,9 @@ function computeParcelle(mutationsSection, idParcelle) {
 				.uniqBy(function (m) {
 					return `${m.code_type_local}@${m.surface_reelle_bati}`
 				})
+				.filter(function(m){
+        				return m.id_mutation === idMutation
+      				})
 				.value()
 
 			var terrains = _.chain(mutationsParcelle)
@@ -829,6 +832,9 @@ function computeParcelle(mutationsSection, idParcelle) {
 				.uniqBy(function (m) {
 					return `${m.code_nature_culture}@${m.code_nature_culture_special}@${m.surface_terrain}`
 				})
+				.filter(function(m){
+        				return m.id_mutation === idMutation
+      				})
 				.value()
 
 			return {
