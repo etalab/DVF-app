@@ -86,6 +86,9 @@ vue.$watch('fold_left', function () {
 
 // Définition des variables globales
 
+var MIN_DATE = '2014-01-01'
+var MAX_DATE = '2018-12-31'
+
 var map = null;
 var mapLoaded = false;
 var hoveredStateId = null;
@@ -95,13 +98,11 @@ var codeCommune = null;
 var codeSection = null;
 var codeParcelle = null;
 
-var data_dvf = null;
-
 var nom_fichier_section = null;
 var data_section = null;
 
-var dateMin = '01-01-2014';
-var dateMax = '31-12-2018';
+var startDate = MIN_DATE
+var endDate = MAX_DATE
 
 var fillColor = '#2a4ba9'
 var borderColor = '#627BC1'
@@ -260,16 +261,6 @@ function exportCSV(el, data, fileName) {
 	el.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(csv));
 	el.setAttribute("download", fileName);
 }
-
-/*
-// Non utilisé
-function exportJson(el) {
-
-	var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data_dvf));
-	el.setAttribute("href", "data:"+data);
-	el.setAttribute("download", 'nomfichier.json');
-}
-*/
 
 function uniq(array) {
 	return Object.keys(
@@ -454,10 +445,11 @@ function entrerDansSection(sonCode) {
 			}
 		),
 		// Charge les mutations
-		$.getJSON("/api/mutations2/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-"),
+		$.getJSON(`/api/mutations3/${codeCommune}/${sonCode}`,
 			function (data) {
-				data_section = data.donnees;
-				data_dvf = data.donnees;
+				data_section = data.mutations.filter(function (m) {
+					return m.date_mutation >= startDate && m.date_mutation <= endDate
+				});
 			}
 		)
 	).then(
@@ -492,8 +484,7 @@ function entrerDansSection(sonCode) {
 
 			fit(parcelles)
 			vue.section = {
-				code: sonCode,
-				n_mutations: data_section.nbMutations,
+				code: sonCode
 			};
 		}
 	);
@@ -696,6 +687,10 @@ function toggleLeftBar() {
 
 	// Paramètres français du range picker
 	$('input[name="daterange"]').daterangepicker({
+		minDate: new Date(MIN_DATE),
+		maxDate: new Date(MAX_DATE),
+		startDate: new Date(startDate),
+		endDate: new Date(endDate),
 		opens: 'left',
 		"locale": {
 			"format": "DD/MM/YYYY",
@@ -732,9 +727,9 @@ function toggleLeftBar() {
 		}
 	}, function (start, end) {
 		// Fonction executée quand la personne change les dates
-		dateMin = start.format('DD-MM-YYYY');
-		dateMax = end.format('DD-MM-YYYY');
-		if (codeSection != null) {
+		startDate = start.format('YYYY-MM-DD');
+		endDate = end.format('YYYY-MM-DD');
+		if (codeSection !== null) {
 			entrerDansSection(codeSection);
 		}
 	});
@@ -749,16 +744,6 @@ function toggleLeftBar() {
 					text: data[i].code + ' - ' + data[i].nom
 				}));
 			});
-		}
-	);
-
-	// On récupère la plage des mutations de la base
-	$.getJSON("/api/dates2",
-		function (data) {
-			dateMin = (new Date(data.min)).toLocaleDateString('fr-FR');
-			dateMax = (new Date(data.max)).toLocaleDateString('fr-FR');
-			$('#daterange').data('daterangepicker').setStartDate(dateMin);
-			$('#daterange').data('daterangepicker').setEndDate(dateMax);
 		}
 	);
 
