@@ -1,4 +1,4 @@
-# Explorer les données de DVF (demandes de valeur foncière)
+# Explorer les données de DVF (Demandes de Valeur Foncière)
 
 La base de données DVF recense les mutations à titre onéreux (vente, vente en l'état futur d'achèvement, vente terrain à bâtir, échange, adjudication, expropriation) advenues les 5 dernières années. 
 
@@ -8,45 +8,94 @@ Nous lirons volontiers vos suggestions d'amélioration.
 
 Les données de Mayotte ainsi que de l'Alsace et de la Moselle sont manquantes.
 
-Une API développée par Christian Quest est disponible [ici](http://api.cquest.org/dvf), avec sa [documentation](http://data.cquest.org/dgfip_dvf/LISEZ_MOI.txt)
+Une API développée par Christian Quest est disponible [ici](http://api.cquest.org/dvf), avec sa [documentation](http://data.cquest.org/dgfip_dvf/LISEZ_MOI.txt).
 
-## Installation sur un serveur
+## Installation
 
-### Pré-requis
+### 1- Pré-requis
 
-Il faut un serveur Linux, avec au minium PostgreSQL et Python (Flask). Pour héberger l'application, ajouter Nginx, Supervisor et GUnicorn.
+Il faut un serveur Linux (ici, nous prendrons Ubuntu 18.04 comme exemple)
 
-### Base de données
-
-Pour préparer la base de données, il faut lancer le script dédié. On peut procéder ainsi :
-
+### 2- Récupération du dépôt
 ```bash
-git clone https://github.com/marion-paclot/DVF
-cd DVF
-sh db/build_db.sh
+$ git clone https://github.com/marion-paclot/DVF
+$ cd DVF
 ```
 
-Le script commence par créer une base de données PostgreSQL et une table, puis télécharge les données DVF retraitées par Etalab, disponibles [ici](https://github.com/etalab/dvf/). Enfin quelques post-traitements sont effectués (traitement de quelques minutes).
+### 3- Installation minimale : pour développer l'interface utilisateur seule (Front End)
 
-## Développer l'interface utilisateur
+Pour participer au développement de l'interface utilisateuri, il n'est pas nécessaire d'installer Python et PostgreSQL.
 
-Pour participer au développement de l'interface utilisateur il n'est pas nécessaire d'installer Python et PostgreSQL.
+- [Node.js](https://nodejs.org) 8 ou supérieur
+```bash
+$ sudo apt-get update && sudo apt install nodejs
+$ nodejs -v
+v8.10.0 
+```
+
+- [yarn](https://yarnpkg.com)
+```bash
+$ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+$ echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+$ sudo apt-get update && sudo apt-get install yarn
+$ yarn --version
+1.15.2
+```
 
 Un script [Node.js](https://nodejs.org) permet de servir l'interface et de faire proxy vers l'API de production.
 
-### Pré-requis
+installation des dépendances Node.js
+```bash
+$ yarn
+```
 
-- [Node.js](https://nodejs.org) 8 ou supérieur
-- [yarn](https://yarnpkg.com)
+Démarrage du serveur Web (port 3000 par défaut)
+```bash
+$ yarn start
+```
 
-### Utilisation
+### 4- Suite de l'installation : pour développer l'ensiemble de l'application  (Full Stack: Back End + Front End)
+
+PostgreSQL
+```bash
+$ sudo apt-get update && sudo apt install postgresql-10
+$ psql -V
+psql (PostgreSQL) 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
+```
+
+Creation de la base de données et import des données :
+
+Le script commence par créer une base de données PostgreSQL et une table, puis télécharge les données DVF retraitées par Etalab, disponibles [ici](https://github.com/etalab/dvf/). Enfin quelques post-traitements sont effectués (traitement de quelques minutes).
 
 ```bash
-# On installe les dépendances Node.js
-yarn
+$ sh db/build_db.sh
+```
 
-# Démarrage du serveur Web (port 3000 par défaut)
-yarn start
+Configuration de l'accès à la base de données
+
+Dans la commande ci-dessous, remplacer <YOUR PASSWORD> par votre mode de passe.
+```bash
+$ sudo -u postgres psql
+postgres=# \password postgres
+Enter new password: <YOUR PASSWORD>
+Enter it again: <YOUR PASSWORD>
+postgres=# \q
+
+$ echo -e "postgres\n<YOUR PASSWORD>\nlocalhost" > config.csv
+```
+
+Installation des packages pythons :
+```bash
+$ sudo apt-get update && sudo apt install python3
+$ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+$ sudo apt install libpq-dev python-dev
+$ sudo apt install python3-psycopg2 python3-flask python3-pandas python3-sqlalchemy python3-psycopg2
+```
+
+Démarrage du serveur Web (port 5000 par défaut)
+
+```bash
+$ python app.py
 ```
 
 ### Configuration
