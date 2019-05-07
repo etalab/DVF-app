@@ -1,105 +1,140 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>DVF</title>
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous"/>
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
-		<link rel="stylesheet" href="/css/app.css"/>
-		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.min.js"></script>
-		<script src='https://unpkg.com/mapbox-gl@0.54.0/dist/mapbox-gl.js'></script>
-		<link href='https://unpkg.com/mapbox-gl@0.54.0/dist/mapbox-gl.css' rel='stylesheet' />
-		<script src='https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js'></script>
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-		<link rel="shortcut icon" type="image/x-icon" href="/favicon.png">
-	</head>
-	<body>
-		<div class="topnav">
-			<a class="active" href="/">Demande de Valeur Foncière</a>
-			<a onclick="toggleLeftBar()"><i class="fas fa-bars fa-1x"></i></a>
-			<div class="topnav-right">
-				<a href="https://github.com/marion-paclot/DVF">
-					Code<span class="long-text"> source</span>
-				</a>
-				<a href="faq.html">À propos</a>
-				<a href="https://framaforms.org/demande-de-valeur-fonciere-dvf-votre-avis-nous-interesse-1556111586">
-					Votre avis<span class="long-text"> nous intéresse<span>
-				</a>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>DVF</title>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+		integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+	<script crossorigin="anonymous"
+		src="https://polyfill.io/v3/polyfill.min.js?features=default%2Ces2015%2Ces2016%2Ces2017%2Cfetch%2CPromise"></script>
+	<link rel="stylesheet" href="/css/app.css?version=11" />
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+		integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.min.js"></script>
+	<script src='https://unpkg.com/mapbox-gl@0.54.0/dist/mapbox-gl.js'></script>
+	<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+		integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+		crossorigin=""></script>
+	<link href='https://unpkg.com/mapbox-gl@0.54.0/dist/mapbox-gl.css' rel='stylesheet' />
+	<script src='https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js'></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+	<script type="text/javascript" src="https://unpkg.com/lodash@4.17.11/lodash.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.png">
+	<style type="text/css">
+		html,
+		body {
+			height: 100vh;
+			overflow-y: hidden;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="topnav">
+		<div class="topnav-left">
+			<div class="title">
+				<a class="full-title" href="/">Demande de Valeur Foncière</a>
+				<a class="short-title" href="/">DVF</a>
+			</div>
+			<div class="hamburger" onclick="toggleLeftBar()">
+				<i class="fas fa-bars fa-1x"></i>
 			</div>
 		</div>
-		<div id="app" class="wrapper">
-			<div id="sidebar_left" v-show="!fold_left" class="container">
-				<br/>
-				<div class="form-group">
-					<label for="departements" class="control-label">Département</label>
-					<select name = "departements" id = "departements" onchange = "selectionnerDepartement()" class="form-control">
-						<option style="display:none"></option>
-					</select>
-				</div>
-				<div class="form-group">
-					<label for="communes" class="control-label">Commune</label>
-					<select name = "communes" id = "communes" onchange = "selectionnerCommune()" class="form-control">
-						<option style="display:none"></option>
-					</select>
-				</div>
-				<div class="form-group">
-					<label for="sections" class="control-label">Section cadastrale</label>
-					<select name="sections" id="sections" onchange="selectionnerSection()" class="form-control">
-						<option style="display:none"></option>
-					</select>
-				</div>
-				<div class="form-group">
-					<label for="parcelles" class="control-label">Parcelle cadastrale</label>
-					<select name="parcelles" id="parcelles" onchange="selectionnerParcelle()" class="form-control">
-						<option style="display:none"></option>
-					</select>
-				</div>
-				<div class="form-group">
-					<label for="daterange" class="control-label">Date de la mutation</label>
-					<input type="text" id="daterange" name="daterange" value="01-01-2010 - 15-01-2018" class="form-control"/>
-				</div>
-				<div v-if="section != null">
-					<a v-if="data_dvf.length > 0" id="exportCSV" onclick="exportCSV(this, data_dvf, codeCommune + '_' + codeSection + '.csv');" class="btn btn-primary" style="width: 100%">Télécharger les mutations de la section</a>
-					<div v-else class="text-muted">
-						La base de données DVF ne contient pas de mutation dans la section sélectionnée sur la plage temporelle choisie.
-						<div v-if="['67', '68', '57', '976'].indexOf(codeDepartement) != -1">
-							En particulier, la base DVF ne contient pas de mutation en Haut-Rhin, Bas-Rhin, Moselle et à Mayotte.
-						</div>
-						<a href="/faq.html">En savoir plus</a>
+		<div class="topnav-right">
+			<a href="https://github.com/etalab/DVF-app">
+				Code<span class="long-text"> source</span>
+			</a>
+			<a href="faq.html">À propos</a>
+			<a href="https://framaforms.org/demande-de-valeur-fonciere-dvf-votre-avis-nous-interesse-1556111586">
+				Votre avis<span class="long-text"> nous intéresse</span>
+			</a>
+		</div>
+	</div>
+	<div id="app" class="wrapper">
+		<div id="sidebar_left" v-show="!fold_left" class="container scrollable">
+			<br />
+			<div class="form-group">
+				<label for="departements" class="control-label">Département</label>
+				<select name="departements" id="departements" onchange="selectionnerDepartement()" class="form-control">
+					<option style="display:none"></option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="communes" class="control-label">Commune</label>
+				<select name="communes" id="communes" onchange="selectionnerCommune()" class="form-control">
+					<option style="display:none"></option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="sections" class="control-label">Section cadastrale</label>
+				<select name="sections" id="sections" onchange="selectionnerSection()" class="form-control">
+					<option style="display:none"></option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="parcelles" class="control-label">Parcelle cadastrale</label>
+				<select name="parcelles" id="parcelles" onchange="selectionnerParcelle()" class="form-control">
+					<option style="display:none"></option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="daterange" class="control-label">Date de la mutation</label>
+				<input type="text" id="daterange" name="daterange" value="01-01-2010 - 15-01-2018" class="form-control" />
+			</div>
+			<div v-if="section != null">
+				<a v-if="data_section.length > 0" id="exportCSV"
+					onclick="exportCSV(this, data_section, codeCommune + '_' + codeSection + '.csv');" class="btn btn-primary"
+					style="width: 100%">Télécharger les mutations de la section</a>
+				<div v-else class="text-muted">
+					La base de données DVF ne contient pas de mutation dans la section sélectionnée sur la plage temporelle
+					choisie.
+					<div v-if="['67', '68', '57', '976'].indexOf(codeDepartement) != -1">
+						En particulier, la base DVF ne contient pas de mutation en Haut-Rhin, Bas-Rhin, Moselle et à Mayotte.
 					</div>
+					<a href="/faq.html">En savoir plus</a>
 				</div>
 			</div>
-			<div id="content">
-				<div id="mapid"></div>
-			</div>
-			<div id="sidebar_right" class="container" v-if="parcelle != null && parcelle.mutations.length > 0">
-				<span onclick="sortirDeParcelle()" class="mt-2 mb-2 close-link">Fermer</span>
-				<br/>
-				<boite-accordeon  v-for="(mutation, index) in parcelle.mutations" :mutation="mutation" :key="mutation.infos[0]['Code parcelle'] + index" :index="index"></boite-accordeon>
+			<div id="logo">
+				<a href="https://www.etalab.gouv.fr/qui-sommes-nous">
+					<img src="css/etalab-blanc.png" alt="Etalab" style="max-width: 100px" />
+				</a>
 			</div>
 		</div>
+		<div id="content">
+			<div id="mapid"></div>
+		</div>
+		<div id="sidebar_right" class="container scrollable" v-if="parcelle != null && parcelle.mutations.length > 0">
+			<span onclick="sortirDeParcelle()" class="mt-2 mb-2 close-link">Fermer</span>
+			<br />
+			<boite-accordeon v-for="(mutation, index) in parcelle.mutations" :mutation="mutation"
+				:key="mutation.infos[0].id_parcelle + index" :index="index"></boite-accordeon>
+		</div>
+	</div>
 
-		<!-- Matomo -->
-		<script type="text/javascript">
-		  var _paq = _paq || [];
-		  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-		  _paq.push(['trackPageView']);
-		  _paq.push(['enableLinkTracking']);
-		  (function() {
-			var u="//stats.data.gouv.fr/";
-			_paq.push(['setTrackerUrl', u+'piwik.php']);
+	<!-- Matomo -->
+	<script type="text/javascript">
+		var _paq = _paq || [];
+		/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+		_paq.push(['trackPageView']);
+		_paq.push(['enableLinkTracking']);
+		(function () {
+			var u = "//stats.data.gouv.fr/";
+			_paq.push(['setTrackerUrl', u + 'piwik.php']);
 			_paq.push(['setSiteId', '76']);
-			var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-			g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-		  })();
-		</script>
+			var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+			g.type = 'text/javascript'; g.async = true; g.defer = true; g.src = u + 'piwik.js'; s.parentNode.insertBefore(g, s);
+		})();
+	</script>
 
-		<script src="js/index.js?version=4"></script>
+	<script src="js/index.js?version=10"></script>
 
-	</body>
+</body>
+
 </html>

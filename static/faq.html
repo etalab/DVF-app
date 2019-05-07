@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 	<head>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<title>DVF</title>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous"/>
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
-		<link rel="stylesheet" href="/css/app.css"/>
+		<link rel="stylesheet" href="/css/app.css?version=11"/>
 		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.min.js"></script>
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
@@ -14,84 +14,88 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+		<script type="text/javascript" src="https://unpkg.com/lodash@4.17.11/lodash.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.png">
 	</head>
 	<body>
 		<div class="topnav">
-			<a class="active" href="/">Demande de Valeur Foncière</a>
-			<a onclick="vue.fold_left = !vue.fold_left"><i class="fas fa-bars fa-1x"></i></a>
+			<div class="topnav-left">
+				<div class="title">
+					<a class="full-title" href="/">Demande de Valeur Foncière</a>
+					<a class="short-title" href="/">DVF</a>
+				</div>
+			</div>
 			<div class="topnav-right">
 				<a href="https://github.com/marion-paclot/DVF">
 					Code<span class="long-text"> source</span>
 				</a>
 				<a href="faq.html">À propos</a>
 				<a href="https://framaforms.org/demande-de-valeur-fonciere-dvf-votre-avis-nous-interesse-1556111586">
-					Votre avis<span class="long-text"> nous intéresse<span>
+					Votre avis<span class="long-text"> nous intéresse</span>
 				</a>
 			</div>
 		</div>
-		<div class="container" style="color: #000; background-color: #eee; padding: 50px;">
-			<h2>A propos</h2>
-			</br>
-			<p>Cette application est proposée par la <a href="https://www.etalab.gouv.fr/qui-sommes-nous">mission Etalab</a> et permet de visualiser les données DVF (demandes de valeurs foncières), correspondant aux mutations à titre onéreux réalisées les 5 dernières années. Les données DVF brutes sont téléchargeables sur le site <a href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres/">https://www.data.gouv.fr</a> depuis le 24 avril 2019 et sont produites par la Direction générale des Finances publiques.</br>Vous y trouverez beaucoup d'informations sur le cadre technique et légal de cette publication</p>
-			</br>
-			<h3>Comment utiliser l'application ?</h3>
-			<p>Vous pouvez utiliser les menus déroulants situés à gauche (masqués sur petit écran). Vous pouvez aussi cliquer directement sur la carte pour descendre jusqu'à la parcelle cadastrale qui vous intéresse.</p>
-			</br>
-
+		<div class="container faq">
+			<h2>&Agrave; propos</h2>
+			<p>Cette application est proposée par la <a href="https://www.etalab.gouv.fr/qui-sommes-nous">mission Etalab</a> et permet de visualiser les données DVF (demandes de valeurs foncières), correspondant aux mutations à titre onéreux réalisées les 5 dernières années. Les données DVF brutes sont téléchargeables sur le site <a href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres/">https://www.data.gouv.fr</a> depuis le 24 avril 2019 et sont produites par la Direction générale des Finances publiques. Vous y trouverez beaucoup d'informations sur le cadre technique et légal de cette publication.</p>
+			
+			<h2>Comment utiliser l'application ?</h2>
+			<p>Cliquez sur un département, puis sur une commune, puis sur une section cadastrale. La carte se met à jour automatiquement. Les parcelles cadastrales concerncées par au moins une mutation s'affichent en bleu. Cliquez dessus pour obtenir la liste des mutations (date, valeur foncière, dispositions).
+			Vous pouvez aussi utiliser les menus déroulants situés à gauche (masqués sur petit écran) pour choisir un département puis une commune.</p>
+			
 			<h2>Questions fréquentes</h2>
-			<h3 style="color: #002D81">Dans quel cadre règlementaire sont publiées ces informations ?</h3>
-			<p>Ces données sont publiées dans le cadre de la <a href="https://www.legifrance.gouv.fr/affichTexteArticle.do?idArticle=JORFARTI000037307655&cidTexte=JORFTEXT000037307624&dateTexte=29990101&categorieLien=id">loi pour un Etat au service d'une société de confiance</a> :
-			<div>Article 13
-			<div style = "margin-left : 40px; ">
-			Le chapitre III du titre II du livre des procédures fiscales est ainsi modifié : <br/>
-			1° Au début du premier alinéa de l'article L. 107 B, les mots : « Sans préjudice des dispositions de l'article L. 135 B, » sont supprimés ; <br/>
-			2° Le 2° de la section I est complété par un article L. 112 A ainsi rédigé : </p>
-			<p>
-			« Art. L. 112 A.-Afin de concourir à la transparence des marchés fonciers et immobiliers, l'administration fiscale rend librement accessibles au public, sous forme électronique, les éléments d'information qu'elle détient au sujet des valeurs foncières déclarées à l'occasion des mutations intervenues au cours des cinq dernières années. <br/>
-			« Un décret en Conseil d'Etat précise les modalités d'application du présent article. » ; </p></div>
+			<h3>Dans quel cadre règlementaire sont publiées ces informations ?</h3>
+			<p>Ces données sont publiées dans le cadre de l'Article 13 de la <a href="https://www.legifrance.gouv.fr/affichTexteArticle.do?idArticle=JORFARTI000037307655&cidTexte=JORFTEXT000037307624&dateTexte=29990101&categorieLien=id">loi pour un Etat au service d'une société de confiance</a> :</p>
+			<div class="law">
+				Le chapitre III du titre II du livre des procédures fiscales est ainsi modifié : <br/>
+				1° Au début du premier alinéa de l'article L. 107 B, les mots : « Sans préjudice des dispositions de l'article L. 135 B, » sont supprimés ; <br/>
+				2° Le 2° de la section I est complété par un article L. 112 A ainsi rédigé : <br/><br/>
+				« Art. L. 112 A.-Afin de concourir à la transparence des marchés fonciers et immobiliers, l'administration fiscale rend librement accessibles au public, sous forme électronique, les éléments d'information qu'elle détient au sujet des valeurs foncières déclarées à l'occasion des mutations intervenues au cours des cinq dernières années. <br/>
+				« Un décret en Conseil d'Etat précise les modalités d'application du présent article. » ;<br/><br/>
+				3° Les premier à seizième alinéas de l'article L. 135 B sont supprimés.
+			</div>
 			<p><a href = "https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006069583&idArticle=LEGIARTI000038001715">L'article R*112 A-3</a> du livre des procédures fiscales dispose par ailleurs que :</p>
-			<div style = "margin-left : 40px; ">
+			<div class="law">
 			Les conditions générales d'utilisation des informations prévoient, d'une part, que les traitements portant sur la réutilisation des informations mentionnées à l'article R. * 112 A-1 ne peuvent avoir ni pour objet ni pour effet de permettre la réidentification des personnes concernées et, d'autre part, que ces informations ne peuvent faire l'objet d'une indexation sur les moteurs de recherche en ligne.
-			</div><br/>
+			</div>
 
 						
 			
-			<h3 style="color: #002D81">Je ne vois pas ma commune</h3>
+			<h3>Je ne vois pas ma commune</h3>
 			<p>Plusieurs possibilités : le cadastre n'est pas vectorisé, c'est pas exemple le cas d'Arrigny (51); ou la commune a fusionné avec une autre commune, et nous n'avons pas encore intégré ce changement. C'est par exemple le cas de la ville de Fourqueux (78) qui a fusionné récemment avec sa voisine, Saint-Germain-en-Laye.</p>
-			<h3 style="color: #002D81">Il manque vraiment beaucoup de transactions dans une commune nouvelle</h3>
+			<h3>Il manque vraiment beaucoup de transactions dans une commune nouvelle</h3>
 			<p>La fusion de communes entraîne un renommage des sections cadastrales. Mais les données DVF ne sont pas pour autant modifiées a posteriori pour tenir compte de ce renommage. Il va donc manquer toutes les transactions antérieures à la fusion sur une partie de la commune nouvelle. Mais nous travaillons sur ce point.</p>
-			<h3 style="color: #002D81">Il y a un problème avec l'Alsace et Mayotte</h3>
+			<h3>Il y a un problème avec l'Alsace et Mayotte</h3>
 			<p>La Direction générale des Finances publiques, qui produit les données DVF, ne dispose pas des mutations des départements du Bas-Rhin, Haut-Rhin, Moselle et Mayotte. Pour l'ancienne Alsace-Moselle les données sont dans le Livre Foncier en raison de l'application du droit local, et ne sont actuellement pas ouvertes.</p>
-			<h3 style="color: #002D81">Ça ne marche pas !</h3>
+			<h3>Ça ne marche pas !</h3>
 			<p>Nous n'avons pas testé avec tous les navigateurs, il est donc possible que l'application ne soit pas compatible avec certains d'entre eux.</p>
-			<h3 style="color: #002D81">J'ai vendu ma maison, pourtant je ne vois pas la transaction</h3>
+			<h3>J'ai vendu ma maison, pourtant je ne vois pas la transaction</h3>
 			<p>La remontée des données DVF peut être lente : ainsi, il manque encore une partie des données de l'années 2018, et c'est sans doute le cas de quelques mutations intervenues au cours des années précédentes. Pour les données plus anciennes, la Direction générale des Finances publiques sera un meilleur interlocuteur.</p>
-			<h3 style="color: #002D81">Il manque plein d'informations, par exemple l'étage pour un appartement</h3>
+			<h3>Il manque plein d'informations, par exemple l'étage pour un appartement</h3>
 			<p>Malheureusement cette information n'est pas présente dans la base de données initiale.</p>
-			<h3 style="color: #002D81">Une API est-elle prévue ?</h3>
+			<h3>Une API est-elle prévue ?</h3>
 			<p>Pas dans l'immédiat, mais vous pouvez utiliser l'API fournie par Christian Quest <a href="http://api.cquest.org/dvf">ici</a>, le mieux étant de commencer par lire <a href="http://data.cquest.org/dgfip_dvf/LISEZ_MOI.txt">sa documentation</a>.</p>
-			<h3 style="color: #002D81">J'ai repéré un gros bug, comment vous en faire part ?</h3>
-			<p>Le code source de l'application est publié sur <a href="https://github.com/marion-paclot/DVF">Github</a> et la section Issues accueillera vos remarques. Merci !</p></br>
+			<h3>J'ai repéré un gros bug, comment vous en faire part ?</h3>
+			<p>Le code source de l'application est publié sur <a href="https://github.com/etalab/DVF-app">GitHub</a>. Vous pouvez venir nous y détailler les problèmes que vous rencontrez ou les idées que vous avez dans la section <i>Issues</i>. Merci !</p>
+			
 			<h2>Nous contacter</h2>
 			<p>cadastre[at]data.gouv.fr</p>
-			</br>
+			
 			<h2>Mentions légales</h2>
-			<h3 style="color: #002D81">Editeur</h3>
-			<p>Direction interministérielle du numérique et du système d’information et de communication de l’État (DINSIC)</br>
-			20, avenue de Ségur</br>
-			75007 Paris</br>
+			<h3>Editeur</h3>
+			<p>Direction interministérielle du numérique et du système d’information et de communication de l’État (DINSIC)<br/>
+			20, avenue de Ségur<br/>
+			75007 Paris<br/>
 			dinsic-sec-directeur [at] modernisation.gouv.fr</p>
-			<h3 style="color: #002D81">Directeur de la publication</h3>
+			<h3>Directeur de la publication</h3>
 			<p>M. Nadi Bou Hanna, DINSIC</p>
-			<h3 style="color: #002D81">Hébergeur</h3>
-			<p>Société OVH</br>
-				SAS au capital de 10 059 500 €</br>
-				RCS Lille Métropole 424 761 419 00045</br>
-				Code APE 6311Z</br>
+			<h3>Hébergeur</h3>
+			<p>Société OVH<br/>
+				SAS au capital de 10 059 500 €<br/>
+				RCS Lille Métropole 424 761 419 00045<br/>
+				Code APE 6311Z<br/>
 				Siège social : 2 rue Kellermann - 59100 Roubaix - France.</p>
-			</br>
 		</div>
 
 		<!-- Matomo -->

@@ -34,13 +34,16 @@ Vue.component('boite-accordeon', {
 							<b>{{ formatterNombre(mutation.infos[0]['valeur_fonciere']) }} € / {{ mutation.infos[0]['nature_mutation'] }}</b><br>
 							<span>{{ mutation.infos[0]['date_mutation'] }}</span>
 			 			</div>
+						<div v-if="vue.mutationIndex != index" class="ml-1 mr-1">
+							<i class="fas fa-sort-down fa-1x"></i>
+						</div>
 					</div>
 					<div v-if="vue.mutationIndex == index" style="background-color: #eee" class="mt-3">
 						<boite
 							v-for="batiment in mutation.batiments"
 							:valeur="(batiment['code_type_local'] != 3) ? (formatterNombre(batiment['surface_reelle_bati']) + ' m²') : ''"
 							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['code_type_local']]"
-							:texte="batiment['type_local'] + ((batiment['code_type_local'] < 3) ? (' / ' + batiment['nombre_pieces_principales'] + ' p') : '')">
+							:texte="batiment['type_local'] + ((batiment['code_type_local'] < 3) ? (' / ' + formatterNombre(batiment['nombre_pieces_principales']) + ' p') : '')">
 						</boite>
 						<boite
 							v-for="terrain in mutation.terrains"
@@ -48,7 +51,7 @@ Vue.component('boite-accordeon', {
 							icone="fa fa-tree"
 							:texte="terrain['nature_culture'] + (terrain['nature_culture_speciale'] != 'None' ? ' / ' + terrain['nature_culture_speciale'] : '')">
 						</boite>
-							<div v-if="mutation.mutations_liees.length > 0" style = "padding:0.5rem">
+							<div v-if="mutation.parcellesLiees.length > 0" style = "padding:0.5rem">
 								Cette mutation contient des dispositions dans des parcelles adjacentes. La valeur foncière correspond au total.
 							</div>
 					</div>
@@ -64,18 +67,18 @@ Vue.component('boite-accordeon', {
 
 // Ici, on cree l'application Vue (on lui dit de se relier à l'élément HTML app)
 var vue = new Vue({
-		el: '#app',
-		data: {
-			fold_left: false,
-			section: null,
-			parcelle: null,
-			mutationIndex: null,
-		},
-		methods: {},
-	});
+	el: '#app',
+	data: {
+		fold_left: false,
+		section: null,
+		parcelle: null,
+		mutationIndex: null,
+	},
+	methods: {},
+});
 
 // Resize map when left side bar show/hide
-vue.$watch('fold_left', function() {
+vue.$watch('fold_left', function () {
 	map.resize()
 })
 
@@ -97,8 +100,8 @@ var data_dvf = null;
 var nom_fichier_section = null;
 var data_section = null;
 
-var dateMin = '01-01-2015';
-var dateMax = '01-01-2019';
+var dateMin = '01-01-2014';
+var dateMax = '31-12-2018';
 
 var hoverableSources = ['departements', 'communes', 'sections', 'parcelles']
 var fillLayerPaint = {
@@ -223,18 +226,18 @@ const EMPTY_FEATURE_COLLECTION = {
 
 /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
 function openNav() {
-  document.getElementById("mySidebar").style.width = "250px";
-  document.getElementById("main").style.marginLeft = "250px";
+	document.getElementById("mySidebar").style.width = "250px";
+	document.getElementById("main").style.marginLeft = "250px";
 }
 
 /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
 function closeNav() {
-  document.getElementById("sidebar_left").style.width = "0";
-  document.getElementById("main").style.marginLeft = "0";
+	document.getElementById("sidebar_left").style.width = "0";
+	document.getElementById("main").style.marginLeft = "0";
 }
 
-$('.input-daterange input').each(function() {
-    $(this).datepicker('clearDates');
+$('.input-daterange input').each(function () {
+	$(this).datepicker('clearDates');
 });
 
 
@@ -242,11 +245,11 @@ function exportCSV(el, data, fileName) {
 
 	var json = data;
 	var fields = Object.keys(json[0])
-	var replacer = function(key, value) { return value === null ? '' : value }
-	var csv = json.map(function(row){
-	  return fields.map(function(fieldName){
-		return JSON.stringify(row[fieldName], replacer)
-	  }).join(';')
+	var replacer = function (key, value) { return value === null ? '' : value }
+	var csv = json.map(function (row) {
+		return fields.map(function (fieldName) {
+			return JSON.stringify(row[fieldName], replacer)
+		}).join(';')
 	})
 	csv.unshift(fields.join(';')); // add header column
 	csv = csv.join('\r\n');
@@ -283,9 +286,9 @@ function resetSourcesData(sources) {
 	})
 }
 
-function fit(geosjon) {
-	var bbox = turf.bbox(geosjon)
-	map.fitBounds(bbox, { padding: 20, animate: false })
+function fit(geojson) {
+	var bbox = turf.bbox(geojson)
+	map.fitBounds(bbox, { padding: 20, animate: true })
 }
 
 function onMouseMove(event, source) {
@@ -294,7 +297,7 @@ function onMouseMove(event, source) {
 
 	if (event.features.length > 0) {
 		if (hoveredStateId !== null) {
-			hoverableSources.map(function(source) {
+			hoverableSources.map(function (source) {
 				map.setFeatureState({ source, id: hoveredStateId }, { hover: false }); // clean all sources to prevent error
 			})
 		}
@@ -377,28 +380,24 @@ function formatterNombre(nombreDecimal) {
 
 function entrerDansParcelle(sonCode) {
 	codeParcelle = sonCode;
-	data_parcelle = null;
-	$.getJSON("/api/parcelles2/" + codeParcelle + "/from=" + dateMin.replace(new RegExp("/", "g"), "-")  + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
-		function (data) {
-			data_parcelle = data;
+	data_parcelle = computeParcelle(data_section, sonCode)
 
-			// Formattage des champs pour l'affichage
-			for (m = 0; m < data_parcelle.mutations.length; m++){
-				data_parcelle.mutations[m].infos[0]['date_mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['date_mutation'])).toLocaleDateString('fr-FR');
-			}
 
-			vue.parcelle = {
-				code: codeParcelle,
-				n_mutations: data_parcelle.nbMutations,
-				mutations: data_parcelle.mutations,
-			};
-			if (vue.parcelle.mutations.length == 1) {
-				entrerDansMutation(0);
-			} else {
-				entrerDansMutation(null);
-			}
-		}
-	);
+	// Formattage des champs pour l'affichage
+	for (m = 0; m < data_parcelle.mutations.length; m++) {
+		data_parcelle.mutations[m].infos[0]['date_mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['date_mutation'])).toLocaleDateString('fr-FR');
+	}
+
+	vue.parcelle = {
+		code: codeParcelle,
+		mutations: data_parcelle.mutations,
+	};
+
+	if (vue.parcelle.mutations.length == 1) {
+		entrerDansMutation(0);
+	} else {
+		entrerDansMutation(null);
+	}
 }
 
 function sortirDeParcelle() {
@@ -410,7 +409,7 @@ function sortirDeParcelle() {
 }
 
 function getSectionCode(section) {
-	const {prefixe, code} = section
+	const { prefixe, code } = section
 	return (prefixe + ('0' + code).slice(-2))
 }
 
@@ -425,9 +424,8 @@ function entrerDansMutation(sonIndex) {
 
 	codesParcelles = [codeParcelle];
 	if (sonIndex != null) {
-
-		for (autre of vue.parcelle.mutations[sonIndex].mutations_liees) {
-			codesParcelles.push(autre['id_parcelle']);
+		for (parcelleLiee of vue.parcelle.mutations[sonIndex].parcellesLiees) {
+			codesParcelles.push(parcelleLiee);
 		}
 	}
 
@@ -453,22 +451,22 @@ function entrerDansSection(sonCode) {
 			}
 		),
 		// Charge les mutations
-		$.getJSON("/api/mutations2/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-") ,
+		$.getJSON("/api/mutations2/" + codeCommune + "/" + sonCode + "/from=" + dateMin.replace(new RegExp("/", "g"), "-") + '&to=' + dateMax.replace(new RegExp("/", "g"), "-"),
 			function (data) {
-				data_section = data;
+				data_section = data.donnees;
 				data_dvf = data.donnees;
 			}
 		)
 	).then(
 		// Une fois qu'on a la géographie et les mutations, on fait tout l'affichage
-		function (data) {
-			data_geo.features = data_geo.features.filter(function(e) {
-				return (sonCode == getSectionCode({ prefixe: e.properties.prefixe, code: e.properties.section}))
+		function () {
+			data_geo.features = data_geo.features.filter(function (e) {
+				return (sonCode == getSectionCode({ prefixe: e.properties.prefixe, code: e.properties.section }))
 			}).sort(function (e, a) {
 				return (e.id).localeCompare(a.id);
 			});
 
-			parcelles = data[0]
+			parcelles = data_geo
 
 			map.getSource('parcelles').setData(parcelles)
 
@@ -476,7 +474,7 @@ function entrerDansSection(sonCode) {
 
 			parcelles.features.map(filledParcelleOptions)
 
-			var parcellesCodes = data_section.donnees.map(parcelle => parcelle.id_parcelle)
+			var parcellesCodes = data_section.map(parcelle => parcelle.id_parcelle)
 			parcellesCodes.unshift('id')
 
 			var includesMutated = parcellesCodes.slice()
@@ -507,6 +505,11 @@ function entrerDansCommune(sonCode) {
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.getJSON("https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/" + codeCommune + "/geojson/sections",
 		function (data) {
+			data.features.sort(function (a, b) {
+				if (!a.properties.nom) return -Infinity;
+				return a.properties.nom.localeCompare(b.properties.nom);
+			});
+
 			sections = data
 			map.getSource('sections').setData(sections)
 
@@ -532,6 +535,7 @@ function entrerDansDepartement(sonCode) {
 	console.log('Nous entrons dans le département ' + codeDepartement);
 	vue.section = null;
 	vue.commune = null;
+	vue.parcelle = null;
 	document.getElementById('communes').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
 	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
@@ -618,7 +622,7 @@ function toggleLeftBar() {
 		maxZoom: 30
 	})
 
-	map.addControl(new mapboxgl.NavigationControl({showCompass: false}));
+	map.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
 
 	if (!mapLoaded) {
 		map.on('load', function () {
@@ -670,14 +674,14 @@ function toggleLeftBar() {
 	hoverableSources.map(function (source) {
 		var layer = `${source}-layer`
 
-		map.on("mousemove", layer, function(e) {onMouseMove(e, source)});
-		map.on("mouseleave", layer, function(e) {onMouseLeave(e, source)});
+		map.on("mousemove", layer, function (e) { onMouseMove(e, source) });
+		map.on("mouseleave", layer, function (e) { onMouseLeave(e, source) });
 	})
 
 	map.on('click', 'departements-layer', onDepartementClick)
 	map.on('click', 'communes-layer', onCityClicked)
 	map.on('click', 'sections-layer', onSectionClicked)
-	map.on('click', 'parcelles-layer', function(event) {
+	map.on('click', 'parcelles-layer', function (event) {
 		if (selectedStateId) {
 			map.setFeatureState({ source: 'parcelles', id: selectedStateId }, { selected: false });
 		}
@@ -761,3 +765,53 @@ function toggleLeftBar() {
 	}
 
 })();
+
+function computeParcelle(mutationsSection, idParcelle) {
+	var mutationsParcelle = mutationsSection.filter(function (m) {
+		return m.id_parcelle === idParcelle
+	})
+
+	var mutations = _.chain(mutationsParcelle)
+		.groupBy('id_mutation')
+		.map(function (rows, idMutation) {
+			var infos = [_.pick(rows[0], 'date_mutation', 'id_parcelle', 'nature_mutation', 'valeur_fonciere')]
+
+			var parcellesLiees = _.uniq(
+				mutationsSection
+					.filter(function (m) {
+						return m.id_mutation === idMutation && m.id_parcelle !== idParcelle
+					})
+					.map(function (m) {
+						return m.id_parcelle
+					})
+			)
+
+			var batiments = _.chain(mutationsParcelle)
+				.filter(function (m) {
+					return m.type_local !== 'None'
+				})
+				.uniqBy(function (m) {
+					return `${m.code_type_local}@${m.surface_reelle_bati}`
+				})
+				.value()
+
+			var terrains = _.chain(mutationsParcelle)
+				.filter(function (m) {
+					return m.nature_culture !== 'None'
+				})
+				.uniqBy(function (m) {
+					return `${m.code_nature_culture}@${m.code_nature_culture_special}@${m.surface_terrain}`
+				})
+				.value()
+
+			return {
+				infos: infos,
+				parcellesLiees: parcellesLiees,
+				batiments: batiments,
+				terrains: terrains
+			}
+		})
+		.value()
+
+	return { mutations: mutations }
+}

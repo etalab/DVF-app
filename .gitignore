@@ -2,3 +2,5 @@ config.csv
 node_modules
 .DS_Store
 .env
+
+db/data
