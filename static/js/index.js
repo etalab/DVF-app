@@ -103,10 +103,17 @@ var data_section = null;
 var dateMin = '01-01-2014';
 var dateMax = '31-12-2018';
 
+var fillColor = '#2a4ba9'
+var borderColor = '#627BC1'
+var mutationColor = '#238FD8'
+var mutationSelectedColor = '#ff5FA8'
+var mutationLieesColor = '#ff8FD8'
+var unmutatedColor = '#212f39'
+
 var hoverableSources = ['departements', 'communes', 'sections', 'parcelles']
 var fillLayerPaint = {
-	"fill-color": "#2a4ba9",
-	"fill-outline-color": "#627BC1",
+	"fill-color": fillColor,
+	"fill-outline-color": borderColor,
 	"fill-opacity": ["case",
 		["boolean", ["feature-state", "hover"], false],
 		0.2,
@@ -183,15 +190,11 @@ var parcellesLayer = {
 	source: 'parcelles',
 	type: 'fill',
 	paint: {
-		"fill-color": ["case",
-			["boolean", ["feature-state", "selected"], false],
-			"#ff5FA8",
-			"#2a4ba9"
-		],
+		"fill-color": mutationColor,
 		"fill-outline-color": ["case",
 			["boolean", ["feature-state", "selected"], false],
-			"#ff8FD8",
-			"#627BC1"
+			mutationLieesColor,
+			borderColor
 		],
 		"fill-opacity": ["case",
 			["boolean", ["feature-state", "hover"], false],
@@ -207,7 +210,7 @@ var unmutatedParcellesLayer = {
 	source: 'parcelles',
 	type: 'fill',
 	paint: {
-		'fill-color': "#212f39",
+		'fill-color': unmutatedColor,
 		'fill-opacity': 0.2
 	}
 }
@@ -401,7 +404,7 @@ function entrerDansParcelle(sonCode) {
 }
 
 function sortirDeParcelle() {
-	map.setPaintProperty('parcelles-layer', 'fill-color', "#627BC1")
+	map.setPaintProperty('parcelles-layer', 'fill-color', mutationColor)
 	if (selectedStateId) {
 		map.setFeatureState({ source: 'parcelles', id: selectedStateId }, { selected: false });
 	}
@@ -432,8 +435,8 @@ function entrerDansMutation(sonIndex) {
 	map.setPaintProperty('parcelles-layer', 'fill-color', [
 		'case',
 		['match', ['get', 'id'], uniq(codesParcelles), true, false],
-		"#ff8FD8",
-		"#627BC1"
+		mutationLieesColor,
+		mutationColor
 	])
 }
 
