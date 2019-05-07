@@ -188,3 +188,6 @@ h3 {
 	margin-top: 50px;
 }
 
+.mapboxgl-ctrl-attrib-inner {
+  color: #000;
+}
