@@ -813,28 +813,22 @@ function computeParcelle(mutationsSection, idParcelle) {
 					})
 			)
 
-			var batiments = _.chain(mutationsParcelle)
+			var batiments = _.chain(rows)
 				.filter(function (m) {
 					return m.type_local !== 'None'
 				})
 				.uniqBy(function (m) {
 					return `${m.code_type_local}@${m.surface_reelle_bati}`
 				})
-				.filter(function(m){
-        				return m.id_mutation === idMutation
-      				})
 				.value()
 
-			var terrains = _.chain(mutationsParcelle)
+			var terrains = _.chain(rows)
 				.filter(function (m) {
 					return m.nature_culture !== 'None'
 				})
 				.uniqBy(function (m) {
 					return `${m.code_nature_culture}@${m.code_nature_culture_special}@${m.surface_terrain}`
 				})
-				.filter(function(m){
-        				return m.id_mutation === idMutation
-      				})
 				.value()
 
 			return {
