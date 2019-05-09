@@ -98,6 +98,7 @@ var selectedStateId = null;
 var codeDepartement = null;
 var codeCommune = null;
 var codeSection = null;
+var data_parcelle = null;
 var codeParcelle = null;
 var codesParcelles = null;
 
@@ -405,6 +406,71 @@ function onMouseLeave(event, source) {
 	}
 }
 
+function resetMutation() {
+	vue.mutationIndex = null
+	codesParcelles = null
+
+	map.setPaintProperty('parcelles-layer', 'fill-color', mutationColor)
+
+	if (selectedStateId) {
+		map.setFeatureState({ source: 'parcelles', id: selectedStateId }, { selected: false });
+	}
+}
+
+function resetParcelle() {
+	vue.parcelle = null;
+	data_parcelle = null;
+
+	map.setPaintProperty('parcelles-layer', 'fill-color', parcellesLayer.paint['fill-color'])
+
+	if (codesParcelles) {
+		resetMutation()
+	}
+}
+
+function resetSection() {
+	vue.section = null;
+	codeSection = null;
+	data_section = null;
+	parcelles = null;
+
+	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>'
+	map.getSource('parcelles').setData(EMPTY_FEATURE_COLLECTION)
+	map.setFilter('parcelles-layer', null)
+
+	if (data_parcelle) {
+		resetParcelle()
+	}
+}
+
+function resetCommune() {
+	vue.commune = null;
+	codeCommune = null;
+	nom_fichier_commune = null;
+	sections = null;
+
+	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
+	map.getSource('sections').setData(EMPTY_FEATURE_COLLECTION)
+	map.setFilter('communes-layer', null)
+
+	if (codeSection) {
+		resetSection()
+	}
+}
+
+function resetDepartement() {
+	communes = null;
+	codeDepartement = null
+
+	document.getElementById('communes').innerHTML = '<option style="display:none"></option>';
+	map.getSource('communes').setData(EMPTY_FEATURE_COLLECTION)
+	map.setFilter('departements-layer', null)
+
+	if (codeCommune) {
+		resetCommune()
+	}
+}
+
 function selectionnerDepartement() {
 	// L'utilisateur a cliqué sur la liste déroulante des départements
 	var e = document.getElementById("departements");
@@ -490,11 +556,8 @@ function entrerDansParcelle(sonCode) {
 }
 
 function sortirDeParcelle() {
-	map.setPaintProperty('parcelles-layer', 'fill-color', mutationColor)
-	if (selectedStateId) {
-		map.setFeatureState({ source: 'parcelles', id: selectedStateId }, { selected: false });
-	}
-	entrerDansSection(codeSection);
+	resetParcelle()
+	fit(parcelles)
 }
 
 function getSectionCode(section) {
@@ -522,17 +585,22 @@ function entrerDansMutation(sonIndex) {
 }
 
 function entrerDansSection(sonCode) {
+	if (codeSection) {
+		resetSection()
+	}
+
+	if (data_parcelle) {
+		resetParcelle()
+	}
+
 	codeSection = sonCode;
-	console.log("Section sélectionnée : " + sonCode);
-	vue.parcelle = null;
-	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	$.when(
 		// Charge la couche géographique
 		getParcelles(codeCommune).then(function (data) {
 			data_geo = data;
 		}),
 		// Charge les mutations
-		$.getJSON(`/api/mutations3/${codeCommune}/${sonCode}`,
+		$.getJSON(`/api/mutations3/${codeCommune}/${codeSection}`,
 			function (data) {
 				data_section = data.mutations.filter(function (m) {
 					return m.date_mutation >= startDate && m.date_mutation <= endDate
@@ -543,7 +611,7 @@ function entrerDansSection(sonCode) {
 		// Une fois qu'on a la géographie et les mutations, on fait tout l'affichage
 		function () {
 			data_geo.features = data_geo.features.filter(function (e) {
-				return (sonCode == getSectionCode({ prefixe: e.properties.prefixe, code: e.properties.section }))
+				return (codeSection == getSectionCode({ prefixe: e.properties.prefixe, code: e.properties.section }))
 			}).sort(function (e, a) {
 				return (e.id).localeCompare(a.id);
 			});
@@ -565,12 +633,16 @@ function entrerDansSection(sonCode) {
 }
 
 function entrerDansCommune(sonCode) {
-	vue.parcelle = null;
-	vue.section = null;
+	if (codeCommune) {
+		resetCommune()
+	}
+
+	if (codeSection) {
+		resetSection()
+	}
+
 	console.log("Nous entrons dans la commune " + sonCode);
 	codeCommune = sonCode;
-	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
-	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	getSections(codeCommune).then(
 		function (data) {
 			data.features.sort(function (a, b) {
@@ -597,16 +669,13 @@ function entrerDansCommune(sonCode) {
 }
 
 function entrerDansDepartement(sonCode) {
+	if (codeDepartement) {
+		resetDepartement()
+	}
 
 	// Vide l'interface
 	codeDepartement = sonCode;
 	console.log('Nous entrons dans le département ' + codeDepartement);
-	vue.section = null;
-	vue.commune = null;
-	vue.parcelle = null;
-	document.getElementById('communes').innerHTML = '<option style="display:none"></option>';
-	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
-	document.getElementById('parcelles').innerHTML = '<option style="display:none"></option>';
 	// Charge les communes
 	$.getJSON("https://geo.api.gouv.fr/departements/" + codeDepartement + "/communes?geometry=contour&format=geojson&type=commune-actuelle",
 		function (data) {
@@ -879,7 +948,7 @@ function parcellesFilter() {
 
 	map.setFilter('parcelles-layer', includesMutated) // include
 	map.setFilter('unmutated-parcelles-layer', exludesMutated) // exclude
-	map.setFilter('sections-layer', ['!=', ['get', 'code'], sonCode.replace(/^0+/, '')])
+	map.setFilter('sections-layer', ['!=', ['get', 'code'], codeSection.replace(/^0+/, '')])
 }
 
 function communeFilter() {
