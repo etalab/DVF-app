@@ -362,15 +362,6 @@ function getSections(codeCommune) {
 	return getCadastreLayer('sections', codeCommune)
 }
 
-function uniq(array) {
-	return Object.keys(
-		array.reduce(function (acc, item) {
-			acc[item] = true
-			return acc
-		}, {})
-	)
-}
-
 function resetSourcesData(sources) {
 	sources.map(source => {
 		var source = map.getSource(source)
@@ -933,7 +924,7 @@ function layerfilter() {
 function mutationsFilter() {
 	map.setPaintProperty('parcelles-layer', 'fill-color', [
 		'case',
-		['match', ['get', 'id'], uniq(codesParcelles), true, false],
+		['match', ['get', 'id'], _.uniq(codesParcelles), true, false],
 		mutationLieesColor,
 		mutationColor
 	])
