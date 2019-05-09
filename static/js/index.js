@@ -73,6 +73,7 @@ var vue = new Vue({
 		section: null,
 		parcelle: null,
 		mutationIndex: null,
+		mapStyle: 'vector',
 	},
 	methods: {},
 });
@@ -91,12 +92,61 @@ var MAX_DATE = '2018-12-31'
 
 var map = null;
 var mapLoaded = false;
+var mapStyleChanged = false;
 var hoveredStateId = null;
 var selectedStateId = null;
 var codeDepartement = null;
 var codeCommune = null;
 var codeSection = null;
 var codeParcelle = null;
+var codesParcelles = null;
+
+var styles = {
+	ortho: {
+		"version": 8,
+		"glyphs": "https://openmaptiles.geo.data.gouv.fr/fonts/{fontstack}/{range}.pbf",
+		"sources": {
+			"raster-tiles": {
+				"type": "raster",
+				"tiles": [
+					"https://wxs.ign.fr/eop8s6g4hrpvxnxer1g6qu44/geoportail/wmts?layer=ORTHOIMAGERY.ORTHOPHOTOS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix={z}&TileCol={x}&TileRow={y}"
+				],
+				"tileSize": 256,
+				"attribution": "© IGN"
+			}
+		},
+		"layers": [
+			{
+				"id": "simple-tiles",
+				"type": "raster",
+				"source": "raster-tiles"
+			}
+		]
+	},
+	vector: {
+		"version": 8,
+		"glyphs": "https://openmaptiles.geo.data.gouv.fr/fonts/{fontstack}/{range}.pbf",
+		"sources": {
+			"raster-tiles": {
+				"type": "raster",
+				"tiles": [
+					"https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
+					"https://b.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
+					"https://c.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
+				],
+				"tileSize": 256,
+				"attribution": 'donn&eacute;es &copy; <a href="//osm.org/copyright">OpenStreetMap</a>/ODbL - rendu <a href="//openstreetmap.fr">OSM France</a>'
+			}
+		},
+		"layers": [
+			{
+				"id": "simple-tiles",
+				"type": "raster",
+				"source": "raster-tiles"
+			}
+		]
+	}
+}
 
 var nom_fichier_section = null;
 var data_section = null;
@@ -422,7 +472,6 @@ function entrerDansParcelle(sonCode) {
 	codeParcelle = sonCode;
 	data_parcelle = computeParcelle(data_section, sonCode)
 
-
 	// Formattage des champs pour l'affichage
 	for (m = 0; m < data_parcelle.mutations.length; m++) {
 		data_parcelle.mutations[m].infos[0]['date_mutation'] = (new Date(data_parcelle.mutations[m].infos[0]['date_mutation'])).toLocaleDateString('fr-FR');
@@ -469,16 +518,10 @@ function entrerDansMutation(sonIndex) {
 		}
 	}
 
-	map.setPaintProperty('parcelles-layer', 'fill-color', [
-		'case',
-		['match', ['get', 'id'], uniq(codesParcelles), true, false],
-		mutationLieesColor,
-		mutationColor
-	])
+	mutationsFilter()
 }
 
 function entrerDansSection(sonCode) {
-
 	codeSection = sonCode;
 	console.log("Section sélectionnée : " + sonCode);
 	vue.parcelle = null;
@@ -509,22 +552,9 @@ function entrerDansSection(sonCode) {
 
 			map.getSource('parcelles').setData(parcelles)
 
-			fit(parcelles)
-
 			parcelles.features.map(filledParcelleOptions)
 
-			var parcellesCodes = data_section.map(parcelle => parcelle.id_parcelle)
-			parcellesCodes.unshift('id')
-
-			var includesMutated = parcellesCodes.slice()
-			includesMutated.unshift('in')
-
-			var exludesMutated = parcellesCodes.slice()
-			exludesMutated.unshift('!in')
-
-			map.setFilter('parcelles-layer', includesMutated) // include
-			map.setFilter('unmutated-parcelles-layer', exludesMutated) // exclude
-			map.setFilter('sections-layer', ['!=', ['get', 'code'], sonCode.replace(/^0+/, '')])
+			parcellesFilter()
 
 			fit(parcelles)
 			vue.section = {
@@ -552,7 +582,7 @@ function entrerDansCommune(sonCode) {
 			map.getSource('sections').setData(sections)
 
 			data.features.map(filledSectionsOptions)
-			map.setFilter('communes-layer', ['!=', ['get', 'code'], codeCommune])
+			communeFilter()
 
 			resetSourcesData(['parcelles'])
 
@@ -602,7 +632,7 @@ function afficherCommunesDepartement(data) {
 
 	map.getSource('communes').setData(communes)
 	data.features.map(filledCommunesOptions)
-	map.setFilter('departements-layer', ['!=', ['get', 'code'], codeDepartement])
+	departementsFilter()
 
 	resetSourcesData(['sections', 'parcelles'])
 
@@ -633,29 +663,7 @@ function toggleLeftBar() {
 	// Mise en place de la carte
 	map = new mapboxgl.Map({
 		container: 'mapid',
-		style: {
-			"version": 8,
-			"glyphs": "https://openmaptiles.geo.data.gouv.fr/fonts/{fontstack}/{range}.pbf",
-			"sources": {
-				"raster-tiles": {
-					"type": "raster",
-					"tiles": [
-						"https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
-						"https://b.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
-						"https://c.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
-					],
-					"tileSize": 256,
-					"attribution": 'donn&eacute;es &copy; <a href="//osm.org/copyright">OpenStreetMap</a>/ODbL - rendu <a href="//openstreetmap.fr">OSM France</a>'
-				}
-			},
-			"layers": [
-				{
-					"id": "simple-tiles",
-					"type": "raster",
-					"source": "raster-tiles"
-				}
-			]
-		},
+		style: styles[vue.mapStyle],
 		center: [3, 47],
 		zoom: 5,
 		minZoom: 1,
@@ -664,53 +672,26 @@ function toggleLeftBar() {
 
 	map.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
 
-	if (!mapLoaded) {
-		map.on('load', function () {
+	map.on('load', function() {
+		if (!departements) {
 			// Chargement des contours des départements
 			$.getJSON("/donneesgeo/departements-100m.geojson",
 				function (data) {
 					departements = data
-
+				}
+			).then(function() {
 					map.addSource("departements", {
 						type: 'geojson',
 						generateId: true,
-						data
+					data: departements
 					})
 					map.addLayer(departementsLayer)
 					map.addLayer(departementsContoursLayer)
 				map.setPaintProperty(departementsContoursLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
+			})
 				}
-			)
-
-			map.addSource("communes", {
-				type: 'geojson',
-				generateId: true,
-				data: communes
-			})
-			map.addLayer(communesLayer)
-			map.addLayer(communesContoursLayer)
-
-			map.addSource("sections", {
-				type: 'geojson',
-				generateId: true,
-				data: sections
-			})
-			map.addLayer(sectionsLayer)
-			map.addLayer(sectionsLineLayer)
-			map.addLayer(sectionsSymbolLayer)
-
-			map.addSource("parcelles", {
-				type: 'geojson',
-				generateId: true,
-				data: parcelles
-			})
-			map.addLayer(parcellesLayer)
-			map.addLayer(unmutatedParcellesLayer)
-			map.addLayer(unmutatedParcellesContoursLayer)
 		})
-
-		mapLoaded = true
-	}
+	map.on('styledata', loadCustomLayers)
 
 	hoverableSources.map(function (source) {
 		var layer = `${source}-layer`
@@ -800,6 +781,114 @@ function toggleLeftBar() {
 	}
 
 })();
+
+function loadCustomLayers() {
+	if (!mapLoaded) {
+		if (departements) {
+			map.addSource("departements", {
+				type: 'geojson',
+				generateId: true,
+				data: departements
+			})
+			map.addLayer(departementsLayer)
+			map.addLayer(departementsContoursLayer)
+			map.setPaintProperty(departementsContoursLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
+		}
+
+		map.addSource("communes", {
+			type: 'geojson',
+			generateId: true,
+			data: communes
+		})
+		map.addLayer(communesLayer)
+		map.addLayer(communesContoursLayer)
+		map.setPaintProperty(communesContoursLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
+
+		map.addSource("sections", {
+			type: 'geojson',
+			generateId: true,
+			data: sections
+		})
+		map.addLayer(sectionsLayer)
+		map.addLayer(sectionsLineLayer)
+		map.addLayer(sectionsSymbolLayer)
+		map.setPaintProperty(sectionsLineLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
+
+		map.addSource("parcelles", {
+			type: 'geojson',
+			generateId: true,
+			data: parcelles
+		})
+		map.addLayer(parcellesLayer)
+		map.addLayer(unmutatedParcellesLayer)
+		map.addLayer(unmutatedParcellesContoursLayer)
+		map.setPaintProperty(unmutatedParcellesContoursLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
+	}
+
+	if (mapStyleChanged) {
+		layerfilter()
+		mapStyleChanged = false
+	}
+
+	mapLoaded = true
+}
+
+function changeMapStyle() {
+	vue.mapStyle = vue.mapStyle === 'vector' ? 'ortho' : 'vector'
+	map.setStyle(styles[vue.mapStyle])
+	mapLoaded = false
+	mapStyleChanged = true
+}
+
+function layerfilter() {
+	if (codeDepartement) {
+		departementsFilter()
+	}
+
+	if (codeCommune) {
+		communeFilter()
+	}
+
+	if (data_section) {
+		parcellesFilter()
+	}
+
+	if (codesParcelles) {
+		mutationsFilter()
+	}
+}
+
+function mutationsFilter() {
+	map.setPaintProperty('parcelles-layer', 'fill-color', [
+		'case',
+		['match', ['get', 'id'], uniq(codesParcelles), true, false],
+		mutationLieesColor,
+		mutationColor
+	])
+}
+
+function parcellesFilter() {
+	var parcellesId = data_section.map(parcelle => parcelle.id_parcelle)
+	parcellesId.unshift('id')
+
+	var includesMutated = parcellesId.slice()
+	includesMutated.unshift('in')
+
+	var exludesMutated = parcellesId.slice()
+	exludesMutated.unshift('!in')
+
+	map.setFilter('parcelles-layer', includesMutated) // include
+	map.setFilter('unmutated-parcelles-layer', exludesMutated) // exclude
+	map.setFilter('sections-layer', ['!=', ['get', 'code'], sonCode.replace(/^0+/, '')])
+}
+
+function communeFilter() {
+	map.setFilter('communes-layer', ['!=', ['get', 'code'], codeCommune])
+}
+
+function departementsFilter() {
+	map.setFilter('departements-layer', ['!=', ['get', 'code'], codeDepartement])
+}
 
 function computeParcelle(mutationsSection, idParcelle) {
 	var mutationsParcelle = mutationsSection.filter(function (m) {
