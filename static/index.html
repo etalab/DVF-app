@@ -105,7 +105,12 @@
 			</div>
 		</div>
 		<div id="content">
-			<div id="mapid"></div>
+			<div id="mapid">
+				<div class="switch-map-style" onclick="changeMapStyle()">
+					<img v-if="mapStyle == 'vector'" src="/images/preview-ortho.png" alt="Fond orthophoto" />
+					<img v-if="mapStyle == 'ortho'" src="/images/preview-vector.png" alt="Fond vectoriel" />
+				</div>
+			</div>
 		</div>
 		<div id="sidebar_right" class="container scrollable" v-if="parcelle != null && parcelle.mutations.length > 0">
 			<span onclick="sortirDeParcelle()" class="mt-2 mb-2 close-link">Fermer</span>
