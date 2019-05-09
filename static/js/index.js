@@ -122,6 +122,15 @@ var fillLayerPaint = {
 	]
 }
 
+var contoursPaint = {
+	"line-width": [
+		'case',
+		["boolean", ["feature-state", "hover"], false],
+		3,
+		1
+	]
+}
+
 var departements = null;
 var departementsLayer = {
 	id: 'departements-layer',
@@ -132,7 +141,8 @@ var departementsLayer = {
 var departementsContoursLayer = {
 	id: 'departements-contours-layer',
 	source: 'departements',
-	type: 'line'
+	type: 'line',
+	paint: contoursPaint
 }
 
 var communes = null;
@@ -145,7 +155,8 @@ var communesLayer = {
 var communesContoursLayer = {
 	id: 'communes-contours-layer',
 	source: 'communes',
-	type: 'line'
+	type: 'line',
+	paint: contoursPaint
 }
 
 var sections = null;
@@ -175,15 +186,8 @@ var sectionsLineLayer = {
 	id: 'sections-line-layer',
 	source: 'sections',
 	type: 'line',
-	paint: {
-		"line-width": [
-			'case',
-			["boolean", ["feature-state", "hover"], false],
-			4,
-			1
-		]
+	paint: contoursPaint
 	}
-}
 
 var parcelles = null;
 var parcellesLayer = {
@@ -218,7 +222,8 @@ var unmutatedParcellesLayer = {
 var unmutatedParcellesContoursLayer = {
 	id: 'unmutated-parcelles-countours-layer',
 	source: 'parcelles',
-	type: 'line'
+	type: 'line',
+	paint: contoursPaint
 }
 
 const EMPTY_FEATURE_COLLECTION = {
@@ -673,6 +678,7 @@ function toggleLeftBar() {
 					})
 					map.addLayer(departementsLayer)
 					map.addLayer(departementsContoursLayer)
+				map.setPaintProperty(departementsContoursLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
 				}
 			)
 
