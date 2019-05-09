@@ -287,8 +287,11 @@ function getCadastreLayer(layerName, codeCommune) {
 			return {
 				type: 'FeatureCollection',
 				features: featureCollections.reduce(function (acc, featureCollection) {
-					if (featureCollection && featureCollection.features)
-					return acc.concat(featureCollection.features)
+					if (featureCollection && featureCollection.features) {
+						return acc.concat(featureCollection.features)
+					}
+
+					return acc
 				}, [])
 			}
 		})
