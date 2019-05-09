@@ -277,7 +277,7 @@ var unmutatedParcellesContoursLayer = {
 	paint: contoursPaint
 }
 
-const EMPTY_FEATURE_COLLECTION = {
+var EMPTY_FEATURE_COLLECTION = {
 	type: 'FeatureCollection',
 	features: []
 }
@@ -511,7 +511,8 @@ function sortirDeParcelle() {
 }
 
 function getSectionCode(section) {
-	const { prefixe, code } = section
+	var prefixe = section.prefixe
+	var code = section.code
 	return (prefixe + ('0' + code).slice(-2))
 }
 
