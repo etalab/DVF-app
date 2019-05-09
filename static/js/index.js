@@ -319,7 +319,7 @@ function exportCSV(el, data, fileName) {
 }
 
 function resetSourcesData(sources) {
-	sources.map(source => {
+	sources.forEach(function (source) {
 		var source = map.getSource(source)
 		if (source) {
 			source.setData(EMPTY_FEATURE_COLLECTION)
@@ -888,7 +888,9 @@ function mutationsFilter() {
 }
 
 function parcellesFilter() {
-	var parcellesId = data_section.map(parcelle => parcelle.id_parcelle)
+	var parcellesId = data_section.map(function (parcelle) {
+		return parcelle.id_parcelle
+	})
 	parcellesId.unshift('id')
 
 	var includesMutated = parcellesId.slice()

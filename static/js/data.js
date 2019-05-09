@@ -16,7 +16,7 @@ var communesMappingPromise = getRemoteJSON('/donneesgeo/communes-mapping.json', 
 
 function getCadastreLayer(layerName, codeCommune) {
 	return communesMappingPromise.then(function (communesMapping) {
-		const communesToGet = codeCommune in communesMapping ? communesMapping[codeCommune] : [codeCommune]
+		var communesToGet = codeCommune in communesMapping ? communesMapping[codeCommune] : [codeCommune]
 		return Promise.all(communesToGet.map(function (communeToGet) {
 			return getRemoteJSON(`https://cadastre.data.gouv.fr/bundler/cadastre-etalab/communes/${communeToGet}/geojson/${layerName}`)
 		})).then(function (featureCollections) {
