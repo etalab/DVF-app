@@ -67,8 +67,9 @@ th {
 }
 
 .close-link {
-  float: right;
+  text-align: right;
   cursor: pointer;
+  margin: 0.5em 0;
 }
 
 .close-link:hover {
