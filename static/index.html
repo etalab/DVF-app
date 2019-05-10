@@ -24,13 +24,6 @@
 	<script type="text/javascript" src="https://unpkg.com/lodash@4.17.11/lodash.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 	<link rel="shortcut icon" type="image/x-icon" href="/favicon.png">
-	<style type="text/css">
-		html,
-		body {
-			height: 100vh;
-			overflow-y: hidden;
-		}
-	</style>
 </head>
 
 <body>
@@ -54,37 +47,40 @@
 			</a>
 		</div>
 	</div>
+
 	<div id="app" class="wrapper">
-		<div id="sidebar_left" v-show="!fold_left" class="container scrollable">
-			<br />
-			<div class="form-group">
-				<label for="departements" class="control-label">Département</label>
-				<select name="departements" id="departements" onchange="selectionnerDepartement()" class="form-control">
-					<option style="display:none"></option>
-				</select>
+		<div id="sidebar_left" class="sidebar" v-show="!fold_left" class="container">
+			<div class="scrollable">
+				<div class="form-group">
+					<label for="departements" class="control-label">Département</label>
+					<select name="departements" id="departements" onchange="selectionnerDepartement()" class="form-control">
+						<option style="display:none"></option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="communes" class="control-label">Commune</label>
+					<select name="communes" id="communes" onchange="selectionnerCommune()" class="form-control">
+						<option style="display:none"></option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="sections" class="control-label">Section cadastrale</label>
+					<select name="sections" id="sections" onchange="selectionnerSection()" class="form-control">
+						<option style="display:none"></option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="parcelles" class="control-label">Parcelle cadastrale</label>
+					<select name="parcelles" id="parcelles" onchange="selectionnerParcelle()" class="form-control">
+						<option style="display:none"></option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="daterange" class="control-label">Date de la mutation</label>
+					<input type="text" id="daterange" name="daterange" value="01-01-2010 - 15-01-2018" class="form-control" />
+				</div>
 			</div>
-			<div class="form-group">
-				<label for="communes" class="control-label">Commune</label>
-				<select name="communes" id="communes" onchange="selectionnerCommune()" class="form-control">
-					<option style="display:none"></option>
-				</select>
-			</div>
-			<div class="form-group">
-				<label for="sections" class="control-label">Section cadastrale</label>
-				<select name="sections" id="sections" onchange="selectionnerSection()" class="form-control">
-					<option style="display:none"></option>
-				</select>
-			</div>
-			<div class="form-group">
-				<label for="parcelles" class="control-label">Parcelle cadastrale</label>
-				<select name="parcelles" id="parcelles" onchange="selectionnerParcelle()" class="form-control">
-					<option style="display:none"></option>
-				</select>
-			</div>
-			<div class="form-group">
-				<label for="daterange" class="control-label">Date de la mutation</label>
-				<input type="text" id="daterange" name="daterange" value="01-01-2010 - 15-01-2018" class="form-control" />
-			</div>
+
 			<div v-if="section != null">
 				<a v-if="data_section.length > 0" id="exportCSV"
 					onclick="exportCSV(this, data_section, codeCommune + '_' + codeSection + '.csv');" class="btn btn-primary"
@@ -98,12 +94,14 @@
 					<a href="/faq.html">En savoir plus</a>
 				</div>
 			</div>
+
 			<div id="logo">
 				<a href="https://www.etalab.gouv.fr/qui-sommes-nous">
 					<img src="css/etalab-blanc.png" alt="Etalab" style="max-width: 100px" />
 				</a>
 			</div>
 		</div>
+
 		<div id="content">
 			<div id="mapid">
 				<div class="switch-map-style" onclick="changeMapStyle()">
@@ -112,11 +110,15 @@
 				</div>
 			</div>
 		</div>
-		<div id="sidebar_right" class="container scrollable" v-if="parcelle != null && parcelle.mutations.length > 0">
-			<span onclick="sortirDeParcelle()" class="mt-2 mb-2 close-link">Fermer</span>
-			<br />
-			<boite-accordeon v-for="(mutation, index) in parcelle.mutations" :mutation="mutation"
-				:key="mutation.infos[0].id_parcelle + index" :index="index"></boite-accordeon>
+
+		<div id="sidebar_right" class="sidebar" v-if="parcelle != null && parcelle.mutations.length > 0">
+			<div onclick="sortirDeParcelle()" class="close-link">Fermer X</div>
+			<div class="scrollable">
+				<div class="cards">
+					<boite-accordeon v-for="(mutation, index) in parcelle.mutations" :mutation="mutation"
+						:key="mutation.infos[0].id_parcelle + index" :index="index"></boite-accordeon>
+				</div>
+			</div>
 		</div>
 	</div>
 
