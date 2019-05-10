@@ -34,8 +34,18 @@ function getCadastreLayer(layerName, codeCommune) {
 	})
 }
 
-function getParcelles(codeCommune) {
-	return getCadastreLayer('parcelles', codeCommune)
+function getParcelles(codeCommune, idSection) {
+	return getCadastreLayer('parcelles', codeCommune).then(function (featureCollection) {
+		return {
+			type: 'FeatureCollection',
+			features: _.chain(featureCollection.features)
+				.filter(function (f) {
+					return f.id.startsWith(idSection)
+				})
+				.sortBy('id')
+				.value()
+		}
+	})
 }
 
 function getSections(codeCommune) {
