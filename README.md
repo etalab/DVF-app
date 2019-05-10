@@ -54,7 +54,7 @@ Démarrage du serveur Web (port 3000 par défaut)
 $ yarn start
 ```
 
-### 4- Suite de l'installation : pour développer l'ensiemble de l'application  (Full Stack: Back End + Front End)
+### 4- Suite de l'installation : pour développer l'ensemble de l'application  (Full Stack: Back End + Front End)
 
 PostgreSQL
 ```bash
