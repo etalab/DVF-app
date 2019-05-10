@@ -35,6 +35,7 @@ var selectedStateId = null;
 var codeDepartement = null;
 var codeCommune = null;
 var codeSection = null;
+var idSection = null;
 var data_parcelle = null;
 var codeParcelle = null;
 var codesParcelles = null;
@@ -376,6 +377,7 @@ function selectionnerSection() {
 	// L'utilisateur a cliqué sur la liste déroulante des sections
 	var e = document.getElementById("sections");
 	var sonCode = e.options[e.selectedIndex].value;
+	idSection = e.options[e.selectedIndex].id;
 	entrerDansSection(sonCode);
 }
 
@@ -397,6 +399,7 @@ function filledSectionsOptions(feature) {
 	var code = getSectionCode(feature.properties)
 
 	$('#sections').append($('<option />', {
+		id: feature.properties.id,
 		value: code,
 		text: code.replace(/^0+/, '')
 	}))
@@ -451,6 +454,7 @@ function getSectionCode(section) {
 function onSectionClicked(event) {
 	sonCode = getSectionCode(event.features[0].properties)
 	document.getElementById("sections").value = sonCode;
+	idSection = event.features[0].properties.id
 	entrerDansSection(sonCode);
 }
 
@@ -833,7 +837,7 @@ function parcellesFilter() {
 
 	map.setFilter('parcelles-layer', includesMutated) // include
 	map.setFilter('unmutated-parcelles-layer', exludesMutated) // exclude
-	map.setFilter('sections-layer', ['!=', ['get', 'code'], codeSection.replace(/^0+/, '')])
+	map.setFilter('sections-layer', ['!=', ['get', 'id'], idSection])
 }
 
 function communeFilter() {
