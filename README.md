@@ -24,7 +24,7 @@ $ cd DVF
 
 ### 3- Installation minimale : pour développer l'interface utilisateur seule (Front End)
 
-Pour participer au développement de l'interface utilisateuri, il n'est pas nécessaire d'installer Python et PostgreSQL.
+Pour participer au développement de l'interface utilisateur, il n'est pas nécessaire d'installer Python et PostgreSQL.
 
 - [Node.js](https://nodejs.org) 8 ou supérieur
 ```bash
@@ -73,7 +73,7 @@ $ sh db/build_db.sh
 
 Configuration de l'accès à la base de données
 
-Dans la commande ci-dessous, remplacer <YOUR PASSWORD> par votre mode de passe.
+Dans la commande ci-dessous, remplacer <YOUR PASSWORD> par votre mot de passe.
 ```bash
 $ sudo -u postgres psql
 postgres=# \password postgres
