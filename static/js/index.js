@@ -687,7 +687,7 @@ function toggleLeftBar() {
 		center: [3, 47],
 		zoom: 5,
 		minZoom: 1,
-		maxZoom: 20
+		maxZoom: 19
 	})
 
 	map.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
