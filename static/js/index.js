@@ -505,11 +505,6 @@ function entrerDansCommune(sonCode) {
 	codeCommune = sonCode;
 	getSections(codeCommune).then(
 		function (data) {
-			data.features.sort(function (a, b) {
-				if (!a.properties.nom) return -Infinity;
-				return a.properties.nom.localeCompare(b.properties.nom);
-			});
-
 			sections = data
 			map.getSource('sections').setData(sections)
 
