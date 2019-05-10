@@ -84,7 +84,22 @@ function getParcelles(codeCommune, idSection) {
 }
 
 function getSections(codeCommune) {
-	return getCadastreLayer('sections', codeCommune)
+	return getCadastreLayer('sections', codeCommune).then(function (featureCollection) {
+		var features = featureCollection.features
+		var hasMultiplePrefixes = features.some(function (f) {
+			return f.properties.commune !== codeCommune || f.properties.prefixe !== '000'
+		})
+		features.forEach(function (f) {
+			if (!hasMultiplePrefixes) {
+				f.properties.label = f.properties.code
+				return
+			}
+
+			var labelPrefix = f.properties.commune === codeCommune ? f.properties.prefixe : f.properties.commune.substr(2)
+			f.properties.label = `${labelPrefix} ${f.properties.code}`
+		})
+		return featureCollection
+	})
 }
 
 function computeParcelle(mutationsSection, idParcelle) {

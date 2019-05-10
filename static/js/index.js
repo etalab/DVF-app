@@ -164,9 +164,7 @@ var sectionsSymbolLayer = {
 	},
 	layout: {
 		'text-field': ['format',
-			['get', 'prefix'], {},
-			' ', {},
-			['get', 'code'], {},
+			['get', 'label'], {}
 		]
 	}
 }
@@ -400,7 +398,7 @@ function filledCommunesOptions(feature) {
 function filledSectionsOptions(feature) {
 	$('#sections').append($('<option />', {
 		value: feature.properties.id,
-		text: idSectionToCode(feature.properties.id).replace(/^0+/, '')
+		text: feature.properties.label
 	}))
 }
 
