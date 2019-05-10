@@ -34,7 +34,6 @@ var hoveredStateId = null;
 var selectedStateId = null;
 var codeDepartement = null;
 var codeCommune = null;
-var codeSection = null;
 var idSection = null;
 var data_parcelle = null;
 var codeParcelle = null;
@@ -222,6 +221,10 @@ var EMPTY_FEATURE_COLLECTION = {
 
 // Fonctions
 
+function idSectionToCode(idSection) {
+	return idSection.substr(5, 5)
+}
+
 /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
 function openNav() {
 	document.getElementById("mySidebar").style.width = "250px";
@@ -318,7 +321,7 @@ function resetParcelle() {
 
 function resetSection() {
 	vue.section = null;
-	codeSection = null;
+	idSection = null;
 	data_section = null;
 	parcelles = null;
 
@@ -341,7 +344,7 @@ function resetCommune() {
 	map.getSource('sections').setData(EMPTY_FEATURE_COLLECTION)
 	map.setFilter('communes-layer', null)
 
-	if (codeSection) {
+	if (idSection) {
 		resetSection()
 	}
 }
@@ -376,9 +379,8 @@ function selectionnerCommune() {
 function selectionnerSection() {
 	// L'utilisateur a cliqué sur la liste déroulante des sections
 	var e = document.getElementById("sections");
-	var sonCode = e.options[e.selectedIndex].value;
-	idSection = e.options[e.selectedIndex].id;
-	entrerDansSection(sonCode);
+	var newIdSection = e.options[e.selectedIndex].value;
+	entrerDansSection(newIdSection);
 }
 
 function selectionnerParcelle() {
@@ -396,12 +398,9 @@ function filledCommunesOptions(feature) {
 }
 
 function filledSectionsOptions(feature) {
-	var code = getSectionCode(feature.properties)
-
 	$('#sections').append($('<option />', {
-		id: feature.properties.id,
-		value: code,
-		text: code.replace(/^0+/, '')
+		value: feature.properties.id,
+		text: idSectionToCode(feature.properties.id).replace(/^0+/, '')
 	}))
 }
 
@@ -445,17 +444,10 @@ function sortirDeParcelle() {
 	fit(parcelles)
 }
 
-function getSectionCode(section) {
-	var prefixe = section.prefixe
-	var code = section.code
-	return (prefixe + ('0' + code).slice(-2))
-}
-
 function onSectionClicked(event) {
-	sonCode = getSectionCode(event.features[0].properties)
-	document.getElementById("sections").value = sonCode;
-	idSection = event.features[0].properties.id
-	entrerDansSection(sonCode);
+	var newIdSection = event.features[0].properties.id
+	document.getElementById("sections").value = newIdSection;
+	entrerDansSection(newIdSection);
 }
 
 function entrerDansMutation(sonIndex) {
@@ -471,8 +463,8 @@ function entrerDansMutation(sonIndex) {
 	mutationsFilter()
 }
 
-function entrerDansSection(sonCode) {
-	if (codeSection) {
+function entrerDansSection(newIdSection) {
+	if (idSection) {
 		resetSection()
 	}
 
@@ -480,37 +472,26 @@ function entrerDansSection(sonCode) {
 		resetParcelle()
 	}
 
-	codeSection = sonCode;
+	idSection = newIdSection;
 	$.when(
 		// Charge la couche géographique
-		getParcelles(codeCommune).then(function (data) {
-			data_geo = data;
+		getParcelles(codeCommune, idSection).then(function (data) {
+			parcelles = data;
 		}),
 		// Charge les mutations
-		$.getJSON(`/api/mutations3/${codeCommune}/${codeSection}`,
+		$.getJSON(`/api/mutations3/${codeCommune}/${idSectionToCode(idSection)}`,
 			function (data) {
 				data_section = data.mutations.filter(function (m) {
-					return m.date_mutation >= startDate && m.date_mutation <= endDate
+					return m.date_mutation >= startDate && m.date_mutation <= endDate && m.id_parcelle.startsWith(idSection)
 				});
 			}
 		)
 	).then(
 		// Une fois qu'on a la géographie et les mutations, on fait tout l'affichage
 		function () {
-			data_geo.features = data_geo.features.filter(function (e) {
-				return (codeSection == getSectionCode({ prefixe: e.properties.prefixe, code: e.properties.section }))
-			}).sort(function (e, a) {
-				return (e.id).localeCompare(a.id);
-			});
-
-			parcelles = data_geo
-
 			map.getSource('parcelles').setData(parcelles)
-
-			parcelles.features.map(filledParcelleOptions)
-
+			parcelles.features.forEach(filledParcelleOptions)
 			parcellesFilter()
-
 			fit(parcelles)
 			vue.section = {
 				code: sonCode
@@ -524,7 +505,7 @@ function entrerDansCommune(sonCode) {
 		resetCommune()
 	}
 
-	if (codeSection) {
+	if (idSection) {
 		resetSection()
 	}
 
@@ -713,8 +694,8 @@ function toggleLeftBar() {
 		// Fonction executée quand la personne change les dates
 		startDate = start.format('YYYY-MM-DD');
 		endDate = end.format('YYYY-MM-DD');
-		if (codeSection !== null) {
-			entrerDansSection(codeSection);
+		if (idSection !== null) {
+			entrerDansSection(idSection);
 		}
 	});
 
