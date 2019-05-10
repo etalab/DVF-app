@@ -1,71 +1,8 @@
 // Partie Vue -----------------------------------------------------------------
 
-// On commence par creer des "composants" qu'on va utiliser un peu partout
+// Les composants sont définis dans des fichiers séparés
 
-// Là on donne le nom du composant (comme un span, div, h3, etc)
-Vue.component('boite', {
-	// Les paramètres sont là
-	props: ['couleur', 'valeur', 'icone', 'texte'],
-	// La on donne le code source HTML du composant qui peut utiliser des données
-	template:
-		`<div class="media d-flex mt-3">
-			<div class="align-self-center ml-1 mr-1">
-				<i :class="'fa-2x fa-fw ' + icone"></i>
-			</div>
-			<div class="media-body text-left ml-1">
-				<b>{{valeur}}</b><br>
-				<span>{{texte}}</span>
-			</div>
-		</div>`
-});
-
-Vue.component('boite-accordeon', {
-	// Les paramètres sont là
-	props: ['couleur', 'mutation', 'icone', 'index'],
-	// La on donne le code source HTML du composant qui peut utiliser des données
-
-	template: `<div class="card">
-				<div class="card-body" v-on:click="selectionnerMutation()">
-					<div class="media d-flex">
-						<div class="align-self-center ml-1 mr-1">
-							<i class="fas fa-file-signature fa-fw fa-2x"></i>
-						</div>
-						<div class="media-body text-left ml-1">
-							<b>{{ formatterNombre(mutation.infos[0]['valeur_fonciere']) }} € / {{ mutation.infos[0]['nature_mutation'] }}</b><br>
-							<span>{{ mutation.infos[0]['date_mutation'] }}</span>
-			 			</div>
-						<div v-if="vue.mutationIndex != index" class="ml-1 mr-1">
-							<i class="fas fa-sort-down fa-1x"></i>
-						</div>
-					</div>
-					<div v-if="vue.mutationIndex == index" style="background-color: #eee" class="mt-3">
-						<boite
-							v-for="batiment in mutation.batiments"
-							:valeur="(batiment['code_type_local'] != 3) ? (formatterNombre(batiment['surface_reelle_bati']) + ' m²') : ''"
-							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['code_type_local']]"
-							:texte="batiment['type_local'] + ((batiment['code_type_local'] < 3) ? (' / ' + formatterNombre(batiment['nombre_pieces_principales']) + ' p') : '')">
-						</boite>
-						<boite
-							v-for="terrain in mutation.terrains"
-							:valeur="formatterNombre(terrain['surface_terrain']) + ' m²'"
-							icone="fa fa-tree"
-							:texte="terrain['nature_culture'] + (terrain['nature_culture_speciale'] != 'None' ? ' / ' + terrain['nature_culture_speciale'] : '')">
-						</boite>
-							<div v-if="mutation.parcellesLiees.length > 0" style = "padding:0.5rem">
-								Cette mutation contient des dispositions dans des parcelles adjacentes. La valeur foncière correspond au total.
-							</div>
-					</div>
-			</div>
-		</div>`,
-	methods: {
-		selectionnerMutation() {
-			entrerDansMutation(this.index);
-		}
-	}
-});
-
-
-// Ici, on cree l'application Vue (on lui dit de se relier à l'élément HTML app)
+// On crée l'application Vue (on lui dit de se relier à l'élément HTML app)
 var vue = new Vue({
 	el: '#app',
 	data: {
@@ -477,11 +414,6 @@ function onParcelleClicked(event) {
 	selectedStateId = event.features[0].id
 	document.getElementById("parcelles").value = sonCode;
 	entrerDansParcelle(sonCode);
-}
-
-function formatterNombre(nombreDecimal) {
-
-	return nombreDecimal.replace(/\..*/g, '').replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
 }
 
 function entrerDansParcelle(sonCode) {
