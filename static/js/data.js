@@ -12,6 +12,32 @@ function getRemoteJSON(url, throwIfNotFound) {
 	})
 }
 
+function sortByNom(features) {
+	return _.sortBy(features, function (f) { return f.properties.nom })
+}
+
+function getCommunes(codeDepartement) {
+	return getRemoteJSON(`https://geo.api.gouv.fr/departements/${codeDepartement}/communes?geometry=contour&format=geojson&type=commune-actuelle`).then(function (communes) {
+
+		// Pour Paris, Lyon, Marseille, il faut compléter avec les arrondissements
+		if (['75', '69', '13'].includes(codeDepartement)) {
+			return getRemoteJSON('/donneesgeo/arrondissements_municipaux-20180711.json').then(function (arrondissements) {
+				var features = communes.features.filter(function (e) {
+					return !(['13055', '69123', '75056'].includes(e.properties.code))
+				})
+				arrondissements.features.forEach(function (arrondissement) {
+					if (arrondissement.properties.code.startsWith(codeDepartement)) {
+						features.push(arrondissement)
+					}
+				})
+				return {type: 'FeatureCollection', features: sortByNom(features)}
+			})
+		}
+
+		return {type: 'FeatureCollection', features: sortByNom(communes.features)}
+	})
+}
+
 var communesMappingPromise = getRemoteJSON('/donneesgeo/communes-mapping.json', true)
 
 function getCadastreLayer(layerName, codeCommune) {

@@ -545,23 +545,7 @@ function entrerDansDepartement(sonCode) {
 	codeDepartement = sonCode;
 	console.log('Nous entrons dans le département ' + codeDepartement);
 	// Charge les communes
-	$.getJSON("https://geo.api.gouv.fr/departements/" + codeDepartement + "/communes?geometry=contour&format=geojson&type=commune-actuelle",
-		function (data) {
-			// Pour Paris, Lyon, Marseille, il faut compléter avec les arrondissements
-			if (['75', '69', '13'].includes(codeDepartement)) {
-				$.getJSON("/donneesgeo/arrondissements_municipaux-20180711.json",
-					function (dataPLM) {
-						data.features = data.features.filter(function (e) { return !(['13055', '69123', '75056'].includes(e.properties.code)); });
-						dataPLM.features = dataPLM.features.filter(function (e) { return e.properties.code.substring(0, 2) == codeDepartement; });
-						data.features = data.features.concat(dataPLM.features);
-						afficherCommunesDepartement(data);
-					}
-				);
-			} else {
-				afficherCommunesDepartement(data);
-			}
-		}
-	);
+	getCommunes(codeDepartement).then(afficherCommunesDepartement)
 }
 
 function afficherCommunesDepartement(data) {
