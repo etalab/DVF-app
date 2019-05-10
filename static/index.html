@@ -81,7 +81,7 @@
 				</div>
 			</div>
 
-			<div v-if="section != null">
+			<div v-if="section">
 				<a v-if="data_section.length > 0" id="exportCSV"
 					onclick="exportCSV(this, data_section, codeCommune + '_' + idSectionToCode(idSection) + '.csv');" class="btn btn-primary"
 					style="width: 100%">Télécharger les mutations de la section</a>

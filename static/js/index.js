@@ -7,7 +7,7 @@ var vue = new Vue({
 	el: '#app',
 	data: {
 		fold_left: false,
-		section: null,
+		section: false,
 		parcelle: null,
 		mutationIndex: null,
 		mapStyle: 'vector',
@@ -320,7 +320,7 @@ function resetParcelle() {
 }
 
 function resetSection() {
-	vue.section = null;
+	vue.section = false;
 	idSection = null;
 	data_section = null;
 	parcelles = null;
@@ -489,9 +489,7 @@ function entrerDansSection(newIdSection) {
 			parcelles.features.forEach(filledParcelleOptions)
 			parcellesFilter()
 			fit(parcelles)
-			vue.section = {
-				code: sonCode
-			};
+			vue.section = true
 		}
 	);
 }
