@@ -479,13 +479,9 @@ function entrerDansSection(newIdSection) {
 			parcelles = data;
 		}),
 		// Charge les mutations
-		$.getJSON(`/api/mutations3/${codeCommune}/${idSectionToCode(idSection)}`,
-			function (data) {
-				data_section = data.mutations.filter(function (m) {
-					return m.date_mutation >= startDate && m.date_mutation <= endDate && m.id_parcelle.startsWith(idSection)
-				});
-			}
-		)
+		getMutations(codeCommune, idSection, startDate, endDate).then(function (data) {
+			data_section = data
+		})
 	).then(
 		// Une fois qu'on a la géographie et les mutations, on fait tout l'affichage
 		function () {

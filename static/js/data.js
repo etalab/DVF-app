@@ -38,6 +38,15 @@ function getCommunes(codeDepartement) {
 	})
 }
 
+function getMutations(codeCommune, idSection, startDate, endDate) {
+	return getRemoteJSON(`/api/mutations3/${codeCommune}/${idSectionToCode(idSection)}`)
+		.then(function (data) {
+			return data.mutations.filter(function (m) {
+				return m.date_mutation >= startDate && m.date_mutation <= endDate && m.id_parcelle.startsWith(idSection)
+			})
+		})
+}
+
 var communesMappingPromise = getRemoteJSON('/donneesgeo/communes-mapping.json', true)
 
 function getCadastreLayer(layerName, codeCommune) {
