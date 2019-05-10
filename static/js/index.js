@@ -24,7 +24,7 @@ Vue.component('boite-accordeon', {
 	props: ['couleur', 'mutation', 'icone', 'index'],
 	// La on donne le code source HTML du composant qui peut utiliser des données
 
-	template: `<div class="card mt-3">
+	template: `<div class="card">
 				<div class="card-body" v-on:click="selectionnerMutation()">
 					<div class="media d-flex">
 						<div class="align-self-center ml-1 mr-1">

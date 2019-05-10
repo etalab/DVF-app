@@ -21,18 +21,14 @@ th {
   width: 100%;
 }
 
-#sidebar_left {
+.sidebar {
+  display: flex;
+  flex-direction: column;
   min-width: 250px;
   max-width: 250px;
-  background-color: #212D32;
   height: 100%;
-}
-
-#sidebar_right {
-  min-width: 250px;
-  max-width: 250px;
+  padding: 1em;
   background-color: #212D32;
-  height: 100%;
 }
 
 .scrollable {
@@ -62,6 +58,12 @@ th {
   background-color: #005DA3;
   border-color: #005DA3;
   cursor: pointer;
+}
+
+.cards {
+  display: grid;
+  grid-template-rows: auto;
+  grid-row-gap: 0.5em;
 }
 
 .close-link {
