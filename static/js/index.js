@@ -393,9 +393,9 @@ function onParcelleClicked(event) {
 	entrerDansParcelle(sonCode);
 }
 
-function entrerDansParcelle(sonCode) {
-	codeParcelle = sonCode;
-	data_parcelle = computeParcelle(data_section, sonCode)
+function entrerDansParcelle(newCodeParcelle) {
+	codeParcelle = newCodeParcelle;
+	data_parcelle = computeParcelle(data_section, newCodeParcelle)
 
 	// Formattage des champs pour l'affichage
 	for (m = 0; m < data_parcelle.mutations.length; m++) {
@@ -408,10 +408,10 @@ function entrerDansParcelle(sonCode) {
 	};
 
 	if (vue.parcelle.mutations.length == 1) {
-		entrerDansMutation(0);
-	} else {
-		entrerDansMutation(null);
+		return entrerDansMutation(0);
 	}
+
+	return entrerDansMutation(null);
 }
 
 function sortirDeParcelle() {
@@ -436,6 +436,8 @@ function entrerDansMutation(sonIndex) {
 	}
 
 	mutationsFilter()
+
+	return Promise.resolve()
 }
 
 function entrerDansSection(newIdSection) {
@@ -448,7 +450,8 @@ function entrerDansSection(newIdSection) {
 	}
 
 	idSection = newIdSection;
-	$.when(
+
+	return Promise.all([
 		// Charge la couche géographique
 		getParcelles(codeCommune, idSection).then(function (data) {
 			parcelles = data;
@@ -457,7 +460,7 @@ function entrerDansSection(newIdSection) {
 		getMutations(codeCommune, idSection, startDate, endDate).then(function (data) {
 			data_section = data
 		})
-	).then(
+	]).then(
 		// Une fois qu'on a la géographie et les mutations, on fait tout l'affichage
 		function () {
 			map.getSource('parcelles').setData(parcelles)
@@ -469,7 +472,7 @@ function entrerDansSection(newIdSection) {
 	);
 }
 
-function entrerDansCommune(sonCode) {
+function entrerDansCommune(newCodeCommune) {
 	if (codeCommune) {
 		resetCommune()
 	}
@@ -478,9 +481,10 @@ function entrerDansCommune(sonCode) {
 		resetSection()
 	}
 
-	console.log("Nous entrons dans la commune " + sonCode);
-	codeCommune = sonCode;
-	getSections(codeCommune).then(
+	console.log("Nous entrons dans la commune " + newCodeCommune);
+	codeCommune = newCodeCommune;
+
+	return getSections(codeCommune).then(
 		function (data) {
 			sections = data
 			map.getSource('sections').setData(sections)
@@ -504,7 +508,7 @@ function entrerDansDepartement(sonCode) {
 	codeDepartement = sonCode;
 	console.log('Nous entrons dans le département ' + codeDepartement);
 	// Charge les communes
-	getCommunes(codeDepartement).then(afficherCommunesDepartement)
+	return getCommunes(codeDepartement).then(afficherCommunesDepartement)
 }
 
 function afficherCommunesDepartement(data) {
