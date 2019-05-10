@@ -313,7 +313,6 @@ function resetSection() {
 function resetCommune() {
 	vue.commune = null;
 	codeCommune = null;
-	nom_fichier_commune = null;
 	sections = null;
 
 	document.getElementById('sections').innerHTML = '<option style="display:none"></option>';
@@ -492,11 +491,6 @@ function entrerDansCommune(sonCode) {
 			resetSourcesData(['parcelles'])
 
 			fit(sections)
-
-			nom_fichier_commune = codeCommune + '.csv';
-			vue.commune = {
-				code: sonCode
-			};
 		}
 	);
 }
