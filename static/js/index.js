@@ -94,7 +94,7 @@ var endDate = MAX_DATE
 
 var fillColor = '#2a4ba9'
 var borderColor = '#627BC1'
-var mutationColor = '#238FD8'
+var mutationColor = '#00C5FF'
 var mutationSelectedColor = '#ff5FA8'
 var mutationLieesColor = '#ff8FD8'
 var unmutatedColor = '#212f39'
