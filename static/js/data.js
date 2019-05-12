@@ -114,7 +114,7 @@ function computeParcelle(mutationsSection, idParcelle) {
 	var mutations = _.chain(mutationsParcelle)
 		.groupBy('id_mutation')
 		.map(function (rows, idMutation) {
-			var infos = [_.pick(rows[0], 'date_mutation', 'id_parcelle', 'nature_mutation', 'valeur_fonciere')]
+			var infos = [_.pick(rows[0], 'date_mutation', 'id_parcelle', 'nature_mutation', 'valeur_fonciere', 'adresse_numero', 'adresse_suffixe', 'adresse_nom_voie')]
 
 			var parcellesLiees = _.uniq(
 				mutationsSection

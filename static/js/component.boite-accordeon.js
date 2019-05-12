@@ -12,6 +12,7 @@ Vue.component('boite-accordeon', {
 						<div class="media-body text-left ml-1">
 							<b>{{ formatterNombre(mutation.infos[0]['valeur_fonciere']) }} € / {{ mutation.infos[0]['nature_mutation'] }}</b><br>
 							<span>{{ mutation.infos[0]['date_mutation'] }}</span>
+							<div class="address">{{ formatterAdresseNumero(mutation.infos[0]['adresse_numero']) }}{{ formatterSuffixe(mutation, mutation.infos[0]['adresse_suffixe']) }} {{ mutation.infos[0]['adresse_nom_voie'] }}</div>
 			 			</div>
 						<div v-if="vue.mutationIndex != index" class="ml-1 mr-1">
 							<i class="fas fa-sort-down fa-1x"></i>
@@ -45,4 +46,14 @@ Vue.component('boite-accordeon', {
 
 function formatterNombre(nombreDecimal) {
 	return nombreDecimal.replace(/\..*/g, '').replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
+}
+
+function formatterAdresseNumero(nombreDecimal) {
+    return nombreDecimal.replace(/\..*/g, '');
+}
+
+function formatterSuffixe(mutation, adresse_suffixe) {
+	if (!adresse_suffixe.match(/none/i)) {
+		return adresse_suffixe;
+	}
 }
