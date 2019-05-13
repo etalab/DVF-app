@@ -268,7 +268,7 @@ function resetSourcesData(sources) {
 
 function fit(geojson) {
 	var bbox = turf.bbox(geojson)
-	map.fitBounds(bbox, { padding: 20, animate: true })
+	map.fitBounds(bbox, { padding: 20, animate: false })
 }
 
 function onMouseMove(event, source) {
