@@ -21,8 +21,14 @@ app.use('/api', (req, res) => {
   })
 })
 
-app.get('/', (req, res) => {
+function serveIndex(req, res) {
   res.sendFile(join(__dirname, 'static', 'index.html'))
-})
+}
+
+app.get('/d/:codeDepartement', serveIndex)
+app.get('/c/:codeCommune', serveIndex)
+app.get('/c/:codeCommune/s/:idSection', serveIndex)
+app.get('/c/:codeCommune/s/:idSection/p/:codeParcelle', serveIndex)
+app.get('/', serveIndex)
 
 app.listen(process.env.PORT || 3000)

@@ -499,13 +499,13 @@ function entrerDansCommune(newCodeCommune) {
 	);
 }
 
-function entrerDansDepartement(sonCode) {
+function entrerDansDepartement(newCodeDepartement) {
 	if (codeDepartement) {
 		resetDepartement()
 	}
 
 	// Vide l'interface
-	codeDepartement = sonCode;
+	codeDepartement = newCodeDepartement;
 	console.log('Nous entrons dans le département ' + codeDepartement);
 	// Charge les communes
 	return getCommunes(codeDepartement).then(afficherCommunesDepartement)
@@ -541,6 +541,50 @@ function toggleLeftBar() {
 	vue.fold_left = !vue.fold_left;
 }
 
+function getCodeDepartement(codeCommune) {
+	return codeCommune.startsWith('97') ? codeCommune.substr(0, 3) : codeCommune.substr(0, 2)
+}
+
+function initWithContext(context) {
+	if (context.codeCommune) {
+		context.codeDepartement = getCodeDepartement(context.codeCommune)
+	}
+
+	// Callback hell en attendant qu'on modernise un peu ce projet JS avec async/await ;)
+	if (context.codeDepartement) {
+		return entrerDansDepartement(context.codeDepartement).then(function () {
+			if (context.codeCommune) {
+				return entrerDansCommune(context.codeCommune).then(function () {
+					if (context.idSection) {
+						return entrerDansSection(context.idSection).then(function () {
+							if (context.codeParcelle) {
+								return entrerDansParcelle(context.idSection + context.codeParcelle)
+							}
+						})
+					}
+				})
+			}
+		})
+	}
+}
+
+function readContext() {
+	var parts = window.location.pathname.split('/').slice(1)
+	var partsMapping = {
+		d: 'codeDepartement',
+		c: 'codeCommune',
+		s: 'idSection',
+		p: 'codeParcelle'
+	}
+	var baseContext = {}
+	for (var i = 0; i < parts.length; i++) {
+		if (i % 2 === 0 && parts[i] in partsMapping) {
+			baseContext[partsMapping[parts[i]]] = parts[i+1]
+		}
+	}
+	return baseContext
+}
+
 // C'est le code qui est appelé au début (sans que personne ne clique)
 (function () {
 
@@ -571,10 +615,12 @@ function toggleLeftBar() {
 					})
 					map.addLayer(departementsLayer)
 					map.addLayer(departementsContoursLayer)
-				map.setPaintProperty(departementsContoursLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
+					map.setPaintProperty(departementsContoursLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
+
+					initWithContext(readContext())
 			})
-				}
-		})
+		}
+	})
 	map.on('styledata', loadCustomLayers)
 
 	hoverableSources.map(function (source) {
