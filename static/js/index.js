@@ -338,32 +338,29 @@ function resetDepartement() {
 	}
 }
 
+function getSelectValue(id) {
+    var e = document.getElementById(id);
+    return e.options[e.selectedIndex].value;
+}
+
 function selectionnerDepartement() {
 	// L'utilisateur a cliqué sur la liste déroulante des départements
-	var e = document.getElementById("departements");
-	var sonCode = e.options[e.selectedIndex].value;
-	entrerDansDepartement(sonCode);
+	entrerDansDepartement(getSelectValue("departements"));
 };
 
 function selectionnerCommune() {
 	// L'utilisateur a cliqué sur la liste déroulante des communes
-	var e = document.getElementById("communes");
-	var sonCode = e.options[e.selectedIndex].value;
-	entrerDansCommune(sonCode);
+	entrerDansCommune(getSelectValue("communes"));
 }
 
 function selectionnerSection() {
 	// L'utilisateur a cliqué sur la liste déroulante des sections
-	var e = document.getElementById("sections");
-	var newIdSection = e.options[e.selectedIndex].value;
-	entrerDansSection(newIdSection);
+	entrerDansSection(getSelectValue("sections"));
 }
 
 function selectionnerParcelle() {
 	// L'utilisateur a cliqué sur la liste déroulante des sections
-	var e = document.getElementById("parcelles");
-	var sonCode = e.options[e.selectedIndex].value;
-	entrerDansParcelle(sonCode);
+	entrerDansParcelle(getSelectValue("parcelles"));
 }
 
 function filledCommunesOptions(feature) {
@@ -426,6 +423,11 @@ function onSectionClicked(event) {
 	entrerDansSection(newIdSection);
 }
 
+
+function setLocationHash(hash) {
+    if (!parent.location.hash.includes(hash)){ parent.location.hash = hash }
+}
+
 function entrerDansMutation(sonIndex) {
 	vue.mutationIndex = sonIndex;
 
@@ -435,11 +437,17 @@ function entrerDansMutation(sonIndex) {
 			codesParcelles.push(parcelleLiee);
 		}
 	}
+    var codesParcelle = codesParcelles[0];
+    if(codesParcelle == "") return;
+    console.log("Nous entrons dans la mutation " + codesParcelle);
+
+    setLocationHash(getSelectValue("departements") + "-" + getSelectValue("communes") + "-" + getSelectValue("sections") + "-" + codesParcelle);
 
 	mutationsFilter()
 }
 
 function entrerDansSection(newIdSection) {
+    if(newIdSection == "") return;
 	if (idSection) {
 		resetSection()
 	}
@@ -448,6 +456,8 @@ function entrerDansSection(newIdSection) {
 		resetParcelle()
 	}
 
+    console.log("Nous entrons dans la section " + newIdSection);
+    setLocationHash(getSelectValue("departements") + "-" + getSelectValue("communes") + "-" + newIdSection);
 	idSection = newIdSection;
 	$.when(
 		// Charge la couche géographique
@@ -466,11 +476,13 @@ function entrerDansSection(newIdSection) {
 			parcellesFilter()
 			fit(parcelles)
 			vue.section = true
+            document.getElementById("parcelles").dispatchEvent(new Event('change'));
 		}
 	);
 }
 
 function entrerDansCommune(sonCode) {
+    if(sonCode == "") return;
 	if (codeCommune) {
 		resetCommune()
 	}
@@ -480,6 +492,8 @@ function entrerDansCommune(sonCode) {
 	}
 
 	console.log("Nous entrons dans la commune " + sonCode);
+
+    setLocationHash(getSelectValue("departements") + "-" + sonCode);
 	codeCommune = sonCode;
 	getSections(codeCommune).then(
 		function (data) {
@@ -497,11 +511,13 @@ function entrerDansCommune(sonCode) {
 			vue.commune = {
 				code: sonCode
 			};
+            document.getElementById("sections").dispatchEvent(new Event('change'));
 		}
 	);
 }
 
 function entrerDansDepartement(sonCode) {
+    if(sonCode == "") return;
 	if (codeDepartement) {
 		resetDepartement()
 	}
@@ -509,6 +525,7 @@ function entrerDansDepartement(sonCode) {
 	// Vide l'interface
 	codeDepartement = sonCode;
 	console.log('Nous entrons dans le département ' + codeDepartement);
+    setLocationHash(codeDepartement);
 	// Charge les communes
 	getCommunes(codeDepartement).then(afficherCommunesDepartement)
 }
@@ -523,6 +540,8 @@ function afficherCommunesDepartement(data) {
 	resetSourcesData(['sections', 'parcelles'])
 
 	fit(communes)
+
+    document.getElementById("communes").dispatchEvent(new Event('change'));
 }
 
 function onCityClicked(event) {
@@ -542,6 +561,43 @@ function onDepartementClick(event) {
 function toggleLeftBar() {
 	vue.fold_left = !vue.fold_left;
 }
+
+var DeepLink = {
+    recurisveSelect: function() {
+        var selectIdValues = DeepLink.selectIdValues;
+        var ids = DeepLink.selectIds;
+        var id = ids.shift();
+        var nextId = ids[0];
+        if (id != null) {
+            var value = selectIdValues[id];
+            var elem = document.getElementById(id);
+            elem.removeEventListener('change', DeepLink.recurisveSelect);
+            if (nextId) {
+                var nextElem = document.getElementById(nextId);
+                nextElem.addEventListener('change', DeepLink.recurisveSelect);
+            }
+            if (value != "" && elem.value != value) {
+                elem.value =  value;
+                elem.dispatchEvent(new Event('change'));
+            }
+
+        }
+    },
+
+    handle: function(){
+        var bashItems = parent.location.hash.replace(/.*#/g, '').split('-');
+        var selectIdValues = {};
+        if(bashItems[0]){ selectIdValues.departements = bashItems[0]; }
+        if(bashItems[1]){ selectIdValues.communes     = bashItems[1]; }
+        if(bashItems[2]){ selectIdValues.sections     = bashItems[2]; }
+        if(bashItems[3]){ selectIdValues.parcelles    = bashItems[3]; }
+
+        DeepLink.selectIdValues = selectIdValues;
+        DeepLink.selectIds = Object.keys(selectIdValues);
+        DeepLink.recurisveSelect()
+    }
+};
+
 
 // C'est le code qui est appelé au début (sans que personne ne clique)
 (function () {
@@ -574,6 +630,8 @@ function toggleLeftBar() {
 					map.addLayer(departementsLayer)
 					map.addLayer(departementsContoursLayer)
 				map.setPaintProperty(departementsContoursLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
+
+                DeepLink.handle()
 			})
 				}
 		})
