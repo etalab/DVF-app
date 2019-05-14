@@ -61,29 +61,7 @@ var styles = {
 			}
 		]
 	},
-	vector: {
-		"version": 8,
-		"glyphs": "https://openmaptiles.geo.data.gouv.fr/fonts/{fontstack}/{range}.pbf",
-		"sources": {
-			"raster-tiles": {
-				"type": "raster",
-				"tiles": [
-					"https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
-					"https://b.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
-					"https://c.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
-				],
-				"tileSize": 256,
-				"attribution": 'donn&eacute;es &copy; <a href="//osm.org/copyright">OpenStreetMap</a>/ODbL - rendu <a href="//openstreetmap.fr">OSM France</a>'
-			}
-		},
-		"layers": [
-			{
-				"id": "simple-tiles",
-				"type": "raster",
-				"source": "raster-tiles"
-			}
-		]
-	}
+	vector: 'https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json'
 }
 
 var nom_fichier_section = null;
