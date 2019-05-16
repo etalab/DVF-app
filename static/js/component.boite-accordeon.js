@@ -49,9 +49,6 @@ function formatterNombre(nombreDecimal) {
 }
 
 function formatterAdresseNumero(nombreDecimal) {
-	if (!nombreDecimal.match(/none/i)) {
-		return '';
-	}
     return nombreDecimal.replace(/\..*/g, '');
 }
 
