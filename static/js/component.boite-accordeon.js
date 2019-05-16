@@ -49,7 +49,9 @@ function formatterNombre(nombreDecimal) {
 }
 
 function formatterAdresseNumero(nombreDecimal) {
-    return nombreDecimal.replace(/\..*/g, '');
+	if (! isNaN(nombreDecimal)) {
+		return nombreDecimal.replace(/\..*/g, '');
+	}
 }
 
 function formatterSuffixe(mutation, adresse_suffixe) {
