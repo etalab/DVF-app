@@ -180,7 +180,7 @@ var unmutatedParcellesLayer = {
 	type: 'fill',
 	paint: {
 		'fill-color': unmutatedColor,
-		'fill-opacity': 0.2
+		'fill-opacity': 0.05
 	}
 }
 var unmutatedParcellesContoursLayer = {
