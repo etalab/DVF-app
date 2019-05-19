@@ -106,6 +106,16 @@ function getSections(codeCommune) {
 	})
 }
 
+function sortByDateDesc(mutations) {
+	return _.sortBy(mutations, function (m) {
+		if (!m.infos[0].date_mutation) {
+			return 0
+		}
+
+		return -(new Date(m.infos[0].date_mutation).getTime())
+	})
+}
+
 function computeParcelle(mutationsSection, idParcelle) {
 	var mutationsParcelle = mutationsSection.filter(function (m) {
 		return m.id_parcelle === idParcelle
@@ -153,5 +163,5 @@ function computeParcelle(mutationsSection, idParcelle) {
 		})
 		.value()
 
-	return { mutations: mutations }
+	return {mutations: sortByDateDesc(mutations)}
 }
