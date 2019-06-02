@@ -1,0 +1,58 @@
+DROP TABLE IF EXISTS `dvf`;
+
+CREATE TABLE `dvf` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+	`id_mutation` varchar(255) DEFAULT '',
+	`date_mutation` date DEFAULT NULL,
+	`numero_disposition` int(11) DEFAULT NULL,
+	`nature_mutation` varchar(255) DEFAULT '',
+	`valeur_fonciere` decimal(12,3) DEFAULT 0.0,
+	`adresse_numero` int(11) DEFAULT NULL,
+	`adresse_suffixe` varchar(255) DEFAULT '',
+	`adresse_nom_voie` varchar(255) DEFAULT '',
+	`adresse_code_voie` varchar(255) DEFAULT '',
+	`code_postal` varchar(255) DEFAULT '',
+	`code_commune` varchar(255) DEFAULT '',
+	`nom_commune` varchar(255) DEFAULT '',
+	`code_departement` varchar(255) DEFAULT '',
+	`ancien_code_commune` varchar(255) DEFAULT '',
+	`ancien_nom_commune` varchar(255) DEFAULT '',
+	`id_parcelle` varchar(255) DEFAULT '',
+	`ancien_id_parcelle` varchar(255) DEFAULT '',
+	`numero_volume` varchar(255) DEFAULT '',
+	`lot1_numero` varchar(255) DEFAULT '',
+	`lot1_surface_carrez` decimal(9,2) DEFAULT 0.0,
+	`lot2_numero` varchar(255) DEFAULT '',
+	`lot2_surface_carrez` decimal(9,2) DEFAULT 0.0,
+	`lot3_numero` varchar(255) DEFAULT '',
+	`lot3_surface_carrez` decimal(9,2) DEFAULT 0.0,
+	`lot4_numero` varchar(255) DEFAULT '',
+	`lot4_surface_carrez` decimal(9,2) DEFAULT 0.0,
+	`lot5_numero` varchar(255) DEFAULT '',
+	`lot5_surface_carrez` decimal(9,2) DEFAULT 0.0,
+	`nombre_lots` int(11) DEFAULT NULL,
+	`code_type_local` varchar(255) DEFAULT '',
+	`type_local` varchar(255) DEFAULT '',
+	`surface_reelle_bati` decimal(9,2) DEFAULT 0.0,
+	`nombre_pieces_principales` int(11) DEFAULT NULL,
+	`code_nature_culture` varchar(255) DEFAULT '',
+	`nature_culture` varchar(255) DEFAULT '',
+	`code_nature_culture_speciale` varchar(255) DEFAULT '',
+	`nature_culture_speciale` varchar(255) DEFAULT '',
+	`surface_terrain` decimal(12,3) DEFAULT 0.0,
+	`longitude` decimal(9,7) DEFAULT 0.0,
+	`latitude` decimal(9,7) DEFAULT 0.0,
+	`section_prefixe` varchar(255) DEFAULT '',
+        PRIMARY KEY (`id`),
+  KEY `idx_sectionPrefixe` (`section_prefixe`),
+  KEY `idx_commune` (`code_commune`),
+  KEY `idx_date` (`date_mutation`),
+  KEY `idx_parcelle` (`id_parcelle`),
+  KEY `idx_section_commune` (`code_commune`,`section_prefixe`),
+  KEY `id_mutation` (`id_mutation`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+-- ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+
+
