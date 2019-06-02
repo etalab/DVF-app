@@ -18,14 +18,17 @@ config = pd.read_csv('config.csv', header=None)
 id = config[0][0]
 pwd = config[0][1]
 host = config[0][2]
-engine = create_engine('postgresql://%s:%s@%s/dvf2'%(id, pwd, host))
+#engine = create_engine('postgresql://%s:%s@%s/dvf2'%(id, pwd, host))
+#table = "public.dvf"
+engine = create_engine('mysql+pymysql://%s:%s@%s/dvf2'%(id, pwd, host))
+table = "dvf"
 
 # Chargement des natures de culture plus besoin
 
 @app.route('/api/dates2')
 def dates():
-	dateMin = pd.read_sql("""SELECT min(date_mutation) FROM public.dvf """, engine)
-	dateMax = pd.read_sql("""SELECT max(date_mutation) FROM public.dvf """, engine)
+	dateMin = pd.read_sql("SELECT min(date_mutation) FROM " + table, engine)
+	dateMax = pd.read_sql("SELECT max(date_mutation) FROM " + table, engine)
 	return '{"min": "' + str(dateMin['min'][0]) + '", "max": "' + str(dateMax['max'][0]) + '"}'
 
 
@@ -56,7 +59,7 @@ def send_donneesgeo(path):
 
 @app.route('/api/mutations2/<commune>/<sectionPrefixee>/from=<dateminimum>&to=<datemaximum>')
 def get_mutations2(commune, sectionPrefixee, dateminimum, datemaximum):
-	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE code_commune = %(code)s AND section_prefixe = %(sectionPrefixee)s AND date_mutation >= %(datemin)s AND date_mutation <= %(datemax)s """, engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee, "datemin": dateminimum, "datemax": datemaximum})
+	mutations = pd.read_sql("SELECT * FROM " + table + " WHERE code_commune = %(code)s AND section_prefixe = %(sectionPrefixee)s AND date_mutation >= %(datemin)s AND date_mutation <= %(datemax)s ", engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee, "datemin": dateminimum, "datemax": datemaximum})
 
 	mutations = mutations.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
 	nbMutations = len(mutations.id_mutation.unique())
@@ -67,7 +70,7 @@ def get_mutations2(commune, sectionPrefixee, dateminimum, datemaximum):
 
 @app.route('/api/mutations3/<commune>/<sectionPrefixee>')
 def get_mutations3(commune, sectionPrefixee):
-	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE code_commune = %(code)s AND section_prefixe = %(sectionPrefixee)s""", engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee})
+	mutations = pd.read_sql("SELECT * FROM " + table + " WHERE code_commune = %(code)s AND section_prefixe = %(sectionPrefixee)s", engine, params = {"code": commune, "sectionPrefixee" : sectionPrefixee})
 	mutations = mutations.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
 	json_mutations = '{"mutations": ' + mutations.to_json(orient = 'records') + '}'
 	return json_mutations
@@ -75,7 +78,7 @@ def get_mutations3(commune, sectionPrefixee):
 
 @app.route('/api/parcelles2/<parcelle>/from=<dateminimum>&to=<datemaximum>')
 def get_parcelle(parcelle, dateminimum, datemaximum):
-	mutations = pd.read_sql("""SELECT * FROM public.dvf WHERE id_parcelle = %(code)s AND date_mutation >= %(datemin)s AND date_mutation <= %(datemax)s ;""", 
+	mutations = pd.read_sql("SELECT * FROM " + table + " WHERE id_parcelle = %(code)s AND date_mutation >= %(datemin)s AND date_mutation <= %(datemax)s ;", 
 								engine, 
 								params = {"code": parcelle, "datemin": dateminimum, "datemax": datemaximum})
 	mutations = mutations.sort_values(by=['date_mutation'], ascending = False)
@@ -99,7 +102,7 @@ def get_parcelle(parcelle, dateminimum, datemaximum):
 		infos = infos.to_json(orient = 'records')
 		
 		# Mutations liées
-		mutations_liees = pd.read_sql("""SELECT * FROM public.dvf WHERE id_mutation = %(id_mutation)s AND id_parcelle<> %(parcelle)s;""", 
+		mutations_liees = pd.read_sql("SELECT * FROM " + table + " WHERE id_mutation = %(id_mutation)s AND id_parcelle<> %(parcelle)s;", 
 		engine, 
 		params = {"id_mutation" : mutationIndex, "parcelle" : parcelle})
 		mutations_liees['type_local'].replace('Local industriel. commercial ou assimilé', 'Local industriel commercial ou assimilé', inplace = True)
