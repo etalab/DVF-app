@@ -543,19 +543,23 @@ function toggleLeftBar() {
 
 function initPosition(position) {
 	getDepartement(position.coords.latitude, position.coords.longitude).then(function(commune){
-		document.getElementById("departements").value = commune.code;
-		selectCommune(commune.code);
+		var codeCommune = commune.code;
+		var codeDepartement = commune.codeDepartement;
+		selectDepartement(codeDepartement).then(function(){
+			selectCommune(codeCommune).then(function(){
+				document.getElementById("departements").value = codeDepartement;
+				document.getElementById("communes").value = codeCommune;
+			});
+		});
 	});
 }
 
 function selectDepartement(code){
-	entrerDansDepartement(code);
-	document.getElementById("departements").value = code;
+	return entrerDansDepartement(code);
 }
 
 function selectCommune(code){
-	entrerDansCommune(code);
-	document.getElementById("communes").value = code;
+	return entrerDansCommune(code);
 }
 
 // C'est le code qui est appelé au début (sans que personne ne clique)
