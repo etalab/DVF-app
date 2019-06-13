@@ -541,6 +541,23 @@ function toggleLeftBar() {
 	vue.fold_left = !vue.fold_left;
 }
 
+function initPosition(position) {
+	getDepartement(position.coords.latitude, position.coords.longitude).then(function(commune){
+		document.getElementById("departements").value = commune.code;
+		selectCommune(commune.code);
+	});
+}
+
+function selectDepartement(code){
+	entrerDansDepartement(code);
+	document.getElementById("departements").value = code;
+}
+
+function selectCommune(code){
+	entrerDansCommune(code);
+	document.getElementById("communes").value = code;
+}
+
 // C'est le code qui est appelé au début (sans que personne ne clique)
 (function () {
 
@@ -573,8 +590,8 @@ function toggleLeftBar() {
 					map.addLayer(departementsContoursLayer)
 				map.setPaintProperty(departementsContoursLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
 			})
-				}
-		})
+		}
+	})
 	map.on('styledata', loadCustomLayers)
 
 	hoverableSources.map(function (source) {
@@ -663,7 +680,6 @@ function toggleLeftBar() {
 	if (window.innerWidth < 768) {
 		vue.fold_left = true;
 	}
-
 })();
 
 function loadCustomLayers() {
@@ -776,4 +792,7 @@ function departementsFilter() {
 	map.setFilter('departements-layer', ['!=', ['get', 'code'], codeDepartement])
 }
 
-
+function localizeUser() {
+	if(navigator.geolocation)
+		navigator.geolocation.getCurrentPosition(initPosition);
+}

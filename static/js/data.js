@@ -165,3 +165,10 @@ function computeParcelle(mutationsSection, idParcelle) {
 
 	return {mutations: sortByDateDesc(mutations)}
 }
+
+function getDepartement(lat, lng) {
+	return getRemoteJSON(`https://geo.api.gouv.fr/communes?lat=${lat}&lon=${lng}&fields=nom,code,codesPostaux,codeDepartement,codeRegion,population&format=json&geometry=centre`)
+	.then(function (data) {
+		return data[0]
+	})
+}
