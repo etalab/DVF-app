@@ -537,24 +537,32 @@ function onDepartementClick(event) {
 	document.getElementById("departements").value = sonCode;
 };
 
+function selectionnerAdresse(event) {
+	var criteria = document.getElementById("search").value;
+	getCoordinates(criteria).then(function(position){
+		return initPosition(position.coordinates[0], position.coordinates[1]);	
+	});
+};
+
 function toggleLeftBar() {
 	vue.fold_left = !vue.fold_left;
 }
 
-function initPosition(position) {
-	var lat = position.coords.latitude;
-	var lng = position.coords.longitude;
+function initPositionFromGeolocalisation(position) {
+	initPosition(position.coords.latitude, position.coords.longitude);
+}
 
-	getDepartement(position.coords.latitude, position.coords.longitude).then(function(commune){
+function initPosition(lat, lng) {
+	getDepartement(lng, lat).then(function(commune){
 
-		commune.geometry.coordinates.lat = lat;
-		commune.geometry.coordinates.lng = lng;
+		commune.geometry.coordinates[0] = lat;
+		commune.geometry.coordinates[1] = lng;
 		return getInformationCadastrale(commune.geometry).then(function(props){
 
 			var section = props.section.padStart(5, '0')
 			var code_dep = props.code_dep
 			var code_com = props.code_com
-			var feuille = props.feuille.toString().padStart(5, '0')
+			var feuille = props.feuille.toString().padStart(4, '0')
 	
 			codeSection = `${code_dep}${code_com}${section}`
 			parcelle = `${code_dep}${code_com}${section}${feuille}`
@@ -813,5 +821,5 @@ function departementsFilter() {
 
 function localizeUser() {
 	if(navigator.geolocation)
-		navigator.geolocation.getCurrentPosition(initPosition);
+		navigator.geolocation.getCurrentPosition(initPositionFromGeolocalisation);
 }

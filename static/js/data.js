@@ -180,3 +180,11 @@ function getInformationCadastrale(geom) {
 		return data.features[0].properties
 	})
 }
+
+function getCoordinates(query) {
+	param = encodeURIComponent(query.replace(" ", "+"));
+	return getRemoteJSON(`https://api-adresse.data.gouv.fr/search/?q=${param}`)
+	.then(function (data) {
+		return data.features[0].geometry
+	})
+}

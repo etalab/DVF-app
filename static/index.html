@@ -61,6 +61,19 @@
 					<input type="button" value="Me géolocaliser" onclick="localizeUser()" class="form-control">
 				</div>
 				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon"><span class="glyphicon glyphicon-map-marker"></span></div>
+						<input type="text" name="municipality" id="search" class="form-control" 
+						placeholder="Rechercher une adresse, une ville, un lieu..." 
+						title="Rechercher une adresse, une ville, un lieu..." 
+						value="8 rue des orailles 14123"
+						data-provide="typeahead" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+						<div class="input-group-append">
+							<button class="btn btn-outline-secondary" type="button" onclick="selectionnerAdresse()">Button</button>
+						  </div>
+					</div>
+				</div>
+				<div class="form-group">
 					<label for="departements" class="control-label">Département</label>
 					<select name="departements" id="departements" onchange="selectionnerDepartement()" class="form-control">
 						<option style="display:none"></option>
