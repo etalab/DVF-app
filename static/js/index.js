@@ -542,24 +542,39 @@ function toggleLeftBar() {
 }
 
 function initPosition(position) {
+	var lat = position.coords.latitude;
+	var lng = position.coords.longitude;
+
 	getDepartement(position.coords.latitude, position.coords.longitude).then(function(commune){
-		var codeCommune = commune.code;
-		var codeDepartement = commune.codeDepartement;
-		selectDepartement(codeDepartement).then(function(){
-			selectCommune(codeCommune).then(function(){
-				document.getElementById("departements").value = codeDepartement;
-				document.getElementById("communes").value = codeCommune;
+
+		commune.geometry.coordinates.lat = lat;
+		commune.geometry.coordinates.lng = lng;
+		return getInformationCadastrale(commune.geometry).then(function(props){
+
+			var section = props.section.padStart(5, '0')
+			var code_dep = props.code_dep
+			var code_com = props.code_com
+			var feuille = props.feuille.toString().padStart(5, '0')
+	
+			codeSection = `${code_dep}${code_com}${section}`
+			parcelle = `${code_dep}${code_com}${section}${feuille}`
+
+			var codeCommune = commune.properties.code;
+			var codeDepartement = commune.properties.codeDepartement;
+			entrerDansDepartement(codeDepartement).then(function(){
+				entrerDansCommune(codeCommune).then(function(){
+					entrerDansSection(codeSection).then(function(){
+						entrerDansParcelle(parcelle).then(function(){
+							document.getElementById("departements").value = codeDepartement;
+							document.getElementById("communes").value = codeCommune;
+							document.getElementById("sections").value = codeSection;
+							document.getElementById("parcelles").value = parcelle;
+						})
+					})
+				})
 			});
 		});
 	});
-}
-
-function selectDepartement(code){
-	return entrerDansDepartement(code);
-}
-
-function selectCommune(code){
-	return entrerDansCommune(code);
 }
 
 // C'est le code qui est appelé au début (sans que personne ne clique)

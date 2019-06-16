@@ -167,8 +167,16 @@ function computeParcelle(mutationsSection, idParcelle) {
 }
 
 function getDepartement(lat, lng) {
-	return getRemoteJSON(`https://geo.api.gouv.fr/communes?lat=${lat}&lon=${lng}&fields=nom,code,codesPostaux,codeDepartement,codeRegion,population&format=json&geometry=centre`)
+	return getRemoteJSON(`https://geo.api.gouv.fr/communes?lat=${lat}&lon=${lng}&fields=nom,code,codesPostaux,codeDepartement,codeRegion,population&format=geojson&geometry=centre`)
 	.then(function (data) {
-		return data[0]
+		return data.features[0]
+	})
+}
+
+function getInformationCadastrale(geom) {
+	query = encodeURIComponent(JSON.stringify(geom));
+	return getRemoteJSON(`https://apicarto.ign.fr/api/cadastre/division?geom=${query}`)
+	.then(function (data) {
+		return data.features[0].properties
 	})
 }
