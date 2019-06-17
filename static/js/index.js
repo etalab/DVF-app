@@ -540,7 +540,7 @@ function onDepartementClick(event) {
 function selectionnerAdresse(event) {
 	var criteria = document.getElementById("search").value;
 	getCoordinates(criteria).then(function(position){
-		return initPosition(position.coordinates[0], position.coordinates[1]);	
+		return initPosition(position.coordinates[1], position.coordinates[0]);	
 	});
 };
 
@@ -553,10 +553,10 @@ function initPositionFromGeolocalisation(position) {
 }
 
 function initPosition(lat, lng) {
-	getDepartement(lng, lat).then(function(commune){
+	getDepartement(lat, lng).then(function(commune){
 
-		commune.geometry.coordinates[0] = lat;
-		commune.geometry.coordinates[1] = lng;
+		commune.geometry.coordinates[1] = lat;
+		commune.geometry.coordinates[0] = lng;
 		return getInformationCadastrale(commune.geometry).then(function(props){
 
 			var section = props.section.padStart(5, '0')
@@ -706,7 +706,7 @@ function initPosition(lat, lng) {
 	// Sur mobile, cacher la barre latérale
 	if (window.innerWidth < 768) {
 		vue.fold_left = true;
-	}
+	} 
 })();
 
 function loadCustomLayers() {
