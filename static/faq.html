@@ -61,7 +61,8 @@
 			<h2>Questions fréquentes</h2>
 			
 			<h3>A quoi correspond le prix affiché ?</h3>
-			<p>Il s'agit dun prix "net vendeur", c'est-à-dire ne comprenant ni frais d'agence immobilière, ni frais de notaire. En cas de vente de mobilier (une cuisine équipée par exemple) avec le bien immobilier, le montant de ce mobilier n'est pas compris dans le prix affiché.</p>
+			<p>Il s'agit dun prix "net vendeur", c'est-à-dire ne comprenant ni frais d'agence immobilière, ni frais de notaire. 
+			En cas de vente de mobilier (une cuisine équipée par exemple) avec le bien immobilier, le montant de ce mobilier n'est pas compris dans le prix affiché.</p>
 			<h3>Quand aura lieu la prochaine mise à jour ?</h3>
 			<p>Les <a href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres/">données brutes</a> font l’objet d’une mise à jour semestrielle, en avril et en octobre. Lors de chaque mise à jour, de nouvelles transactions sont susceptibles d’être ajoutées dans tous les millésimes en fonction de la date de mutation.</p>
 			<h3>Je ne vois pas ma commune</h3>
@@ -76,6 +77,10 @@
 			<p>La remontée des données DVF peut être lente : ainsi, il manque encore une partie des données de l'années 2018, et c'est sans doute le cas de quelques mutations intervenues au cours des années précédentes. Pour les données plus anciennes, la direction générale des Finances publiques sera un meilleur interlocuteur.</p>
 			<h3>Il manque plein d'informations, par exemple l'étage pour un appartement</h3>
 			<p>Malheureusement cette information n'est pas présente dans la base de données initiale.</p>
+			<h3>Je suis certain qu'il y a eu plein de transactions dans cet immeuble, et pourtant l'application ne montre rien.</h3>
+			<p>L'application réalise une jointure entre des transactions pour lesquelles on dispose d'un identifiant de parcelle cadastrale et le plan cadastral.
+			Mais il peut arriver que cette jointure ne se fasse pas, par exemple parce que la parcelle est mal renseignée, ou a été renumérotée. 
+			Normalement, les données brutes doivent tout de même contenir les données que vous cherchez. Mais ce sera moins évident à consulter que l'application. Voir la section sur les données brutes.</p>
 			<h3>Une API est-elle prévue ?</h3>
 			<p>Pas dans l'immédiat, mais vous pouvez utiliser l'API fournie par Christian Quest <a href="http://api.cquest.org/dvf">ici</a>, le mieux étant de commencer par lire <a href="http://data.cquest.org/dgfip_dvf/LISEZ_MOI.txt">sa documentation</a>.</p>
 			<h3>J'ai repéré un gros bug, comment vous en faire part ?</h3>
