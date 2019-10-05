@@ -13,7 +13,7 @@ function getRemoteJSON(url, throwIfNotFound) {
 }
 
 function sortByNom(features) {
-	return _.sortBy(features, function (f) { return f.properties.nom })
+	return features.sort(function(a,b){return a.properties.nom.localeCompare(b.properties.nom);})
 }
 
 function getCommunes(codeDepartement) {
