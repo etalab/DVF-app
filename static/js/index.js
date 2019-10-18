@@ -47,7 +47,7 @@ var styles = {
 			"raster-tiles": {
 				"type": "raster",
 				"tiles": [
-					"https://wxs.ign.fr/eop8s6g4hrpvxnxer1g6qu44/geoportail/wmts?layer=ORTHOIMAGERY.ORTHOPHOTOS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix={z}&TileCol={x}&TileRow={y}"
+					"https://wxs.ign.fr/6njcwphuobi6vx0seroqdoza/geoportail/wmts?layer=ORTHOIMAGERY.ORTHOPHOTOS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix={z}&TileCol={x}&TileRow={y}"
 				],
 				"tileSize": 256,
 				"attribution": "Images aériennes © IGN"
