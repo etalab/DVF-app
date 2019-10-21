@@ -54,42 +54,96 @@
 			<p>Pour plus d’informations sur les points précités, vous pouvez consulter <a href = "https://static.data.gouv.fr/resources/demandes-de-valeurs-foncieres/20190510-110938/information-des-personnes-concernees-par-le-traitement-informatique.pdf">l’Information des personnes concernées par le traitement informatique mis en œuvre</a>.</p>
 		
 			<h2>Comment utiliser l'application ?</h2>
-			<p>Cliquez sur un département, puis sur une commune, puis sur une section cadastrale. La carte se met à jour automatiquement. Les parcelles cadastrales concerncées par au moins une mutation s'affichent en bleu. Cliquez dessus pour obtenir la liste des mutations (date, valeur foncière, dispositions).
+			<p>Cliquez sur un département, puis sur une commune, puis sur une section cadastrale (à ce stade, l'utilisation du fond de carte 
+				image satellite peut être utile). La carte se met à jour automatiquement. 
+				Les parcelles cadastrales concernées par au moins une mutation s'affichent en bleu. 
+				Cliquez sur une parcelle bleue pour obtenir la liste des mutations (date, valeur foncière, dispositions).
 			Vous pouvez aussi utiliser les menus déroulants situés à gauche (masqués sur petit écran) pour choisir un département puis une commune.</p>
 
 
 			<h2>Questions fréquentes</h2>
-			
-			<h3>A quoi correspond le prix affiché ?</h3>
-			<p>Il s'agit dun prix "net vendeur", c'est-à-dire ne comprenant ni frais d'agence immobilière, ni frais de notaire. 
-			En cas de vente de mobilier (une cuisine équipée par exemple) avec le bien immobilier, le montant de ce mobilier n'est pas compris dans le prix affiché.</p>
-			<h3>Quand aura lieu la prochaine mise à jour ?</h3>
-			<p>Les <a href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres/">données brutes</a> font l’objet d’une mise à jour semestrielle, en avril et en octobre. Lors de chaque mise à jour, de nouvelles transactions sont susceptibles d’être ajoutées dans tous les millésimes en fonction de la date de mutation.</p>
-			<h3>Je ne vois pas ma commune</h3>
-			<p>Plusieurs possibilités : le cadastre n'est pas vectorisé (par exemple, Arrigny dans la Marne) ou bien la commune a fusionné avec une autre commune et nous n'avons pas encore intégré ce changement.</p>
-			<h3>Il manque vraiment beaucoup de transactions dans une commune nouvelle</h3>
-			<p>La fusion de communes entraîne un renommage des sections cadastrales. Mais les données DVF ne sont pas pour autant modifiées a posteriori pour tenir compte de ce renommage. Il va donc manquer toutes les transactions antérieures à la fusion sur une partie de la commune nouvelle. Mais nous travaillons sur ce point.</p>
-			<h3>Il y a un problème avec l'Alsace et Mayotte</h3>
-			<p>La direction générale des Finances publiques, qui produit les données DVF, ne dispose pas des mutations des départements du Bas-Rhin, Haut-Rhin, Moselle et Mayotte. Pour l'ancienne Alsace-Moselle les données sont dans le Livre Foncier en raison de l'application du droit local, et ne sont actuellement pas ouvertes.</p>
-			<h3>Ça ne marche pas !</h3>
-			<p>Nous n'avons pas testé avec tous les navigateurs, il est donc possible que l'application ne soit pas compatible avec certains d'entre eux.</p>
-			<h3>J'ai vendu ma maison, pourtant je ne vois pas la transaction</h3>
-			<p>La remontée des données DVF peut être lente : ainsi, il manque encore une partie des données de l'années 2018, et c'est sans doute le cas de quelques mutations intervenues au cours des années précédentes. Pour les données plus anciennes, la direction générale des Finances publiques sera un meilleur interlocuteur.</p>
-			<h3>Il manque plein d'informations, par exemple l'étage pour un appartement</h3>
+			<p>
+			<ul>
+			<li><a href="#question_prix">A quoi correspond le prix affiché ?</a></li>
+			<li><a href="#question_surface">Quelle est la surface affichée ?</a></li>
+			<li><a href ="#question_maj">Quand aura lieu la prochaine mise à jour ?</a></li>
+			<li><a href ="#question_commune_manquante">Je ne vois pas ma commune</a></li>
+			<li><a href ="#question_commune_nouvelle">Il manque vraiment beaucoup de transactions dans une commune nouvelle</a></li>
+			<li><a href ="#question_alsace_mayotte">Il manque l'Alsace (Haut-Rhin et Bas-Rhin) et Mayotte</a></li>
+			<li><a href ="#question_marche_pas">Ça ne marche pas !</a></li>
+			<li><a href ="#question_peu_d_infos">Il manque plein d'informations, par exemple l'étage pour un appartement</a></li>
+			<li><a href ="#question_transaction_absente">J'ai vendu ma maison, pourtant je ne vois pas la transaction</a></li>
+			<li><a href ="#question_jointure">Je suis certain qu'il y a eu plein de transactions dans cet immeuble, et pourtant l'application ne montre rien</a></li>
+			<li><a href ="#question_api">Une API est-elle prévue ?</a></li>
+			<li><a href ="#question_bug">J'ai repéré un gros bug, comment vous en faire part ?</a></li>
+			<li><a href ="#question_donnees_brutes">Je souhaite voir les données brutes, où puis-je les trouver ?</a></p></li>
+			</ul>
+			<br> 
+		
+			<h3 id ="question_prix">A quoi correspond le prix affiché ?</h3>
+			<p>Il s'agit dun prix "net vendeur", c'est-à-dire ne comprenant ni frais d'agence immobilière, ni frais de 
+				notaire. En cas de vente de mobilier (une cuisine équipée par exemple) avec le bien immobilier, 
+				le montant de ce mobilier n'est pas compris dans le prix affiché.</p>
+			<h3 id ="question_surface">Quelle est la surface affichée?</h3>
+			<p>La surface affichée correspond à la surface réelle bâtie et non à la surface carrez (présente cependant dans le
+				fichier, mais remplie sporadiquement et sans valeur légale). Vous constatez un écart entre la surface affichée
+				et la surface réelle de votre bien ? Contactez le bureau CL2A de la DGFiP 
+				(<a href="mailto:bureau.cl2a-fdl@dgfip.finances.gouv.fr">bureau.cl2a-fdl@dgfip.finances.gouv.fr</a>).</p>
+			<p>Il s'agit dun prix "net vendeur", c'est-à-dire ne comprenant ni frais d'agence immobilière, ni frais de 
+				notaire. En cas de vente de mobilier (une cuisine équipée par exemple) avec le bien immobilier, 
+				le montant de ce mobilier n'est pas compris dans le prix affiché.</p>
+			<h3 id ="question_maj">Quand aura lieu la prochaine mise à jour ?</h3>
+			<p>Les <a href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres/">données brutes</a> 
+				font l’objet d’une mise à jour semestrielle par la DGFiP, en avril et en octobre, sans que nous disposions d'une 
+				date plus précise. Lors de chaque mise à jour, de nouvelles transactions sont susceptibles d’être 
+				ajoutées dans tous les millésimes en fonction de la date de mutation. Il nous faut ensuite quelques
+				heures pour mettre l'application à jour, si tout va bien.</p>
+			<h3 id ="question_commune_manquante">Je ne vois pas ma commune</h3>
+			<p>Plusieurs possibilités : le cadastre n'est pas vectorisé (par exemple, Arrigny dans la Marne) ou bien 
+				la commune a fusionné avec une autre commune et nous n'avons pas encore intégré ce changement.</p>
+			<h3 id ="question_commune_nouvelle">Il manque vraiment beaucoup de transactions dans une commune nouvelle</h3>
+			<p>La fusion de communes entraîne un renommage des sections cadastrales. Mais les données DVF ne sont 
+				pas pour autant modifiées a posteriori pour tenir compte de ce renommage. Il va donc manquer toutes 
+				les transactions antérieures à la fusion sur une partie de la commune nouvelle. Mais nous travaillons 
+				sur ce point.</p>
+			<h3 id ="question_alsace_mayotte">Il manque l'Alsace (Haut-Rhin et Bas-Rhin) et Mayotte</h3>
+			<p>La direction générale des Finances publiques, qui produit les données DVF, ne dispose pas des mutations 
+				des départements du Bas-Rhin, Haut-Rhin, Moselle et Mayotte. Pour l'ancienne Alsace-Moselle 
+				les données sont dans le Livre Foncier en raison de l'application du droit local, et ne sont 
+				actuellement pas ouvertes.</p>
+			<h3 id ="question_marche_pas">Ça ne marche pas !</h3>
+			<p>Nous n'avons pas testé avec tous les navigateurs, il est donc possible que l'application ne soit pas 
+				compatible avec certains d'entre eux.</p>
+			<h3 id ="question_peu_d_infos">Il manque plein d'informations, par exemple l'étage pour un appartement</h3>
 			<p>Malheureusement cette information n'est pas présente dans la base de données initiale.</p>
-			<h3>Je suis certain qu'il y a eu plein de transactions dans cet immeuble, et pourtant l'application ne montre rien.</h3>
-			<p>L'application réalise une jointure entre des transactions pour lesquelles on dispose d'un identifiant de parcelle cadastrale et le plan cadastral.
-			Mais il peut arriver que cette jointure ne se fasse pas, par exemple parce que la parcelle est mal renseignée, ou a été renumérotée. 
-			Normalement, les données brutes doivent tout de même contenir les transactions que vous cherchez. Mais ce sera moins évident à consulter que l'application. Voir la section sur les données brutes.</p>
-			<h3>Une API est-elle prévue ?</h3>
-			<p>Pas dans l'immédiat, mais vous pouvez utiliser l'API fournie par Christian Quest <a href="http://api.cquest.org/dvf">ici</a>, le mieux étant de commencer par lire <a href="http://data.cquest.org/dgfip_dvf/LISEZ_MOI.txt">sa documentation</a>.</p>
-			<h3>J'ai repéré un gros bug, comment vous en faire part ?</h3>
-			<p>Le code source de l'application est publié sur <a href="https://github.com/etalab/DVF-app">GitHub</a>. Vous pouvez venir nous y détailler les problèmes que vous rencontrez ou les idées que vous avez dans la section <i>Issues</i>. Merci !</p>
-			<h3>Je souhaite voir les données brutes, où puis-je les trouver ?</h3>
+			<h3 id ="question_transaction_absente">J'ai vendu ma maison, pourtant je ne vois pas la transaction</h3>
+			<p>La remontée des données DVF peut être lente : ainsi, il manque encore une partie des données de l'année 
+				passée (n-1) et vraisemblablement quelques transactions des années n-2, n-3, n-4. 
+				Pour les données plus anciennes, la direction générale des Finances publiques sera un meilleur 
+				interlocuteur. Vérifiez cependant que la transaction n'est pas dans les données brutes.</p>
+			<h3 id = "question_jointure">Je suis certain qu'il y a eu plein de transactions dans cet immeuble, et pourtant l'application ne 
+				montre rien</h3>
+			<p>L'application réalise une jointure entre des transactions pour lesquelles on dispose d'un identifiant de 
+				parcelle cadastrale et le plan cadastral.
+				Mais il peut arriver que cette jointure ne se fasse pas, par exemple parce que la parcelle est mal 
+				renseignée, ou a été renumérotée. 
+				Normalement, les données brutes doivent tout de même contenir les transactions que vous cherchez. 
+				Mais ce sera moins évident à consulter que l'application. Voir la section sur les données brutes.</p>
+			<h3 id ="question_api">Une API est-elle prévue ?</h3>
+			<p>Pas dans l'immédiat, mais vous pouvez utiliser l'API fournie par Christian 
+				Quest <a href="http://api.cquest.org/dvf">ici</a>, le mieux étant de commencer par 
+				lire <a href="http://data.cquest.org/dgfip_dvf/LISEZ_MOI.txt">sa documentation</a>.</p>
+			<h3 id ="question_bug">J'ai repéré un gros bug, comment vous en faire part ?</h3>
+			<p>Le code source de l'application est publié sur <a href="https://github.com/etalab/DVF-app">GitHub</a>. 
+				Vous pouvez venir nous y détailler les problèmes que vous rencontrez ou les idées que vous avez dans 
+				la section <i>Issues</i>. Merci !</p>
+			<h3 id ="question_donnees_brutes">Je souhaite voir les données brutes, où puis-je les trouver ?</h3>
 			<p>Les données sont mises à disposition par la DGFIP sur <a href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres/">la page DVF de data.gouv.fr</a>. 
-			La mission Etalab propose aussi ces données légèrement retravaillées, avec notamment un découpage par année et par commune ou département pour faciliter leur réutilisation. 
-			Vous les trouverez sur <a href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres-geolocalisees/">la page DVF géolocalisées de data.gouv.fr</a>. 
-			Attention, pour le découpage par commune, il faut utiliser le code commune et non le code postal. Par exemple, le code commune de Paris 14e est (75)114 et non (75)014.</p>
+				La mission Etalab propose aussi ces données légèrement retravaillées, avec notamment un 
+				découpage par année et par commune ou département pour faciliter leur réutilisation. Vous les trouverez sur 
+				<a href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres-geolocalisees/">la page DVF 
+				géolocalisées de data.gouv.fr</a>. Attention, pour le découpage par commune, il faut utiliser le code 
+				commune et non le code postal. Par exemple, le code commune de Paris 14e est (75)114 et non (75)014.</p>
 
 			<h2>Nous contacter</h2>
 			<p>cadastre[at]data.gouv.fr</p>
