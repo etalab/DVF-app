@@ -18,7 +18,7 @@ Il faut un serveur Linux (ici, nous prendrons Ubuntu 18.04 comme exemple)
 
 ### 2- Récupération du dépôt
 ```bash
-$ git clone https://github.com/marion-paclot/DVF
+$ git clone https://github.com/etalab/DVF-app
 $ cd DVF
 ```
 
