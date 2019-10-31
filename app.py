@@ -18,7 +18,8 @@ config = pd.read_csv('config.csv', header=None)
 id = config[0][0]
 pwd = config[0][1]
 host = config[0][2]
-engine = create_engine('postgresql://%s:%s@%s/dvf2'%(id, pwd, host))
+db = config[0][3]
+engine = create_engine('postgresql://%s:%s@%s/%s'%(id, pwd, host, db))
 
 # Chargement des natures de culture plus besoin
 
