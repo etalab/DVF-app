@@ -9,7 +9,7 @@ Les manipulations à faire sont les suivantes :
   - en avril, retirer l'année la plus ancienne (en 2020, on retire 2014, en 2021, 2015 etc)
 3) Dans static/js/index.js : adapter les dates (début éventuellement et fin à chaque fois) pour tenir compte de la nouvelle plage de données. Possibilité de le faire via l'api dates2, mais nécessitera une requête de plus.
 4) Dans build_db.sh 
-  - renommer la base dvf_etalab en dvf_etalab_oct (ou dvf_etalab_avril, en fonction de la mise à jour. on va alterner entre les deux bases pour pouvoir rebasculer sur l'ancienne version s'il y a un problème)
+  - renommer la base dvf_octobre en dvf_avril (ou l'inverse, en fonction de la mise à jour. on va alterner entre les deux bases pour pouvoir rebasculer sur l'ancienne version s'il y a un problème)
   - faire tourner le script intégralement
 5) Dans config.csv (uniquement sur le serveur)
   - changer le nom de la base de donnée (4ème ligne)
