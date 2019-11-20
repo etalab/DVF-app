@@ -10,11 +10,11 @@ Les manipulations à faire sont les suivantes :
 3) Dans static/js/index.js : adapter les dates (début éventuellement et fin à chaque fois) pour tenir compte de la nouvelle plage de données. Possibilité de le faire via l'api dates2, mais nécessitera une requête de plus.
 4) Dans build_db.sh 
   - renommer la base dvf_octobre en dvf_avril (ou l'inverse, en fonction de la mise à jour. on va alterner entre les deux bases pour pouvoir rebasculer sur l'ancienne version s'il y a un problème)
-  - faire tourner le script intégralement
+  - faire tourner le script intégralement ``sh build_db.sh``
 5) Dans config.csv (uniquement sur le serveur)
   - changer le nom de la base de donnée (4ème ligne)
   - relancer python ``supervisorctl restart all`` pour prendre en compte cette modification de nom de base
-6) Vider le cache Nginx et relancer le service : ``rm –rf /var/cache/nginx/*`` puis ``systemctl restart nginx`` 
+6) Vider le cache Nginx et relancer le service : ``rm -R -rf /var/cache/nginx/*`` puis ``systemctl restart nginx`` 
 7) S'assurer que le cache du navigateur tient compte de la nouvelle plage de date, sinon, dans index.html, incrémenter la version du script (dernière ligne) ``<script src="js/index.js?v=1">``
 
  
