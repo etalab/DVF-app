@@ -31,6 +31,12 @@ Vue.component('boite-accordeon', {
 							icone="fa fa-tree"
 							:texte="terrain['nature_culture'] + (terrain['nature_culture_speciale'] != 'None' ? ' / ' + terrain['nature_culture_speciale'] : '')">
 						</boite>
+						<boite <!-- for terrains a batir, display price per square meter -->
+							v-for="terrain in mutation.terrains"
+							:valeur="formatterNombre(mutation.infos[0]['valeur_fonciere'] / terrain['surface_terrain']) + ' €/m²'"
+							icone="fa fa-tree"
+							:texte="terrain['nature_culture'] + (terrain['nature_culture_speciale'] != 'None' && terrain['nature_culture'] != 'sols' && terrain['nature_culture_speciale'] != 'sols' ? ' / ' + terrain['nature_culture_speciale'] : '')">
+						</boite>
 							<div v-if="mutation.parcellesLiees.length > 0" style = "padding:0.5rem">
 								Cette mutation contient des dispositions dans des parcelles adjacentes. La valeur foncière correspond au total.
 							</div>
