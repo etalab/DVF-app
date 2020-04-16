@@ -12,6 +12,7 @@ Les manipulations à faire sont les suivantes :
 3) Dans static/js/index.js : adapter les dates (début éventuellement et fin à chaque fois) pour tenir compte de la nouvelle plage de données. 
 
 var MIN_DATE = 'YYYY-MM-01'
+
 var MAX_DATE = 'YYYY-MM-31'
 
 Possibilité de le faire via l'api dates2, mais nécessitera une requête de plus.
