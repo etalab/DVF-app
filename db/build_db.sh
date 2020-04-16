@@ -3,10 +3,10 @@
 DIR=$(echo $(dirname $0))
 cd $DIR
 
-sudo -u postgres psql -c "DROP DATABASE IF EXISTS dvf_octobre;"
-sudo -u postgres psql -c "CREATE DATABASE dvf_octobre;"
-sudo -u postgres psql -c "ALTER DATABASE dvf_octobre SET datestyle TO ""ISO, DMY"";"
-sudo -u postgres psql -d dvf_octobre -f "create_table.sql"
+sudo -u postgres psql -c "DROP DATABASE IF EXISTS dvf_avril2020;"
+sudo -u postgres psql -c "CREATE DATABASE dvf_avril2020;"
+sudo -u postgres psql -c "ALTER DATABASE dvf_avril2020 SET datestyle TO ""ISO, DMY"";"
+sudo -u postgres psql -d dvf_avril2020 -f "create_table.sql"
 
 # Chargement des données sur le serveur
 DATADIR="data"
