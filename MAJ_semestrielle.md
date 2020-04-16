@@ -10,8 +10,10 @@ Les manipulations à faire sont les suivantes :
   - renommer la base dvf_YYYYMM en fonction du mois de mise à jour.
   - faire tourner le script intégralement ``sh build_db.sh``
 3) Dans static/js/index.js : adapter les dates (début éventuellement et fin à chaque fois) pour tenir compte de la nouvelle plage de données. 
+
 var MIN_DATE = 'YYYY-MM-01'
 var MAX_DATE = 'YYYY-MM-31'
+
 Possibilité de le faire via l'api dates2, mais nécessitera une requête de plus.
 4) Dans config.csv (uniquement sur le serveur)
   - changer le nom de la base de donnée dvf_YYYYMM (4ème ligne)
