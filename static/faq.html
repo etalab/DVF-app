@@ -4,16 +4,9 @@
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<title>DVF</title>
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous"/>
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
+		<link rel="stylesheet" href="/lib/fontawesome-v5.8.1.css">
+		<link rel="stylesheet" href="/lib/bootstrap-v4.3.1.css">
 		<link rel="stylesheet" href="/css/app.css?version=11"/>
-		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.min.js"></script>
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-		<script type="text/javascript" src="https://unpkg.com/lodash@4.17.11/lodash.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.png">
 	</head>
 	<body>
@@ -38,17 +31,17 @@
 			<h2>&Agrave; propos</h2>
 			<p>Cette application est proposée par <a href="https://www.etalab.gouv.fr/qui-sommes-nous">Etalab</a>, département de la DINUM, et permet de visualiser les données DVF (demandes de valeurs foncières), correspondant aux mutations à titre onéreux réalisées les 5 dernières années. Les données DVF brutes sont téléchargeables sur le site <a href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres/">https://www.data.gouv.fr</a> depuis le 24 avril 2019 et sont produites par la direction générale des Finances publiques. Vous y trouverez des informations sur le cadre technique et légal de cette publication.</p>
 			<br>
-			
+
 			<h2>Comment utiliser l'application ?</h2>
 			<p>Cliquez sur un département, puis sur une commune, puis sur une section cadastrale (à ce stade, l'utilisation du fond de carte image satellite peut être utile). La carte se met à jour automatiquement. Les parcelles cadastrales concernées par au moins une mutation s'affichent en bleu. Cliquez sur une parcelle bleue pour obtenir la liste des mutations (date, valeur foncière, dispositions). Vous pouvez aussi utiliser les menus déroulants situés à gauche (masqués sur petit écran) pour choisir un département puis une commune.</p>
 
 			<h2>Cadre réglementaire de la publication de ces informations</h2>
 			<p>La diffusion de la base DVF (demandes de valeurs foncières), ci-après « la Base », par Etalab, et notamment l’application qu’elle propose permettant de visualiser les données, participe de la transparence des marchés fonciers et immobiliers.</p>
 			<p>Cela a été rendu possible par la <a href = "https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000037307624&categorieLien=id">loi du 10 août 2018 pour un Etat au service d’une société de confiance</a>. La mesure prévoyant la diffusion de la Base est désormais codifié à <a href ="https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006069583&idArticle=LEGIARTI000037309458">l’article L. 112-A du livre des procédures fiscales</a>.</p>
-			<p>La Base est produite par la direction générale des Finances publiques (DGFiP). Sa diffusion est mise en œuvre par Etalab dans les conditions prévues par le <a href = "https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000037884472&categorieLien=id">décret du 28 décembre 2018</a> (<a href = "https://www.legifrance.gouv.fr/affichCode.do;jsessionid=E1D65A6F378B83C68F265E2AEBB7EC15.tplgfr29s_1?idSectionTA=LEGISCTA000038001647&cidTexte=LEGITEXT000006069583&dateTexte=20190513">articles R*112 A-1 et suivants du livre des procédures fiscales</a>) qui dresse la liste des informations diffusées et les conditions de cette diffusion.<p/> 
-			<p>Ce décret prévoit notamment : 
+			<p>La Base est produite par la direction générale des Finances publiques (DGFiP). Sa diffusion est mise en œuvre par Etalab dans les conditions prévues par le <a href = "https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000037884472&categorieLien=id">décret du 28 décembre 2018</a> (<a href = "https://www.legifrance.gouv.fr/affichCode.do;jsessionid=E1D65A6F378B83C68F265E2AEBB7EC15.tplgfr29s_1?idSectionTA=LEGISCTA000038001647&cidTexte=LEGITEXT000006069583&dateTexte=20190513">articles R*112 A-1 et suivants du livre des procédures fiscales</a>) qui dresse la liste des informations diffusées et les conditions de cette diffusion.<p/>
+			<p>Ce décret prévoit notamment :
 				<ul>
-				<li>que la réutilisation des données de la Base ne peuvent avoir ni pour objet ni pour effet de permettre la réidentification des personnes concernées. <b>Nous attirons très fortement l’attention des réutilisateurs sur ce point</b>, </li> 
+				<li>que la réutilisation des données de la Base ne peuvent avoir ni pour objet ni pour effet de permettre la réidentification des personnes concernées. <b>Nous attirons très fortement l’attention des réutilisateurs sur ce point</b>, </li>
 				<li>que ces informations ne peuvent faire l'objet d'une indexation sur les moteurs de recherche en ligne. A cet effet, Etalab a mis en place un dispositif technique propre à empêcher cette indexation.</li>
 				</ul></p>
 			<p>Pour plus d’informations sur les points précités, vous pouvez consulter les <a href = "https://static.data.gouv.fr/resources/demande-de-valeurs-foncieres/20190419-091643/conditions-generales-dutilisation.pdf">Conditions générales d’utilisation de la Base </a>.</p>
@@ -56,8 +49,8 @@
 			<p>Les personnes conservent néanmoins un droit d’accès, de rectification et de limitation des données les concernant. Pour exercer ces droits, vous pouvez contacter le service des impôts des particuliers dont vous relevez, le bureau CL2A de la DGFiP (<a href="mailto:bureau.cl2a-fdl@dgfip.finances.gouv.fr">bureau.cl2a-fdl@dgfip.finances.gouv.fr</a>) ou le délégué à la protection des données (<a href="mailto:le-delegue-a-la-protection-des-donneespersonnelles@finances.gouv.fr">le-delegue-a-la-protection-des-donneespersonnelles@finances.gouv.fr</a>). </p>
 			<p>Pour rappel, la réglementation impose au demandeur de justifier "de son identité par tout moyen" (<a href="https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000038528420&categorieLien=id">article 77 du Décret n° 2019-536 du 29 mai 2019</a> pris pour l'application de la loi n° 78-17 du 6 janvier 1978 relative à l'informatique, aux fichiers et aux libertés). Afin de vérifier que la demande émane bien de la personne concernée, il nous est nécessaire d'obtenir la copie de votre carte nationale d'identité, de votre passeport ou de votre permis de conduire.</p>
 			<p>Pour plus d’informations sur les points précités, vous pouvez consulter <a href = "https://static.data.gouv.fr/resources/demandes-de-valeurs-foncieres/20190510-110938/information-des-personnes-concernees-par-le-traitement-informatique.pdf">l’Information des personnes concernées par le traitement informatique mis en œuvre</a>.</p>
-		
-			
+
+
 
 			<h2>Questions fréquentes</h2>
 			<p>
@@ -79,8 +72,8 @@
 			<li><a href ="#question_erreur">J'ai repéré une erreur, comment vous en faire part ?</a></li>
 			</ul>
 		</p>
-			<br> 
-		
+			<br>
+
 			<h3 id ="question_prix">A quoi correspond le prix affiché ?</h3>
 			<p>Il s'agit dun prix "net vendeur", c'est-à-dire ne comprenant ni frais d'agence immobilière, ni frais de notaire. En cas de vente de mobilier (une cuisine équipée par exemple) avec le bien immobilier, le montant de ce mobilier n'est pas compris dans le prix affiché. La TVA est incluse.</p>
 			<h3 id ="question_surface">Quelle est la surface affichée ?</h3>
@@ -112,8 +105,8 @@
 			<h3 id ="question_erreur">J'ai repéré une erreur, comment vous en faire part ?</h3>
 			<p>Nous utilisons les données produites par la DGFIP, et ne sommes pas en mesure de corriger les valeurs d'une transaction. Pour toute demande d’information ou toute erreur détectée, veuillez contacter le bureau CL2A de la DGFIP à l’adresse suivante : <a href="mailto:bureau.cl2a-fdl@dgfip.finances.gouv.fr">bureau.cl2a-fdl@dgfip.finances.gouv.fr</a>, en renseignant l'objet de votre mail comme suit : DVF-votre nom.</p>
 
-	
-	
+
+
 			<h2>Nous contacter</h2>
 			<p>Assurez-vous d'avoir lu les questions-réponses ci-dessus avant de nous écrire. Merci !</p>
 			<p>Pour une question ou remarque sur le fonctionnement du site : dvf[at]data.gouv.fr</p>
