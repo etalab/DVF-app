@@ -1,0 +1,3 @@
+[submodule "db/dvf"]
+	path = db/dvf
+	url = git@github.com:etalab/dvf.git

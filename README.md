@@ -68,6 +68,7 @@ Creation de la base de données et import des données :
 Le script commence par créer une base de données PostgreSQL et une table, puis télécharge les données DVF retraitées par Etalab, disponibles [ici](https://github.com/etalab/dvf/). Enfin quelques post-traitements sont effectués (traitement de quelques minutes).
 
 ```bash
+$ git submodule update --init
 $ sh db/build_db.sh
 ```
 
