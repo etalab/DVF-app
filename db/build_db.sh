@@ -27,4 +27,4 @@ do
 done
 
 # Ajout d'une colonne et d'index - Assez long
-sudo -u postgres psql -d dvf_202004 -f "alter_table.sql"
+sudo -u postgres psql -d dvf_202010 -f "alter_table.sql"
