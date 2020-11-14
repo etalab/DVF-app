@@ -24,9 +24,11 @@ le fichier de donfiguration `./config.csv` doit être renseigné comme suit:
 postgres
 <mot de passe base de données>
 postgres
-dvf_202004
+dvf_202010
 
 ```
+
+**Note**: Modifier le nom de la base de données en fonction de la version de l'application (voir dans le script `build_db.sh`).
 
 ### Configuration du client
 
