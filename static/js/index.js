@@ -10,7 +10,7 @@ var vue = new Vue({
 		section: false,
 		parcelle: null,
 		mutationIndex: null,
-		mapStyle: 'vector',
+		mapStyle: 'ortho',
 	},
 	methods: {},
 });
