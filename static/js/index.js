@@ -24,8 +24,8 @@ vue.$watch('fold_left', function () {
 
 // Définition des variables globales
 
-var MIN_DATE = '2014-01-01'
-var MAX_DATE = '2020-06-30'
+var MIN_DATE = '2016-01-01'
+var MAX_DATE = '2021-12-31'
 
 var map = null;
 var mapLoaded = false;
