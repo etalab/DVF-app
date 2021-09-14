@@ -537,8 +537,52 @@ function onDepartementClick(event) {
 	document.getElementById("departements").value = sonCode;
 };
 
+function selectionnerAdresse(event) {
+	var criteria = document.getElementById("search").value;
+	getCoordinates(criteria).then(function(position){
+		return initPosition(position.coordinates[1], position.coordinates[0]);	
+	});
+};
+
 function toggleLeftBar() {
 	vue.fold_left = !vue.fold_left;
+}
+
+function initPositionFromGeolocalisation(position) {
+	initPosition(position.coords.latitude, position.coords.longitude);
+}
+
+function initPosition(lat, lng) {
+	getDepartement(lat, lng).then(function(commune){
+
+		commune.geometry.coordinates[1] = lat;
+		commune.geometry.coordinates[0] = lng;
+		return getInformationCadastrale(commune.geometry).then(function(props){
+
+			var section = props.section.padStart(5, '0')
+			var code_dep = props.code_dep
+			var code_com = props.code_com
+			var feuille = props.feuille.toString().padStart(4, '0')
+	
+			codeSection = `${code_dep}${code_com}${section}`
+			parcelle = `${code_dep}${code_com}${section}${feuille}`
+
+			var codeCommune = commune.properties.code;
+			var codeDepartement = commune.properties.codeDepartement;
+			entrerDansDepartement(codeDepartement).then(function(){
+				entrerDansCommune(codeCommune).then(function(){
+					entrerDansSection(codeSection).then(function(){
+						entrerDansParcelle(parcelle).then(function(){
+							document.getElementById("departements").value = codeDepartement;
+							document.getElementById("communes").value = codeCommune;
+							document.getElementById("sections").value = codeSection;
+							document.getElementById("parcelles").value = parcelle;
+						})
+					})
+				})
+			});
+		});
+	});
 }
 
 // C'est le code qui est appelé au début (sans que personne ne clique)
@@ -573,8 +617,8 @@ function toggleLeftBar() {
 					map.addLayer(departementsContoursLayer)
 				map.setPaintProperty(departementsContoursLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
 			})
-				}
-		})
+		}
+	})
 	map.on('styledata', loadCustomLayers)
 
 	hoverableSources.map(function (source) {
@@ -662,8 +706,7 @@ function toggleLeftBar() {
 	// Sur mobile, cacher la barre latérale
 	if (window.innerWidth < 768) {
 		vue.fold_left = true;
-	}
-
+	} 
 })();
 
 function loadCustomLayers() {
@@ -776,4 +819,7 @@ function departementsFilter() {
 	map.setFilter('departements-layer', ['!=', ['get', 'code'], codeDepartement])
 }
 
-
+function localizeUser() {
+	if(navigator.geolocation)
+		navigator.geolocation.getCurrentPosition(initPositionFromGeolocalisation);
+}

@@ -58,6 +58,20 @@
 		<div id="sidebar_left" class="sidebar" v-show="!fold_left" class="container">
 			<div class="scrollable">
 				<div class="form-group">
+						<label for="departements" class="control-label">Adresse</label>
+					<div class="input-group">
+						<input type="text" name="municipality" id="search" class="form-control" 
+						placeholder="Rechercher une adresse, une ville, un lieu..." 
+						title="Rechercher une adresse, une ville, un lieu..." >
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary" onclick="selectionnerAdresse()">Rechercher</button>
+					<button v-if="navigator.geolocation" type="submit" class="btn btn-primary" onclick="localizeUser()">
+						<i class="fas fa-map-marker-alt"></i>
+					</button>
+				</div>
+				<div class="form-group">
 					<label for="departements" class="control-label">Département</label>
 					<select name="departements" id="departements" onchange="selectionnerDepartement()" class="form-control">
 						<option style="display:none"></option>
