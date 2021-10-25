@@ -17,7 +17,7 @@ mkdir -p $DATADIR
 
 for YEAR in {2016..2021}
 do
-  [ ! -f $DATADIR/full_$YEAR.csv.gz ] && wget -r -np -nH -N --cut-dirs 5  https://files.data.gouv.fr/geo-dvf/$year_end-$month/csv/$YEAR/full.csv.gz -O $DATADIR/full_$YEAR.csv.gz
+  [ ! -f $DATADIR/full_$YEAR.csv.gz ] && wget -r -np -nH -N --cut-dirs 5  https://files.data.gouv.fr/geo-dvf/latest/csv/$YEAR/full.csv.gz -O $DATADIR/full_$YEAR.csv.gz
 done
 
 find $DATADIR -name '*.gz' -exec gunzip -f '{}' \;
