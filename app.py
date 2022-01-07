@@ -1,7 +1,7 @@
 # Pour lancer le serveur : python app.py
 # Puis acceder au site sur localhost:5000
 
-from flask import Flask, request, send_from_directory, jsonify
+from flask import Flask, request, send_from_directory
 import json
 import pandas as pd
 from sqlalchemy import create_engine
@@ -73,6 +73,51 @@ def get_mutations3(commune, sectionPrefixee):
 	mutations = mutations.sort_values(by=['date_mutation', 'code_type_local'], ascending=[False, True])
 	json_mutations = '{"mutations": ' + mutations.to_json(orient = 'records') + '}'
 	return json_mutations
+
+# Cette route accepte 5 filtres :
+#   - section_prefixe
+#   - nature_mutation
+#   - type_local
+#   - date_minimum
+#   - date_maximum
+@app.route('/api/commune/<code_commune>/mutations')
+def get_mutations_par_commune(code_commune):
+    requete_sql = 'SELECT * FROM public.dvf WHERE code_commune = %(code_commune)s'
+    requete_params = { "code_commune": code_commune }
+
+    section_prefixe = request.args.get('section_prefixe')
+    if section_prefixe:
+        requete_sql += ' AND section_prefixe = %(section_prefixe)s'
+        requete_params['section_prefixe'] = section_prefixe
+
+    nature_mutation = request.args.get('nature_mutation')
+    if nature_mutation:
+        requete_sql += ' AND nature_mutation = %(nature_mutation)s'
+        requete_params['nature_mutation'] = nature_mutation
+
+    type_local = request.args.get('type_local')
+    if type_local:
+        if type_local != "None":
+            requete_sql += ' AND type_local = %(type_local)s'
+            requete_params['type_local'] = type_local
+        else: requete_sql += ' AND type_local IS NULL'
+
+    date_minimum = request.args.get('date_minimum')
+    if date_minimum:
+        requete_sql += ' AND date_mutation >= %(date_minimum)s'
+        requete_params['date_minimum'] = date_minimum
+
+    date_maximum = request.args.get('date_maximum')
+    if date_maximum:
+        requete_sql += ' AND date_mutation <= %(date_maximum)s'
+        requete_params['date_maximum'] = date_maximum
+
+    mutations = pd.read_sql(requete_sql, engine, params = requete_params)
+    mutations = mutations.applymap(str) # Str pour éviter la conversion des dates en millisecondes.
+    mutations = mutations.sort_values(by=['date_mutation', 'code_type_local'], ascending=[False, True])
+    nbMutations = len(mutations.id_mutation.unique())
+    json_mutations = '{"donnees": ' + mutations.to_json(orient = 'records') + ', "nbMutations": ' + str(nbMutations) + '}'
+    return json_mutations
 
 
 @app.route('/api/parcelles2/<parcelle>/from=<dateminimum>&to=<datemaximum>')
