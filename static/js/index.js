@@ -61,7 +61,7 @@ var styles = {
 			}
 		]
 	},
-	vector: 'https://openmaptiles.geo.data.gouv.fr/styles/osm-bright-latest/style.json'
+	vector: 'https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json'
 }
 
 var nom_fichier_section = null;
