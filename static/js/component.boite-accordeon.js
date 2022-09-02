@@ -1,8 +1,12 @@
 Vue.component('boite-accordeon', {
 	// Les paramètres sont là
 	props: ['couleur', 'mutation', 'icone', 'index'],
+	data () {
+		return {
+			showDetail: false
+		}
+	},
 	// La on donne le code source HTML du composant qui peut utiliser des données
-
 	template: `<div class="card mt-3">
 				<div class="card-body" v-on:click="selectionnerMutation()">
 					<div class="media d-flex">
@@ -19,21 +23,17 @@ Vue.component('boite-accordeon', {
 						</div>
 					</div>
 					<div v-if="vue.mutationIndex == index" style="background-color: #eee" class="mt-3">
-						<boite
-							v-for="batiment in mutation.batiments"
-							:valeur="(batiment['code_type_local'] != 3) ? (formatterNombre(batiment['surface_reelle_bati']) + ' m²') : ''"
-							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['code_type_local']]"
-							:texte="batiment['type_local'] + ((batiment['code_type_local'] < 3) ? (' / ' + formatterNombre(batiment['nombre_pieces_principales']) + ' p') : '')">
-						</boite>
-						<boite
-							v-for="terrain in mutation.terrains"
-							:valeur="formatterNombre(terrain['surface_terrain']) + ' m²'"
-							icone="fa fa-tree"
-							:texte="terrain['nature_culture'] + (terrain['nature_culture_speciale'] != 'None' ? ' / ' + terrain['nature_culture_speciale'] : '')">
-						</boite>
-							<div v-if="mutation.parcellesLiees.length > 0" style = "padding:0.5rem">
-								Cette mutation contient des dispositions dans des parcelles adjacentes. La valeur foncière correspond au total.
-							</div>
+						<mutation :mutation="mutation"></mutation>
+						<div v-if="mutation.mutationsLiees.length > 0" style = "padding:0.5rem">
+							Cette mutation contient des dispositions dans des parcelles adjacentes. La valeur foncière correspond au total.
+							<br><button v-on:click="showDetail = !showDetail">Voir le contenu des autres parcelles de cette mutation</button>
+						</div>
+						<div class="mutations-liees" v-if="showDetail && mutation.mutationsLiees.length > 0">
+							<mutation
+							  v-for="mutationLiee in mutation.mutationsLiees"
+							  :mutation="mutationLiee">
+						  </mutation>
+						</div>
 					</div>
 			</div>
 		</div>`,
