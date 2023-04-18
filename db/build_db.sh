@@ -3,7 +3,7 @@
 DIR=$(echo $(dirname $0))
 cd $DIR
 
-month="06"
+month="12"
 year_end="2022"
 
 sudo -u postgres psql -c "DROP DATABASE IF EXISTS dvf_${year_end}${month};"
@@ -15,7 +15,7 @@ sudo -u postgres psql -d dvf_${year_end}${month} -f "create_table.sql"
 DATADIR="data"
 mkdir -p $DATADIR
 
-for YEAR in {2017..2022}
+for YEAR in {2018..2022}
 do
   [ ! -f $DATADIR/full_$YEAR.csv.gz ] && wget -r -np -nH -N --cut-dirs 5  https://files.data.gouv.fr/geo-dvf/latest/csv/$YEAR/full.csv.gz -O $DATADIR/full_$YEAR.csv.gz
 done
@@ -24,7 +24,7 @@ find $DATADIR -name '*.gz' -exec gunzip -f '{}' \;
 
 #Chargement des données dans postgres
 DATAPATH=$( cd $DATADIR ; pwd -P )
-for YEAR in {2017..2022}
+for YEAR in {2018..2022}
 do
   sudo -u postgres psql -d dvf_$year_end$month -c "COPY dvf FROM '$DATAPATH/full_$YEAR.csv' delimiter ',' csv header encoding 'UTF8';"
 done
