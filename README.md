@@ -11,15 +11,16 @@ Les données de Mayotte ainsi que de l'Alsace et de la Moselle sont manquantes c
 Une API développée par Christian Quest est disponible [ici](http://api.cquest.org/dvf), avec sa [documentation](http://data.cquest.org/dgfip_dvf/LISEZ_MOI.txt).
 
 ## Installation
+*(testé avec succès le 24/04/2023)*
 
 ### 1- Pré-requis
 
-Il faut un serveur Linux (ici, nous prendrons Ubuntu 18.04 comme exemple)
+Il faut un serveur Linux (ici, nous prendrons Ubuntu 22.04 comme exemple)
 
 ### 2- Récupération du dépôt
 ```bash
 $ git clone https://github.com/etalab/DVF-app
-$ cd DVF
+$ cd DVF-app
 ```
 
 ### 3- Installation minimale : pour développer l'interface utilisateur seule (Front End)
@@ -30,7 +31,7 @@ Pour participer au développement de l'interface utilisateur, il n'est pas néce
 ```bash
 $ sudo apt-get update && sudo apt install nodejs
 $ nodejs -v
-v8.10.0 
+v12.22.9
 ```
 
 - [yarn](https://yarnpkg.com)
@@ -39,7 +40,7 @@ $ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 $ echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 $ sudo apt-get update && sudo apt-get install yarn
 $ yarn --version
-1.15.2
+1.22.19
 ```
 
 Un script [Node.js](https://nodejs.org) permet de servir l'interface et de faire proxy vers l'API de production.
@@ -58,9 +59,9 @@ $ yarn start
 
 PostgreSQL
 ```bash
-$ sudo apt-get update && sudo apt install postgresql-10
+$ sudo apt-get update && sudo apt install postgresql-14
 $ psql -V
-psql (PostgreSQL) 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
+psql (PostgreSQL) 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
 ```
 
 Creation de la base de données et import des données :
@@ -70,6 +71,7 @@ Le script commence par créer une base de données PostgreSQL et une table, puis
 ```bash
 $ sh db/build_db.sh
 ```
+Le nom de la base de données est affiché lors de l'import
 
 Configuration de l'accès à la base de données
 
@@ -81,14 +83,14 @@ Enter new password: <YOUR PASSWORD>
 Enter it again: <YOUR PASSWORD>
 postgres=# \q
 
-$ echo -e "postgres\n<YOUR PASSWORD>\nlocalhost" > config.csv
+$ echo -e "postgres\n<YOUR PASSWORD>\nlocalhost<DB NAME>" > config.csv
 ```
 
 Installation des packages pythons :
 ```bash
 $ sudo apt-get update && sudo apt install python3
 $ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-$ sudo apt install libpq-dev python-dev
+$ sudo apt install libpq-dev
 $ sudo apt install python3-psycopg2 python3-flask python3-pandas python3-sqlalchemy python3-psycopg2
 ```
 
