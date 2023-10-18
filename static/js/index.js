@@ -697,8 +697,8 @@ function changerSelection(parametre, valeur, finale) {
 	// Placer le selection dans la file
 	fileSelections.push([parametre, valeur]);
 
-	// Verifier si c'est la finale selection
-	if (finale) {
+	// Verifier si c'est la finale selection, et la carte est déjà rendu
+	if (finale && mapRendered) {
 		// Si oui, obtenir la fonction pour réinitialiser le parametre
 		var nom = parametre[0].toUpperCase() + parametre.slice(1);
 		var fonction = window['reset' + nom];
@@ -706,11 +706,8 @@ function changerSelection(parametre, valeur, finale) {
 		// Executer la fonction
 		fonction.call(this);
 
-		// Verifier si la carte est déjà rendu
-		if (mapRendered) {
-			// Si oui, commencer le traitement manuellement
-			traiterFileSelections();
-		}
+		// Commencer le traitement manuellement
+		traiterFileSelections();
 	}
 }
 
@@ -757,12 +754,12 @@ function traiterFileSelections() {
 	var selection, parametre, valeur, selecteur;
 
 	do {
-		// S'il n'y a pas une prochaine selection, quitter
+		// S'il n'y a plus une selection, quitter
 		if (!fileSelections.length) {
 			return;
 		}
 
-		// Recuperer le parametre et le valuer de la file d'attente
+		// Recuperer le parametre et la valuer de la file d'attente
 		selection = fileSelections.shift();
 		parametre = selection[0];
 		valeur = selection[1];
@@ -770,7 +767,7 @@ function traiterFileSelections() {
 		// Obtenir le boite selection
 		selecteur = $('#' + parametre + 's');
 
-	// Continuer si la valeur ne doit changer pas
+	// Continuer avec la selection suivante si la valeur n'a changer pas
 	} while(valeur === selecteur.val());
 
 	// Chercher l'option de la valeur
@@ -788,10 +785,10 @@ function traiterFileSelections() {
 		// Forcer le traitement de la nouvelle valuer
 		fonction.call(this, false);
 	} else {
-		// Réajouter le selection à le file d'attente
+		// Si non, réajouter le selection à le file d'attente
 		fileSelections.unshift(selection);
 
-		// Attends un seconde avant de réessayer
+		// Attendez que les options se chargent avant de réessayer
 		setTimeout(traiterFileSelections, 1000);
 	}
 }
