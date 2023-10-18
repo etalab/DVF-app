@@ -569,8 +569,8 @@ function onHashChange(event) {
 		return;
 	}
 
-	// Diviser l'URL en des barres obliques
-	var pieces = location.hash.split('/');
+	// Diviser l'URL en des barres obliques, et ignorer les pieces vide
+	var pieces = location.hash.split('/').filter(piece => piece);
 
 	// Si l'URL ne commencer pas d'un hashbang, ne faire rien
 	if (pieces.shift() != '#!') {
@@ -638,10 +638,12 @@ function onHashChange(event) {
 
 function onMapIdle(event)
 {
+	// Indiquer que la carte est rendu complètement
 	if (!mapRendered) {
 		mapRendered = true;
 	}
 
+	// Effectuer la sélection suivante dans la file d'attente
 	traiterFileSelections();
 }
 
@@ -661,6 +663,11 @@ function changerPeriode(depuis, jusqua) {
 		jusqua = jusqua.replace(recherche, remplacement);
 	}
 
+	// Verifier si les dates a changer, ou quitter
+	if(depuis === startDate && jusqua === endDate) {
+		return;
+	}
+
 	// Définir le format desirable
 	var desirable = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -675,6 +682,15 @@ function changerPeriode(depuis, jusqua) {
 	// Entrez les dates de début et fin
 	picker.setStartDate(new Date(depuis));
 	picker.setEndDate(new Date(jusqua));
+	
+	// Changer les variables d'application
+	startDate = depuis;
+	endDate = jusqua;
+
+	// Recharger la section si nécessaire
+	if(idSection) {
+		entrerDansSection(idSection);
+	}
 }
 
 function changerSelection(parametre, valeur, finale) {
