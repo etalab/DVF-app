@@ -345,7 +345,7 @@ function selectionnerDepartement(interactif = true) {
 	
 	entrerDansDepartement(sonCode);
 
-	if(interactif) {
+	if (interactif) {
 		changerLienPartageable();
 	}
 };
@@ -357,7 +357,7 @@ function selectionnerCommune(interactif = true) {
 	
 	entrerDansCommune(sonCode);
 
-	if(interactif) {
+	if (interactif) {
 		changerLienPartageable();
 	}
 }
@@ -369,7 +369,7 @@ function selectionnerSection(interactif = true) {
 	
 	entrerDansSection(newIdSection);
 
-	if(interactif) {
+	if (interactif) {
 		changerLienPartageable();
 	}
 }
@@ -381,7 +381,7 @@ function selectionnerParcelle(interactif = true) {
 	
 	entrerDansParcelle(sonCode);
 
-	if(interactif) {
+	if (interactif) {
 		changerLienPartageable();
 	}
 }
@@ -563,18 +563,6 @@ function onDepartementClick(event) {
 	changerLienPartageable();
 };
 
-function onMapIdle(event) {
-	// Indiquer que la carte est rendu complètement
-	if (!mapRendered) {
-		mapRendered = true;
-	}
-
-	// Exécuter l'étape suivante de la file d'attente
-	if (selection = fileSelections.shift()) {
-		changerSelection(...selection, true);
-	}
-};
-
 function onHashChange(event) {
 	// Si l'URL n'a changer pas, faire rien
 	if (location.hash == lienPartageable) {
@@ -605,13 +593,13 @@ function onHashChange(event) {
 	if (!piece) {
 		return;
 	}
-
+	
 	// Definer le format de la code, et l'analyser
 	var format = /^(\d{2})(?:(\d{3})(?:([0A-Z]{4}[A-Z])(\d{4})?)?)?$/;
 	var correspondances = format.exec(piece);
 
 	// Si les codes ne se conformant le format correct, quitter
-	if(!correspondances) {
+	if (!correspondances) {
 		return;
 	}
 
@@ -629,10 +617,10 @@ function onHashChange(event) {
 	
 	// Verifier s'il y a un troisième correspondance
 	if (typeof correspondances[2] === 'string') {
-		// Si oui, utiliser les trois premier correspondances comme le ID de section
+		// Si oui, utiliser les trois premier correspondances comme l'ID de section
 		changerSelection('section', correspondances.slice(0, 3).join(''), !pieces.length && !correspondances[3]);
 	} else if (piece = pieces.shift()) {
-		// Si non, utiliser la prochaine piece d'URL comme le ID de section
+		// Si non, utiliser la prochaine piece d'URL comme l'ID de section
 		code += piece.padStart(5, '0');
 		changerSelection('section', code, !pieces.length);
 	}
@@ -646,7 +634,16 @@ function onHashChange(event) {
 		code += piece.padStart(4, '0');
 		changerSelection('parcelle', code, !pieces.length);
 	}
-};
+}
+
+function onMapIdle(event)
+{
+	if (!mapRendered) {
+		mapRendered = true;
+	}
+
+	traiterFileSelections();
+}
 
 function changerPeriode(depuis, jusqua) {
 	// Verifier que le début et fin sont les strings, ou quitter
@@ -680,34 +677,24 @@ function changerPeriode(depuis, jusqua) {
 	picker.setEndDate(new Date(jusqua));
 }
 
-function changerSelection(parametre, valeur, animer) {
-	// Verifier si la carte a fini de charger
-	if (mapRendered) {
-		// Obtenir le boite selection
-		var selecteur = document.getElementById(parametre + 's');
+function changerSelection(parametre, valeur, finale) {
+	// Placer le selection dans la file
+	fileSelections.push([parametre, valeur]);
 
-		// Verifier s'il y a les options
-		if(selecteur.children) {
-			// Si oui, changer le valuer
-			selecteur.value = valeur;
+	// Verifier si c'est la finale selection
+	if (finale) {
+		// Si oui, obtenir la fonction pour réinitialiser le parametre
+		var nom = parametre[0].toUpperCase() + parametre.slice(1);
+		var fonction = window['reset' + nom];
 
-			// Selectioner et déplacer le camera si c'est la dernière parametre, ou si c'était en file d'attente
-			if (animer) {
-				var nom = parametre[0].toUpperCase() + parametre.slice(1);
-				var fonction = window['selectionner' + nom];
+		// Executer la fonction
+		fonction.call(this);
 
-				fonction.call(this, false);
-			}
-		} else {
-			// Si non, remettre le selection dans la file
-			fileSelections.unshift([parametre, valeur]);
-
-			// Attends un seconde avant de réessayer
-			setTimeout(onMapIdle, 1000);
+		// Verifier si la carte est déjà rendu
+		if (mapRendered) {
+			// Si oui, commencer le traitement manuellement
+			traiterFileSelections();
 		}
-	} else {
-		// Si la carte se charger toujours, placer le selection dans la file
-		fileSelections.push([parametre, valeur]);
 	}
 }
 
@@ -734,8 +721,9 @@ function changerLienPartageable() {
 		lienPartageable += '/' + idSection.slice(-5).replace(/^0+/, '');
 	}
 
-	// Verifier s'il y a un code de parceller, correspondant le ID de section
-	if (codeParcelle && codeParcelle.startsWith(idSection)) {
+	// Verifier s'il y a un code de parcelle, correspondant l'ID de section
+	if (codeParcelle  && codeParcelle.startsWith(idSection)) {
+		// Si oui, ajoutez-le à l'URL
 		lienPartageable += '/' + codeParcelle.slice(-4);
 	}
 	
@@ -746,6 +734,50 @@ function changerLienPartageable() {
 
 	// Mets la nouvelle URL dans la barre d'addresse
 	location.hash = lienPartageable;
+}
+
+function traiterFileSelections() {
+	// Initialiser les variables
+	var selection, parametre, valeur, selecteur;
+
+	do {
+		// S'il n'y a pas une prochaine selection, quitter
+		if (!fileSelections.length) {
+			return;
+		}
+
+		// Recuperer le parametre et le valuer de la file d'attente
+		selection = fileSelections.shift();
+		parametre = selection[0];
+		valeur = selection[1];
+
+		// Obtenir le boite selection
+		selecteur = $('#' + parametre + 's');
+
+	// Continuer si la valeur ne doit changer pas
+	} while(valeur === selecteur.val());
+
+	// Chercher l'option de la valeur
+	var option = selecteur.children(`option[value="${valeur}"]`);
+
+	// Verifier s'il y a l'option
+	if (option.length === 1) {
+		// Si oui, changer le valeur
+		selecteur.prop('selectedIndex', option.index());
+
+		// Obtenir le fonction pour traiter le selection
+		var nom = parametre[0].toUpperCase() + parametre.slice(1);
+		var fonction = window['selectionner' + nom];
+
+		// Forcer le traitement de la nouvelle valuer
+		fonction.call(this, false);
+	} else {
+		// Réajouter le selection à le file d'attente
+		fileSelections.unshift(selection);
+
+		// Attends un seconde avant de réessayer
+		setTimeout(traiterFileSelections, 1000);
+	}
 }
 
 function toggleLeftBar() {
