@@ -430,12 +430,18 @@ function entrerDansMutation(sonIndex) {
 
 	codesParcelles = [codeParcelle];
 	if (sonIndex != null) {
-		for (parcelleLiee of vue.parcelle.mutations[sonIndex].parcellesLiees) {
-			codesParcelles.push(parcelleLiee);
+		for (mutationLiee of vue.parcelle.mutations[sonIndex].mutationsLiees) {
+			codesParcelles.push(mutationLiee.infos[0].id_parcelle);
 		}
 	}
 
 	mutationsFilter()
+
+	return Promise.resolve()
+}
+
+function voirDetailMutation(sonIndex) {
+	console.log(vue.parcelle.mutations[sonIndex].mutationsLiees);
 
 	return Promise.resolve()
 }
