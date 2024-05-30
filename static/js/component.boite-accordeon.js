@@ -22,6 +22,7 @@ Vue.component('boite-accordeon', {
 						<boite
 							v-for="batiment in mutation.batiments"
 							:valeur="(batiment['code_type_local'] != 3) ? (formatterNombre(batiment['surface_reelle_bati']) + ' m²') : ''"
+							:prix_m2="prixMetreCarre"
 							:icone="['', 'fa fa-home', 'fas fa-building', 'fas fa-warehouse', 'fas fa-store'][batiment['code_type_local']]"
 							:texte="batiment['type_local'] + ((batiment['code_type_local'] < 3) ? (' / ' + formatterNombre(batiment['nombre_pieces_principales']) + ' p') : '')">
 						</boite>
@@ -40,6 +41,14 @@ Vue.component('boite-accordeon', {
 	methods: {
 		selectionnerMutation() {
 			entrerDansMutation(this.index);
+		}
+	},
+	computed: {
+		prixMetreCarre() {
+			if (this.mutation.batiments.length !== 1) return '';
+			var prixM2 = this.mutation.batiments[0]['valeur_fonciere'] / this.mutation.batiments[0]['surface_reelle_bati'];
+			if (isNaN(prixM2)) return '';
+			return formatterNombre(prixM2.toString());
 		}
 	}
 });
