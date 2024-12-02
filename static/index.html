@@ -23,11 +23,27 @@
 		html, body {
 			height: 100vh;
 			overflow-y: hidden;
+		}		
+		#announcement {
+			padding: 15px;
+			text-align: center;
+			background: #E8EDFF;
+			color: #0063CB
+		}
+		#announcement a {
+			color:#0063CB;
+			font-weight: bold;
 		}
 	</style>
 </head>
 
 <body>
+	<div id="announcement">
+		<i class="fa fa-info-circle" aria-hidden="true"></i>
+		Cette application fait peau neuve !
+		<a href="https://explore.data.gouv.fr/immobilier" target="_blank">Tester la nouvelle application DVF <i class="fa fa-external-link" aria-hidden="true" style="font-size: smaller;"></i></a>
+		<i class="fa fa-times" aria-hidden="true" onclick="document.getElementById('announcement').style.display='none'" style="float: right;"></i>
+	</div>
 	<div class="topnav">
 		<div class="topnav-left">
 			<div class="title">
@@ -140,7 +156,7 @@
 	<script src="js/data.js"></script>
 	<script src="js/component.boite.js"></script>
 	<script src="js/component.boite-accordeon.js"></script>
-	<script src="js/index.js?v=1"></script>
+	<script src="js/index.js?v=3"></script>
 
 </body>
 

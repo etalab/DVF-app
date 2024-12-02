@@ -8,8 +8,27 @@
 		<link rel="stylesheet" href="/lib/bootstrap-v4.3.1.css">
 		<link rel="stylesheet" href="/css/app.css?version=11"/>
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.png">
+		<style type="text/css">
+			#announcement {
+				padding: 15px;
+				text-align: center;
+				background: #E8EDFF;
+				color: #0063CB
+			}
+			#announcement a {
+				color:#0063CB;
+				font-weight: bold;
+			}
+		</style>
 	</head>
 	<body>
+		<div id="announcement">
+			<i class="fa fa-info-circle" aria-hidden="true"></i>
+			Cette application fait peau neuve !
+			<a href="https://explore.data.gouv.fr/immobilier" target="_blank">Tester la nouvelle application DVF <i class="fa fa-external-link" aria-hidden="true" style="font-size: smaller;"></i></a>
+
+			<i class="fa fa-times" aria-hidden="true" onclick="document.getElementById('announcement').style.display='none'" style="float: right;"></i>
+		</div>
 		<div class="topnav">
 			<div class="topnav-left">
 				<div class="title">
@@ -44,11 +63,11 @@
 				<li>que la réutilisation des données de la Base ne peuvent avoir ni pour objet ni pour effet de permettre la réidentification des personnes concernées. <b>Nous attirons très fortement l’attention des réutilisateurs sur ce point</b>, </li>
 				<li>que ces informations ne peuvent faire l'objet d'une indexation sur les moteurs de recherche en ligne. A cet effet, Etalab a mis en place un dispositif technique propre à empêcher cette indexation.</li>
 				</ul></p>
-			<p>Pour plus d’informations sur les points précités, vous pouvez consulter les <a href = "https://static.data.gouv.fr/resources/demande-de-valeurs-foncieres/20190419-091643/conditions-generales-dutilisation.pdf">Conditions générales d’utilisation de la Base </a>.</p>
+			<p>Pour plus d’informations sur les points précités, vous pouvez consulter les <a href = "https://static.data.gouv.fr/resources/demandes-de-valeurs-foncieres/20201026-172435/conditions-generales-dutilisation-20201016.pdf">Conditions générales d’utilisation de la Base </a>.</p>
 			<p><b>Dans la mesure où la diffusion de la Base répond à une obligation légale, il n’est pas possible, aux personnes concernées, de s’opposer à cette diffusion par Etalab ou au traitement par la DGFiP de données les concernant. Il n’est notamment pas possible de les effacer.</b></p>
-			<p>Les personnes conservent néanmoins un droit d’accès, de rectification et de limitation des données les concernant. Pour exercer ces droits, vous pouvez contacter le service des impôts des particuliers dont vous relevez, le bureau CL2A de la DGFiP (<a href="mailto:bureau.cl2a-fdl@dgfip.finances.gouv.fr">bureau.cl2a-fdl@dgfip.finances.gouv.fr</a>) ou le délégué à la protection des données (<a href="mailto:le-delegue-a-la-protection-des-donneespersonnelles@finances.gouv.fr">le-delegue-a-la-protection-des-donneespersonnelles@finances.gouv.fr</a>). </p>
+			<p>Les personnes conservent néanmoins un droit d’accès, de rectification et de limitation des données les concernant.</p>
 			<p>Pour rappel, la réglementation impose au demandeur de justifier "de son identité par tout moyen" (<a href="https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000038528420&categorieLien=id">article 77 du Décret n° 2019-536 du 29 mai 2019</a> pris pour l'application de la loi n° 78-17 du 6 janvier 1978 relative à l'informatique, aux fichiers et aux libertés). Afin de vérifier que la demande émane bien de la personne concernée, il nous est nécessaire d'obtenir la copie de votre carte nationale d'identité, de votre passeport ou de votre permis de conduire.</p>
-			<p>Pour plus d’informations sur les points précités, vous pouvez consulter <a href = "https://static.data.gouv.fr/resources/demandes-de-valeurs-foncieres/20190510-110938/information-des-personnes-concernees-par-le-traitement-informatique.pdf">l’Information des personnes concernées par le traitement informatique mis en œuvre</a>.</p>
+			<p>Pour plus d’informations sur les points précités, vous pouvez consulter <a href = "https://static.data.gouv.fr/resources/demandes-de-valeurs-foncieres/20201026-172636/information-des-personnes-concernees-par-le-traitement-informatique-20201016.pdf">l’Information des personnes concernées par le traitement informatique mis en œuvre</a>.</p>
 
 
 
@@ -77,7 +96,7 @@
 			<h3 id ="question_prix">A quoi correspond le prix affiché ?</h3>
 			<p>Il s'agit dun prix "net vendeur", c'est-à-dire ne comprenant ni frais d'agence immobilière, ni frais de notaire. En cas de vente de mobilier (une cuisine équipée par exemple) avec le bien immobilier, le montant de ce mobilier n'est pas compris dans le prix affiché. La TVA est incluse.</p>
 			<h3 id ="question_surface">Quelle est la surface affichée ?</h3>
-			<p>La surface affichée correspond à la surface réelle bâtie et non à la surface carrez (présente cependant dans le fichier, mais remplie sporadiquement et sans valeur légale). Vous constatez un écart entre la surface affichée et la surface réelle de votre bien ? Contactez le bureau CL2A de la DGFiP (<a href="mailto:bureau.cl2a-fdl@dgfip.finances.gouv.fr">bureau.cl2a-fdl@dgfip.finances.gouv.fr</a>).</p>
+			<p>La surface affichée correspond à la surface réelle bâtie et non à la surface carrez (présente cependant dans le fichier, mais remplie sporadiquement et sans valeur légale).</p>
 			<h3 id ="question_maj">Quand aura lieu la prochaine mise à jour ?</h3>
 			<p>Les <a href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres/">données brutes</a> font l’objet d’une mise à jour semestrielle par la DGFiP, fin avril et fin octobre. La mise à jour d'avril permet d'ajouter des données allant jusqu'à fin décembre de l'année passée et celle d'octobre des données allant jusqu'à fin juin de l'année en cours. Lors de chaque mise à jour, de nouvelles transactions sont susceptibles d’être ajoutées dans tous les millésimes en fonction de la date de mutation. Il nous faut ensuite quelques heures pour mettre l'application à jour, si tout va bien.</p>
 			<h3 id ="question_commune_manquante">Je ne vois pas ma commune</h3>
@@ -103,9 +122,7 @@
 			<h3 id ="question_demande_valeur">Puis-je vous écrire pour connaître la valeur d'une transaction qui n'apparaît pas sur le site ?</h3>
 			<p>Nous ne disposons pas de données supplémentaires, aussi si une transaction est absente du site (hormis les cas liés à la jointure avec le plan cadastral mentionnés plus haut), nous ne serons pas en mesure de vous apporter une quelconque information la concernant. Le mieux est de vous adresser au service de publicité foncière dont dépend la commune du bien, et dont vous trouverez les coordonnées en ligne.</p>
 			<h3 id ="question_erreur">J'ai repéré une erreur, comment vous en faire part ?</h3>
-			<p>Nous utilisons les données produites par la DGFIP, et ne sommes pas en mesure de corriger les valeurs d'une transaction. Pour toute demande d’information ou toute erreur détectée, veuillez contacter le bureau CL2A de la DGFIP à l’adresse suivante : <a href="mailto:bureau.cl2a-fdl@dgfip.finances.gouv.fr">bureau.cl2a-fdl@dgfip.finances.gouv.fr</a>, en renseignant l'objet de votre mail comme suit : DVF-votre nom.</p>
-
-
+			<p>Nous utilisons les données produites par la DGFIP, et ne sommes pas en mesure de corriger les valeurs d'une transaction. Pour toute demande d’information ou toute erreur détectée, veuillez contacter le producteur des données sur <a href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres-geolocalisees/">la page dédiée</a>.</p>
 
 			<h2>Nous contacter</h2>
 			<p>Assurez-vous d'avoir lu les questions-réponses ci-dessus avant de nous écrire. Merci !</p>
@@ -115,10 +132,9 @@
 			<h3>Editeur</h3>
 			<p>Direction interministérielle du numérique (DINUM)<br/>
 			20, avenue de Ségur<br/>
-			75007 Paris<br/>
-			dinsic-sec-directeur [at] modernisation.gouv.fr</p>
-			<h3>Directeur de la publication</h3>
-			<p>M. Nadi Bou Hanna, Directeur interministériel du numérique</p>
+			75007 Paris</p>
+			<h3>Directrice de la publication</h3>
+			<p>Mme Stéphanie Schaer, Directrice interministérielle du numérique</p>
 			<h3>Hébergeur</h3>
 			<p>Société OVH<br/>
 				SAS au capital de 10 059 500 €<br/>

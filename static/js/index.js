@@ -1,4 +1,4 @@
-// Partie Vue -----------------------------------------------------------------
+	// Partie Vue -----------------------------------------------------------------
 
 // Les composants sont définis dans des fichiers séparés
 
@@ -24,8 +24,8 @@ vue.$watch('fold_left', function () {
 
 // Définition des variables globales
 
-var MIN_DATE = '2015-01-01'
-var MAX_DATE = '2019-12-31'
+var MIN_DATE = '2019-07-01'
+var MAX_DATE = '2024-06-30'
 
 var map = null;
 var mapLoaded = false;
@@ -47,7 +47,7 @@ var styles = {
 			"raster-tiles": {
 				"type": "raster",
 				"tiles": [
-					"https://tiles.geo.api.gouv.fr/photographies-aeriennes/tiles/{z}/{x}/{y}"
+					"https://data.geopf.fr/wmts?layer=ORTHOIMAGERY.ORTHOPHOTOS&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix={z}&TileCol={x}&TileRow={y}"
 				],
 				"tileSize": 256,
 				"attribution": "Images aériennes © IGN"
@@ -775,5 +775,3 @@ function communeFilter() {
 function departementsFilter() {
 	map.setFilter('departements-layer', ['!=', ['get', 'code'], codeDepartement])
 }
-
-

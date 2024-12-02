@@ -5,7 +5,7 @@ CREATE TABLE public.dvf
 	date_mutation DATE,
 	numero_disposition INTEGER,
 	nature_mutation CHARACTER VARYING,
-	valeur_fonciere DECIMAL(12,2),
+	valeur_fonciere DECIMAL(16,2),
 	adresse_numero INTEGER,
 	adresse_suffixe CHARACTER VARYING,
 	adresse_nom_voie CHARACTER VARYING,
