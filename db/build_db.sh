@@ -3,9 +3,9 @@
 DIR=$(echo $(dirname $0))
 cd $DIR
 
-month="06"
+month="12"
 year_end="2024"
-min_year=2019
+min_year=2020
 max_year=2024
 
 sudo -u postgres psql -c "DROP DATABASE IF EXISTS dvf_${year_end}${month};"
