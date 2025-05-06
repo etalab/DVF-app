@@ -29,6 +29,7 @@ var MAX_DATE = '2024-12-31'
 
 var map = null;
 var mapLoaded = false;
+var mapRendered = false;
 var mapStyleChanged = false;
 var hoveredStateId = null;
 var selectedStateId = null;
@@ -38,6 +39,8 @@ var idSection = null;
 var data_parcelle = null;
 var codeParcelle = null;
 var codesParcelles = null;
+var lienPartageable = null;
+var fileSelections = [];
 
 var styles = {
 	ortho: {
@@ -217,9 +220,7 @@ $('.input-daterange input').each(function () {
 	$(this).datepicker('clearDates');
 });
 
-
 function exportCSV(el, data, fileName) {
-
 	var json = data;
 	var fields = Object.keys(json[0])
 	var replacer = function (key, value) { return value === null ? '' : value }
@@ -337,32 +338,52 @@ function resetDepartement() {
 	}
 }
 
-function selectionnerDepartement() {
+function selectionnerDepartement(interactif = true) {
 	// L'utilisateur a cliqué sur la liste déroulante des départements
 	var e = document.getElementById("departements");
 	var sonCode = e.options[e.selectedIndex].value;
+	
 	entrerDansDepartement(sonCode);
+
+	if (interactif) {
+		changerLienPartageable();
+	}
 };
 
-function selectionnerCommune() {
+function selectionnerCommune(interactif = true) {
 	// L'utilisateur a cliqué sur la liste déroulante des communes
 	var e = document.getElementById("communes");
 	var sonCode = e.options[e.selectedIndex].value;
+	
 	entrerDansCommune(sonCode);
+
+	if (interactif) {
+		changerLienPartageable();
+	}
 }
 
-function selectionnerSection() {
+function selectionnerSection(interactif = true) {
 	// L'utilisateur a cliqué sur la liste déroulante des sections
 	var e = document.getElementById("sections");
 	var newIdSection = e.options[e.selectedIndex].value;
+	
 	entrerDansSection(newIdSection);
+
+	if (interactif) {
+		changerLienPartageable();
+	}
 }
 
-function selectionnerParcelle() {
+function selectionnerParcelle(interactif = true) {
 	// L'utilisateur a cliqué sur la liste déroulante des sections
 	var e = document.getElementById("parcelles");
 	var sonCode = e.options[e.selectedIndex].value;
+	
 	entrerDansParcelle(sonCode);
+
+	if (interactif) {
+		changerLienPartageable();
+	}
 }
 
 function filledCommunesOptions(feature) {
@@ -391,6 +412,7 @@ function onParcelleClicked(event) {
 	selectedStateId = event.features[0].id
 	document.getElementById("parcelles").value = sonCode;
 	entrerDansParcelle(sonCode);
+	changerLienPartageable();
 }
 
 function entrerDansParcelle(newCodeParcelle) {
@@ -423,12 +445,13 @@ function onSectionClicked(event) {
 	var newIdSection = event.features[0].properties.id
 	document.getElementById("sections").value = newIdSection;
 	entrerDansSection(newIdSection);
+	changerLienPartageable();
 }
 
 function entrerDansMutation(sonIndex) {
 	vue.mutationIndex = sonIndex;
-
 	codesParcelles = [codeParcelle];
+
 	if (sonIndex != null) {
 		for (parcelleLiee of vue.parcelle.mutations[sonIndex].parcellesLiees) {
 			codesParcelles.push(parcelleLiee);
@@ -466,6 +489,7 @@ function entrerDansSection(newIdSection) {
 			map.getSource('parcelles').setData(parcelles)
 			parcelles.features.forEach(filledParcelleOptions)
 			parcellesFilter()
+
 			fit(parcelles)
 			vue.section = true
 		}
@@ -526,16 +550,248 @@ function afficherCommunesDepartement(data) {
 function onCityClicked(event) {
 	// L'utilisateur a cliqué sur la géométrie d'une commune
 	var sonCode = event.features[0].properties.code;
-	entrerDansCommune(sonCode);
 	document.getElementById("communes").value = sonCode;
+	entrerDansCommune(sonCode);
+	changerLienPartageable();
 }
 
 function onDepartementClick(event) {
 	// L'utilisateur a cliqué sur la géométrie d'un département
 	var sonCode = event.features[0].properties.code
-	entrerDansDepartement(sonCode);
 	document.getElementById("departements").value = sonCode;
+	entrerDansDepartement(sonCode);
+	changerLienPartageable();
 };
+
+function onHashChange(event) {
+	// Si l'URL n'a changer pas, faire rien
+	if (location.hash == lienPartageable) {
+		return;
+	}
+
+	// Diviser l'URL en des barres obliques, et ignorer les pieces vide
+	var pieces = location.hash.split('/').filter(piece => piece);
+
+	// Si l'URL ne commencer pas d'un hashbang, ne faire rien
+	if (pieces.shift() != '#!') {
+		return;
+	}
+
+	// Obtenir la première piece
+	var piece = pieces.shift();
+	
+	// Verifier si la première partie de l'URL contient un tiret
+	if (piece.includes('-')) {
+		// Si oui, traitez-le comme un période
+		changerPeriode(...piece.split('-'));
+
+		// Obtenir la prochaine piece
+		piece = pieces.shift();
+	}
+
+	// S'il n'y a plus de pièces, quitter  
+	if (!piece) {
+		return;
+	}
+	
+	// Definer le format de la code, et l'analyser
+	var format = /^(\d{2})(?:(\d{3})(?:([0A-Z]{4}[A-Z])(\d{4})?)?)?$/;
+	var correspondances = format.exec(piece);
+
+	// Si les codes ne se conformant le format correct, quitter
+	if (!correspondances) {
+		return;
+	}
+
+	// Sauvegarder le code correspondant complèt
+	var code = correspondances.shift();
+
+	// Utiliser la première correspondance comme le code de département
+	changerSelection('departement', correspondances.slice(0, 1).join(''), !pieces.length && !correspondances[1]);
+
+	// Verifier s'il y a un deuxième correspondance
+	if (typeof correspondances[1] === 'string') {
+		// Utiliser les deux premier correspondances comme le code de commune
+		changerSelection('commune', correspondances.slice(0, 2).join(''), !pieces.length && !correspondances[2]);
+	}
+	
+	// Verifier s'il y a un troisième correspondance
+	if (typeof correspondances[2] === 'string') {
+		// Si oui, utiliser les trois premier correspondances comme l'ID de section
+		changerSelection('section', correspondances.slice(0, 3).join(''), !pieces.length && !correspondances[3]);
+	} else if (piece = pieces.shift()) {
+		// Si non, utiliser la prochaine piece d'URL comme l'ID de section
+		code += piece.padStart(5, '0');
+		changerSelection('section', code, !pieces.length);
+	}
+
+	// Verifier s'il y a un quatrième correspondance
+	if (typeof correspondances[3] === 'string') {
+		// Si oui, utiliser les quatres premier correspondances comme le code de parcelle
+		changerSelection('parcelle', correspondances.slice(0, 4).join(''), !pieces.length);
+	} else if (piece = pieces.shift()) {
+		// Si non, utiliser la prochaine piece d'URL comme le code de parcelle
+		code += piece.padStart(4, '0');
+		changerSelection('parcelle', code, !pieces.length);
+	}
+}
+
+function onMapIdle(event)
+{
+	// Indiquer que la carte est rendu complètement
+	if (!mapRendered) {
+		mapRendered = true;
+	}
+
+	// Effectuer la sélection suivante dans la file d'attente
+	traiterFileSelections();
+}
+
+function changerPeriode(depuis, jusqua) {
+	// Verifier que le début et fin sont les strings, ou quitter
+	if (typeof depuis !== 'string' || typeof jusqua !== 'string') {
+		return;
+	}
+
+	// Verifier s'il y a les tirets dans les dates
+	if (!depuis.includes('-') || !jusqua.includes('-')) {
+		// Si non, reformatter les en utilisant un expression régulière
+		var recherche = /(\d{2})(\d{2})(\d{2})$/;
+		var remplacement = '20$1-$2-$3';
+
+		depuis = depuis.replace(recherche, remplacement);
+		jusqua = jusqua.replace(recherche, remplacement);
+	}
+
+	// Verifier si les dates a changer, ou quitter
+	if(depuis === startDate && jusqua === endDate) {
+		return;
+	}
+
+	// Définir le format desirable
+	var desirable = /^\d{4}-\d{2}-\d{2}$/;
+
+	// Verifier si le les dates sont formée correctement, ou quitter
+	if (!desirable.test(depuis) || !desirable.test(jusqua)) {
+		return;
+	}
+
+	// Obtenir l'objet de sélectionneur des dates
+	var picker = $('input[name="daterange"]').data('daterangepicker');
+
+	// Entrez les dates de début et fin
+	picker.setStartDate(new Date(depuis));
+	picker.setEndDate(new Date(jusqua));
+	
+	// Changer les variables d'application
+	startDate = depuis;
+	endDate = jusqua;
+
+	// Recharger la section si nécessaire
+	if(idSection) {
+		entrerDansSection(idSection);
+	}
+}
+
+function changerSelection(parametre, valeur, finale) {
+	// Placer le selection dans la file
+	fileSelections.push([parametre, valeur]);
+
+	// Verifier si c'est la finale selection, et la carte est déjà rendu
+	if (finale && mapRendered) {
+		// Si oui, obtenir la fonction pour réinitialiser le parametre
+		var nom = parametre[0].toUpperCase() + parametre.slice(1);
+		var fonction = window['reset' + nom];
+
+		// Executer la fonction
+		fonction.call(this);
+
+		// Commencer le traitement manuellement
+		traiterFileSelections();
+	}
+}
+
+function changerLienPartageable() {
+	// Formatter les dates comme "YYMMDD" en suppriment les tirets
+	var depuis = startDate.replaceAll('-', '').slice(-6);
+	var jusqua = endDate.replaceAll('-', '').slice(-6);
+
+	// Reconstruire l'URL avec les dates
+	lienPartageable = `#!/${depuis}-${jusqua}/`;
+
+	// Verifier s'il y a un code de commune
+	if (codeCommune) {
+		// Si oui, ajoutez-le à l'URL
+		lienPartageable += codeCommune;
+	} else if (codeDepartement) {
+		// Si non, ajouter le code de département
+		lienPartageable += codeDepartement;
+	}
+
+	// Verifier s'il y a un ID de section, correspondant le code de commune
+	if (idSection && idSection.startsWith(codeCommune)) {
+		// Si oui, ajoutez-le à l'URL
+		lienPartageable += '/' + idSection.slice(-5).replace(/^0+/, '');
+	}
+
+	// Verifier s'il y a un code de parcelle, correspondant l'ID de section
+	if (codeParcelle  && codeParcelle.startsWith(idSection)) {
+		// Si oui, ajoutez-le à l'URL
+		lienPartageable += '/' + codeParcelle.slice(-4);
+	}
+	
+	// Verifier si l'URL à changer, ou quitter si non
+	if (lienPartageable === location.hash) {
+		return;
+	}
+
+	// Mets la nouvelle URL dans la barre d'addresse
+	location.hash = lienPartageable;
+}
+
+function traiterFileSelections() {
+	// Initialiser les variables
+	var selection, parametre, valeur, selecteur;
+
+	do {
+		// S'il n'y a plus une selection, quitter
+		if (!fileSelections.length) {
+			return;
+		}
+
+		// Recuperer le parametre et la valuer de la file d'attente
+		selection = fileSelections.shift();
+		parametre = selection[0];
+		valeur = selection[1];
+
+		// Obtenir le boite selection
+		selecteur = $('#' + parametre + 's');
+
+	// Continuer avec la selection suivante si la valeur n'a changer pas
+	} while(valeur === selecteur.val());
+
+	// Chercher l'option de la valeur
+	var option = selecteur.children(`option[value="${valeur}"]`);
+
+	// Verifier s'il y a l'option
+	if (option.length === 1) {
+		// Si oui, changer le valeur
+		selecteur.prop('selectedIndex', option.index());
+
+		// Obtenir le fonction pour traiter le selection
+		var nom = parametre[0].toUpperCase() + parametre.slice(1);
+		var fonction = window['selectionner' + nom];
+
+		// Forcer le traitement de la nouvelle valuer
+		fonction.call(this, false);
+	} else {
+		// Si non, réajouter le selection à le file d'attente
+		fileSelections.unshift(selection);
+
+		// Attendez que les options se chargent avant de réessayer
+		setTimeout(traiterFileSelections, 1000);
+	}
+}
 
 function toggleLeftBar() {
 	vue.fold_left = !vue.fold_left;
@@ -564,18 +820,19 @@ function toggleLeftBar() {
 					departements = data
 				}
 			).then(function() {
-					map.addSource("departements", {
-						type: 'geojson',
-						generateId: true,
+				map.addSource("departements", {
+					type: 'geojson',
+					generateId: true,
 					data: departements
-					})
-					map.addLayer(departementsLayer)
-					map.addLayer(departementsContoursLayer)
+				})
+				map.addLayer(departementsLayer)
+				map.addLayer(departementsContoursLayer)
 				map.setPaintProperty(departementsContoursLayer.id, 'line-color', vue.mapStyle === 'ortho' ? '#fff' : '#000')
 			})
-				}
-		})
+		}
+	})
 	map.on('styledata', loadCustomLayers)
+	map.on('idle', onMapIdle)
 
 	hoverableSources.map(function (source) {
 		var layer = `${source}-layer`
@@ -596,6 +853,9 @@ function toggleLeftBar() {
 		map.setFeatureState({ source: 'parcelles', id: selectedStateId }, { selected: true })
 		onParcelleClicked(event)
 	})
+
+	// Commencer d'écouter à les changes du lien partageable
+	$(window).on('hashchange', onHashChange)
 
 	// Paramètres français du range picker
 	$('input[name="daterange"]').daterangepicker({
@@ -641,9 +901,12 @@ function toggleLeftBar() {
 		// Fonction executée quand la personne change les dates
 		startDate = start.format('YYYY-MM-DD');
 		endDate = end.format('YYYY-MM-DD');
+
 		if (idSection !== null) {
 			entrerDansSection(idSection);
 		}
+
+		changerLienPartageable();
 	});
 
 	// Chargement de la liste des départements
@@ -659,11 +922,15 @@ function toggleLeftBar() {
 		}
 	);
 
+	// Analyser le lien de partage s'il en a un
+	if (location.hash) {
+		onHashChange();
+	}
+
 	// Sur mobile, cacher la barre latérale
 	if (window.innerWidth < 768) {
 		vue.fold_left = true;
 	}
-
 })();
 
 function loadCustomLayers() {
