@@ -1,0 +1,30 @@
+version: '3'
+services:
+  postgres:
+    build: ./postgres
+    image: dvfapp-postgres:latest
+    container_name: postgres
+    environment:
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+        - ./data:/var/lib/postgresql/data
+        - ../:/home/dvfapp
+  server:
+    build: ./server
+    image: dvfapp-server:latest
+    container_name: server
+    volumes:
+        - ../:/home/dvfapp
+    links:
+        - postgres
+  webapp:
+    build: ./webapp
+    image: dfvapp-webapp:latest
+    container_name: webapp
+    volumes:
+        - ../:/home/dvfapp
+    links:
+        - server
+    ports:
+        - 3000:3000
+    
