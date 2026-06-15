@@ -4,3 +4,5 @@ node_modules
 .env
 
 db/data
+
+docker-compose/.env
