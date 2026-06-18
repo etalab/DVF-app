@@ -124,44 +124,46 @@ function computeParcelle(mutationsSection, idParcelle) {
 	var mutations = _.chain(mutationsParcelle)
 		.groupBy('id_mutation')
 		.map(function (rows, idMutation) {
-			var infos = [_.pick(rows[0], 'date_mutation', 'id_parcelle', 'nature_mutation', 'valeur_fonciere', 'adresse_numero', 'adresse_suffixe', 'adresse_nom_voie')]
-
-			var parcellesLiees = _.uniq(
-				mutationsSection
-					.filter(function (m) {
-						return m.id_mutation === idMutation && m.id_parcelle !== idParcelle
-					})
-					.map(function (m) {
-						return m.id_parcelle
-					})
-			)
-
-			var batiments = _.chain(rows)
+			var mutation = buildMutation(rows)
+			mutation.mutationsLiees = _.chain(mutationsSection)
 				.filter(function (m) {
-					return m.type_local !== 'None'
+					return m.id_mutation === idMutation && m.id_parcelle !== idParcelle
 				})
-				.uniqBy(function (m) {
-					return `${m.code_type_local}@${m.surface_reelle_bati}`
+				.map(function(m) {
+					return buildMutation([m])
 				})
 				.value()
-
-			var terrains = _.chain(rows)
-				.filter(function (m) {
-					return m.nature_culture !== 'None'
-				})
-				.uniqBy(function (m) {
-					return `${m.code_nature_culture}@${m.code_nature_culture_special}@${m.surface_terrain}`
-				})
-				.value()
-
-			return {
-				infos: infos,
-				parcellesLiees: parcellesLiees,
-				batiments: batiments,
-				terrains: terrains
-			}
+			return mutation
 		})
 		.value()
 
 	return {mutations: sortByDateDesc(mutations)}
+}
+
+function buildMutation(rows) {
+	var infos = [_.pick(rows[0], 'id_mutation', 'date_mutation', 'id_parcelle', 'nature_mutation', 'valeur_fonciere', 'adresse_numero', 'adresse_suffixe', 'adresse_nom_voie')]
+
+	var batiments = _.chain(rows)
+		.filter(function (m) {
+			return m.type_local !== 'None'
+		})
+		.uniqBy(function (m) {
+			return `${m.code_type_local}@${m.surface_reelle_bati}`
+		})
+		.value()
+
+	var terrains = _.chain(rows)
+		.filter(function (m) {
+			return m.nature_culture !== 'None'
+		})
+		.uniqBy(function (m) {
+			return `${m.code_nature_culture}@${m.code_nature_culture_special}@${m.surface_terrain}`
+		})
+		.value()
+
+	return {
+		infos: infos,
+		batiments: batiments,
+		terrains: terrains
+	}
 }
