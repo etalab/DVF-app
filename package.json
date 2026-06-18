@@ -20,6 +20,6 @@
   "devDependencies": {
     "@etalab/decoupage-administratif": "^0.6.2",
     "fs-extra": "^8.1.0",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.21"
   }
 }
